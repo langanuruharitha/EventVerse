@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
@@ -32,23 +32,16 @@ export async function POST(request: NextRequest) {
       })
       .select().single();
     if (leadError) {
-      if (leadError.code === "42P01" || leadError.code === "PGRST116") {
-        return NextResponse.json({ success: true, message: `Enquiry received! The vendor will contact you within 24-48 hours.` });
-      }
-      return NextResponse.json({ error: "Failed to save enquiry", details: leadError.message }, { status: 500 });
+      console.error("Lead creation error details:", leadError);
+      return NextResponse.json({ error: `Failed to save enquiry: ${leadError.message} (code: ${leadError.code})` }, { status: 500 });
     }
     if (vendorDbId && lead) {
       try {
         await supabase.from("vendor_notifications").insert({
-          vendor_id: vendorDbId,
-          notification_type: "new_lead",
-          title: `New Enquiry from ${customerName}`,
-          message: `Budget: Rs.${budgetMin} - Rs.${budgetMax}`,
-          related_entity_type: "lead",
-          related_entity_id: lead.id,
-          priority: "high",
-          action_url: `/vendor/leads/${lead.id}`,
-          action_label: "View Enquiry",
+          vendor_id: vendorDbId, notification_type: "new_lead",
+          title: `New Enquiry from ${customerName}`, message: `Budget: Rs.${budgetMin} - Rs.${budgetMax}`,
+          related_entity_type: "lead", related_entity_id: lead.id, priority: "high",
+          action_url: `/vendor/leads/${lead.id}`, action_label: "View Enquiry",
         });
       } catch (err) {
         console.error("Failed to insert vendor notification:", err);
