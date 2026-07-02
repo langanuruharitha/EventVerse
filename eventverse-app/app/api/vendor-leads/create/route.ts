@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
@@ -38,12 +38,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save enquiry", details: leadError.message }, { status: 500 });
     }
     if (vendorDbId && lead) {
-      supabase.from("vendor_notifications").insert({
-        vendor_id: vendorDbId, notification_type: "new_lead",
-        title: `New Enquiry from ${customerName}`, message: `Budget: Rs.${budgetMin} - Rs.${budgetMax}`,
-        related_entity_type: "lead", related_entity_id: lead.id, priority: "high",
-        action_url: `/vendor/leads/${lead.id}`, action_label: "View Enquiry",
-      }).then(() => {}).catch(() => {});
+      try {
+        await supabase.from("vendor_notifications").insert({
+          vendor_id: vendorDbId,
+          notification_type: "new_lead",
+          title: `New Enquiry from ${customerName}`,
+          message: `Budget: Rs.${budgetMin} - Rs.${budgetMax}`,
+          related_entity_type: "lead",
+          related_entity_id: lead.id,
+          priority: "high",
+          action_url: `/vendor/leads/${lead.id}`,
+          action_label: "View Enquiry",
+        });
+      } catch (err) {
+        console.error("Failed to insert vendor notification:", err);
+      }
     }
     return NextResponse.json({ success: true, lead: lead || null, message: `Enquiry sent! ${vendorName || "The vendor"} will respond within 24-48 hours.` });
   } catch (error) {
