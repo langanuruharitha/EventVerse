@@ -1,0 +1,30 @@
+# IDE specific folders (AI assistants)
+.kiro/
+.qoder/
+.vscode/
+
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
