@@ -31,6 +31,27 @@ export default function VendorProfilePage({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   
+  // State for hire vendor modal
+  const [showHireModal, setShowHireModal] = useState(false);
+  const [isCreatingLead, setIsCreatingLead] = useState(false);
+  const [leadCreated, setLeadCreated] = useState(false);
+  
+  // State for hire form
+  const [hireForm, setHireForm] = useState({
+    eventName: '',
+    eventDate: '',
+    eventLocation: '',
+    eventVenue: '',
+    guestCount: '',
+    serviceDetails: '',
+    specificRequirements: '',
+    budgetMin: '',
+    budgetMax: '',
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+  });
+  
   // Find vendor by ID
   const vendor = SAMPLE_VENDORS.find(v => v.id === vendorId);
   
@@ -49,6 +70,59 @@ export default function VendorProfilePage({
     setIsSaved(!isSaved);
     // TODO: Save to database
     alert(isSaved ? 'Vendor removed from saved list!' : 'Vendor saved successfully!');
+  };
+
+  const handleHireVendor = async () => {
+    // Validate form
+    if (!hireForm.customerName || !hireForm.customerEmail) {
+      alert('Please fill in your name and email');
+      return;
+    }
+
+    setIsCreatingLead(true);
+
+    try {
+      const response = await fetch('/api/vendor-leads/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vendorId: vendorId,
+          eventId: null, // Can link to existing event if available
+          eventType: eventType,
+          eventName: hireForm.eventName,
+          eventDate: hireForm.eventDate,
+          eventLocation: hireForm.eventLocation,
+          eventVenue: hireForm.eventVenue,
+          guestCount: hireForm.guestCount ? parseInt(hireForm.guestCount) : null,
+          serviceCategory: vendor.category,
+          serviceDetails: hireForm.serviceDetails,
+          specificRequirements: hireForm.specificRequirements,
+          budgetMin: hireForm.budgetMin ? parseFloat(hireForm.budgetMin) : null,
+          budgetMax: hireForm.budgetMax ? parseFloat(hireForm.budgetMax) : null,
+          budgetFlexible: true,
+          customerName: hireForm.customerName,
+          customerEmail: hireForm.customerEmail,
+          customerPhone: hireForm.customerPhone,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setLeadCreated(true);
+        setTimeout(() => {
+          setShowHireModal(false);
+          setLeadCreated(false);
+        }, 3000);
+      } else {
+        alert('Failed to create lead: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating lead:', error);
+      alert('Failed to contact vendor. Please try again.');
+    } finally {
+      setIsCreatingLead(false);
+    }
   };
 
   const generateAIEmail = async () => {
@@ -80,12 +154,44 @@ Best regards`;
     setIsGenerating(false);
   };
 
-  const handleSendEmail = () => {
-    // Simulate email sending
-    const mailto = `mailto:vendor@${vendor.name.toLowerCase().replace(/ /g, '')}.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailMessage)}`;
-    window.location.href = mailto;
-    setShowEmailModal(false);
-    alert('Opening your email client...');
+  const handleSendEmail = async () => {
+    if (!emailSubject || !emailMessage) {
+      alert('Please fill in subject and message');
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      // Send inquiry through the system (stored in database)
+      const response = await fetch('/api/vendor-inquiries/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vendorId: vendorId,
+          subject: emailSubject,
+          message: emailMessage,
+          eventType: eventType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('✅ Message sent successfully! The vendor will see it in their portal.');
+        setShowEmailModal(false);
+        // Reset form
+        setEmailSubject('');
+        setEmailMessage('');
+      } else {
+        alert('Failed to send message: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Generate sample portfolio images (using emojis as placeholders)
@@ -280,17 +386,24 @@ Best regards`;
               <h3 className="text-xl font-bold text-gray-900 mb-4">Get in Touch</h3>
               
               <button 
-                onClick={handleContactVendor}
+                onClick={() => setShowHireModal(true)}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl mb-3 text-lg"
               >
-                📞 Contact: +91 98765 43210
+                🤝 Hire This Vendor
+              </button>
+              
+              <button 
+                onClick={handleContactVendor}
+                className="w-full py-4 bg-white border-2 border-purple-600 text-purple-600 font-bold rounded-lg hover:bg-purple-50 transition-all mb-3 text-lg"
+              >
+                📞 Call: +91 98765 43210
               </button>
               
               <button 
                 onClick={() => setShowEmailModal(true)}
-                className="w-full py-4 bg-white border-2 border-purple-600 text-purple-600 font-bold rounded-lg hover:bg-purple-50 transition-all mb-3 text-lg"
+                className="w-full py-4 bg-white border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-all mb-3 text-lg"
               >
-                ✉️ Send Email (AI Powered)
+                ✉️ Send Message (AI Powered)
               </button>
               
               <button 
@@ -349,7 +462,7 @@ Best regards`;
             <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
               {/* Header */}
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h2 className="text-2xl font-bold text-gray-900">✉️ Send Email to {vendor.name}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">✉️ Send Message to {vendor.name}</h2>
                 <button
                   onClick={() => setShowEmailModal(false)}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -425,9 +538,248 @@ Best regards`;
                 </div>
 
                 <p className="text-xs text-gray-500 text-center">
-                  * This will open your default email client with the pre-filled message
+                  * Your message will be sent directly to the vendor's inbox on EventVerse
                 </p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Hire Vendor Modal */}
+        {showHireModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-2xl max-w-4xl w-full my-8">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">🤝 Hire {vendor.name}</h2>
+                  <p className="text-sm opacity-90">Send your requirements and get a personalized quote</p>
+                </div>
+                <button
+                  onClick={() => setShowHireModal(false)}
+                  className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {leadCreated ? (
+                <div className="p-12 text-center">
+                  <div className="text-6xl mb-4">✅</div>
+                  <h3 className="text-3xl font-bold text-green-600 mb-2">Success!</h3>
+                  <p className="text-xl text-gray-700 mb-4">
+                    We've sent your inquiry to {vendor.name}
+                  </p>
+                  <p className="text-gray-600">
+                    The vendor will review your requirements and respond within 24-48 hours. 
+                    You can track the status in your dashboard.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={(e) => { e.preventDefault(); handleHireVendor(); }} className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto px-2">
+                    {/* Customer Information */}
+                    <div className="md:col-span-2 bg-purple-50 p-4 rounded-lg">
+                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <span className="text-xl">👤</span> Your Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Your Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={hireForm.customerName}
+                            onChange={(e) => setHireForm({...hireForm, customerName: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="John Doe"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={hireForm.customerEmail}
+                            onChange={(e) => setHireForm({...hireForm, customerEmail: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="john@example.com"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone
+                          </label>
+                          <input
+                            type="tel"
+                            value={hireForm.customerPhone}
+                            onChange={(e) => setHireForm({...hireForm, customerPhone: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="+91 98765 43210"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Event Information */}
+                    <div className="md:col-span-2 bg-pink-50 p-4 rounded-lg">
+                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <span className="text-xl">🎉</span> Event Details
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Event Name
+                          </label>
+                          <input
+                            type="text"
+                            value={hireForm.eventName}
+                            onChange={(e) => setHireForm({...hireForm, eventName: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="e.g., Birthday Party, Wedding"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Event Date
+                          </label>
+                          <input
+                            type="date"
+                            value={hireForm.eventDate}
+                            onChange={(e) => setHireForm({...hireForm, eventDate: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Location
+                          </label>
+                          <input
+                            type="text"
+                            value={hireForm.eventLocation}
+                            onChange={(e) => setHireForm({...hireForm, eventLocation: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="City, State"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Venue
+                          </label>
+                          <input
+                            type="text"
+                            value={hireForm.eventVenue}
+                            onChange={(e) => setHireForm({...hireForm, eventVenue: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Venue name"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Number of Guests
+                          </label>
+                          <input
+                            type="number"
+                            value={hireForm.guestCount}
+                            onChange={(e) => setHireForm({...hireForm, guestCount: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Budget */}
+                    <div className="md:col-span-2">
+                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <span className="text-xl">💰</span> Budget Range
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Minimum Budget (₹)
+                          </label>
+                          <input
+                            type="number"
+                            value={hireForm.budgetMin}
+                            onChange={(e) => setHireForm({...hireForm, budgetMin: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="25000"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Maximum Budget (₹)
+                          </label>
+                          <input
+                            type="number"
+                            value={hireForm.budgetMax}
+                            onChange={(e) => setHireForm({...hireForm, budgetMax: e.target.value})}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="50000"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Service Details */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Service Details
+                      </label>
+                      <textarea
+                        value={hireForm.serviceDetails}
+                        onChange={(e) => setHireForm({...hireForm, serviceDetails: e.target.value})}
+                        rows={3}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="What specific services do you need?"
+                      />
+                    </div>
+
+                    {/* Specific Requirements */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Specific Requirements
+                      </label>
+                      <textarea
+                        value={hireForm.specificRequirements}
+                        onChange={(e) => setHireForm({...hireForm, specificRequirements: e.target.value})}
+                        rows={4}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Any special requirements, preferences, or constraints?"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 mt-6 pt-6 border-t">
+                    <button
+                      type="submit"
+                      disabled={isCreatingLead}
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-lg font-bold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                    >
+                      {isCreatingLead ? '📤 Sending...' : '📤 Send Inquiry'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowHireModal(false)}
+                      className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all text-lg"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-gray-500 text-center mt-4">
+                    * The vendor will receive your inquiry via email and respond within 24-48 hours
+                  </p>
+                </form>
+              )}
             </div>
           </div>
         )}
