@@ -132,11 +132,11 @@ export default function TemplateEditorPage() {
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-6">
         <div className="max-w-7xl mx-auto px-4">
           <Link
-            href="/invitations/templates"
+            href="/invitations"
             className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to Templates
+            Back to Invitations
           </Link>
           <h1 className="text-3xl font-bold">Edit Your Invitation</h1>
           <p className="text-purple-100">Customize the details and generate your invitation</p>

@@ -90,14 +90,7 @@ export default async function InvitationsPage() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-gray-900">My Invitations</h2>
-            {invitations && invitations.length > 0 && (
-              <Link
-                href="/invitations/gallery"
-                className="text-pink-600 hover:text-pink-700 font-semibold"
-              >
-                View All →
-              </Link>
-            )}
+          
           </div>
 
           {invitations && invitations.length > 0 ? (
