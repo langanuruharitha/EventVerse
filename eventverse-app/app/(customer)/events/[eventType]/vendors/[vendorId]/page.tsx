@@ -399,12 +399,7 @@ Best regards`;
                 📞 Call: +91 98765 43210
               </button>
               
-              <button 
-                onClick={() => setShowEmailModal(true)}
-                className="w-full py-4 bg-white border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-all mb-3 text-lg"
-              >
-                ✉️ Send Message (AI Powered)
-              </button>
+
               
               <button 
                 onClick={handleSaveVendor}
@@ -456,94 +451,7 @@ Best regards`;
           </div>
         </div>
 
-        {/* AI Email Modal */}
-        {showEmailModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              {/* Header */}
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h2 className="text-2xl font-bold text-gray-900">✉️ Send Message to {vendor.name}</h2>
-                <button
-                  onClick={() => setShowEmailModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
 
-              {/* Form */}
-              <div className="p-6 space-y-6">
-                {/* AI Generate Button */}
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">🤖 AI Email Assistant</h3>
-                      <p className="text-sm text-gray-600">Let AI draft a professional email for you</p>
-                    </div>
-                    <button
-                      onClick={generateAIEmail}
-                      disabled={isGenerating}
-                      className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50"
-                    >
-                      {isGenerating ? '✨ Generating...' : '✨ Generate Email'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Subject */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    value={emailSubject}
-                    onChange={(e) => setEmailSubject(e.target.value)}
-                    placeholder="Enter email subject..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    value={emailMessage}
-                    onChange={(e) => setEmailMessage(e.target.value)}
-                    rows={12}
-                    placeholder="Write your message here or use AI to generate..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-4 pt-4 border-t">
-                  <button
-                    onClick={handleSendEmail}
-                    disabled={!emailSubject || !emailMessage}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    📧 Send Email
-                  </button>
-                  <button
-                    onClick={() => setShowEmailModal(false)}
-                    className="px-8 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-
-                <p className="text-xs text-gray-500 text-center">
-                  * Your message will be sent directly to the vendor's inbox on EventVerse
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Hire Vendor Modal */}
         {showHireModal && (
