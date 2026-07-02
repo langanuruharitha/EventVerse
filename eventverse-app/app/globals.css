@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hide Next.js development overlay and indicators */
+#__next-build-watcher,
+nextjs-portal,
+[data-nextjs-dialog-overlay],
+[data-nextjs-dialog],
+[role="dialog"][aria-labelledby*="nextjs"],
+button[aria-label*="Route"],
+div[style*="z-index: 99999"],
+div[style*="z-index: 9999"][style*="position: fixed"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide the floating Next.js dev toolbar */
+.__next-dev-overlay,
+.__next-dev-toolbar,
+[class*="nextjs-toast"],
+[class*="nextjs-container"],
+button[data-nextjs] {
+  display: none !important;
+}
