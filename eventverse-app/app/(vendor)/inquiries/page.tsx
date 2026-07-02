@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 
 interface Inquiry {
@@ -32,7 +32,7 @@ export default function VendorInquiriesPage() {
 
   const loadInquiries = async () => {
     try {
-      const supabase = createClient();
+      const supabase = createBrowserClient();
       
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
@@ -74,7 +74,7 @@ export default function VendorInquiriesPage() {
   };
 
   const markAsRead = async (inquiryId: string) => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     await supabase
       .from('vendor_inquiries')
       .update({ is_read: true, read_at: new Date().toISOString() })
@@ -91,7 +91,7 @@ export default function VendorInquiriesPage() {
 
     setIsSending(true);
     try {
-      const supabase = createClient();
+      const supabase = createBrowserClient();
       
       await supabase
         .from('vendor_inquiries')
