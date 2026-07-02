@@ -9,9 +9,7 @@ import { ArrowLeft, Video, Download, Upload, Sparkles } from 'lucide-react';
 function CreateVideoInvitationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState(1); // 1: Choose, 2: Customize, 3: Generate
-  const [templates, setTemplates] = useState<any[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [step, setStep] = useState(2); // Start directly at customize step
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
@@ -31,54 +29,13 @@ function CreateVideoInvitationContent() {
   });
 
   useEffect(() => {
-    // Check if coming from template selection
-    const templateId = searchParams.get('templateId');
     const type = searchParams.get('type');
-    
     if (type) {
       setFormData(prev => ({ ...prev, eventType: type }));
     }
-    
-    if (templateId) {
-      // Skip step 1 and go directly to step 2 with template
-      loadTemplate(templateId);
-      setStep(2);
-    } else if (step === 1) {
-      fetchTemplates();
-    }
-  }, [step, formData.eventType, searchParams]);
+  }, [searchParams]);
 
-  const loadTemplate = async (templateId: string) => {
-    const supabase = createBrowserClient();
-    const { data } = await supabase
-      .from('invitation_templates')
-      .select('*')
-      .eq('id', templateId)
-      .single();
-    
-    if (data) {
-      setSelectedTemplate(data);
-    }
-  };
 
-  const fetchTemplates = async () => {
-    setLoading(true);
-    const supabase = createBrowserClient();
-    
-    const { data, error } = await supabase
-      .from('invitation_templates')
-      .select('*')
-      .eq('category', formData.eventType)
-      .order('rating_average', { ascending: false })
-      .limit(12);
-    
-    if (error) {
-      console.error('Error fetching templates:', error);
-    }
-    
-    setTemplates(data || []);
-    setLoading(false);
-  };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -111,8 +68,7 @@ function CreateVideoInvitationContent() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...formData,
-            templateId: selectedTemplate?.id
+            ...formData
           })
         });
       } catch (dbErr) {
@@ -132,8 +88,7 @@ function CreateVideoInvitationContent() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ...formData,
-        templateId: selectedTemplate?.id
+        ...formData
       })
     });
 
@@ -682,10 +637,9 @@ function CreateVideoInvitationContent() {
             <ArrowLeft className="w-5 h-5" />
             Back to Invitations
           </Link>
-          <h1 className="text-4xl font-bold mb-2">🎬 Create Video Invitation</h1>
+          <h1 className="text-4xl font-bold mb-2">🎬 Create Custom Video Invitation</h1>
           <p className="text-blue-100">
-            {step === 1 && 'Choose a video template or create custom'}
-            {step === 2 && 'Customize your video invitation'}
+            {step === 2 && 'Customize your video invitation details'}
             {step === 3 && 'Your video invitation is ready!'}
           </p>
         </div>
@@ -695,147 +649,27 @@ function CreateVideoInvitationContent() {
         {/* Progress Steps */}
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center gap-4">
-            <div className={`flex items-center gap-2 ${step >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
-                1
-              </div>
-              <span className="font-semibold">Choose</span>
-            </div>
-            <div className="w-16 h-1 bg-gray-300" />
             <div className={`flex items-center gap-2 ${step >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
-                2
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold bg-blue-600 text-white`}>
+                1
               </div>
               <span className="font-semibold">Customize</span>
             </div>
             <div className="w-16 h-1 bg-gray-300" />
             <div className={`flex items-center gap-2 ${step >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
-                3
+                2
               </div>
               <span className="font-semibold">Generate</span>
             </div>
           </div>
         </div>
 
-        {/* Step 1: Choose Template */}
-        {step === 1 && (
-          <div>
-            {/* Event Type Selector */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Event Type</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['birthday', 'wedding', 'anniversary', 'corporate'].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setFormData({ ...formData, eventType: type })}
-                    className={`p-6 rounded-xl border-2 transition-all ${
-                      formData.eventType === type
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}
-                  >
-                    <div className="text-4xl mb-2">
-                      {type === 'birthday' && '🎂'}
-                      {type === 'wedding' && '💍'}
-                      {type === 'anniversary' && '💐'}
-                      {type === 'corporate' && '🏢'}
-                    </div>
-                    <div className="font-semibold capitalize">{type}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Template Grid */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Choose Video Template</h2>
-              {loading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin text-4xl mb-4">⏳</div>
-                  <p className="text-gray-600">Loading templates...</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {/* Custom Option */}
-                  <button
-                    onClick={() => {
-                      setSelectedTemplate(null);
-                      setStep(2);
-                    }}
-                    className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl p-8 hover:shadow-xl transition-all border-2 border-dashed border-blue-300"
-                  >
-                    <Sparkles className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                    <div className="font-bold text-gray-900">Custom Video</div>
-                    <div className="text-sm text-gray-600 mt-1">AI Powered</div>
-                  </button>
-
-                  {/* Templates */}
-                  {templates.map((template) => (
-                    <button
-                      key={template.id}
-                      onClick={() => {
-                        setSelectedTemplate(template);
-                        setStep(2);
-                      }}
-                      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
-                    >
-                      <div className="h-48 overflow-hidden relative">
-                        <img
-                          src={template.thumbnail_url}
-                          alt={template.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <Video className="w-12 h-12 text-white" />
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <div className="font-semibold text-gray-900 text-sm line-clamp-1">
-                          {template.name}
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-gray-500 capitalize">{template.style}</span>
-                          {template.is_premium && (
-                            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                              Premium
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Step 2: Customize */}
         {step === 2 && (
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-2xl shadow-lg p-8">
-              {/* Show selected template info if template was chosen */}
-              {selectedTemplate && (
-                <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-20 h-20">
-                      <img
-                        src={selectedTemplate.thumbnail_url}
-                        alt={selectedTemplate.name}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
-                        <Video className="w-8 h-8 text-white" />
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900">{selectedTemplate.name}</h3>
-                      <p className="text-sm text-gray-600 capitalize">{selectedTemplate.style} style</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+
 
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Customize Your Video Invitation
@@ -991,7 +825,7 @@ function CreateVideoInvitationContent() {
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-6">
                   <button
-                    onClick={() => setStep(1)}
+                    onClick={() => router.push('/invitations')}
                     className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
                   >
                     Back

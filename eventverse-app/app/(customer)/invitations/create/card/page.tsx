@@ -66,11 +66,11 @@ function CreateCardInvitationContent() {
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-8">
         <div className="max-w-7xl mx-auto px-4">
           <Link
-            href="/invitations/gallery"
+            href="/invitations"
             className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to Gallery
+            Back to Invitations
           </Link>
           <h1 className="text-4xl font-bold mb-2">✨ Create Custom Invitation Card</h1>
           <p className="text-purple-100">

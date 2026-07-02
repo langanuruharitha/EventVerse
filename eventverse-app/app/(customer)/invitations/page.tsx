@@ -45,13 +45,9 @@ export default async function InvitationsPage() {
                     Create beautiful digital invitation cards with AI
                   </p>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <FileImage className="w-4 h-4" />
-                      <span>Default Templates</span>
-                    </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 font-semibold text-pink-600">
                       <Plus className="w-4 h-4" />
-                      <span>Custom Design</span>
+                      <span>Create Custom Card</span>
                     </div>
                   </div>
                 </div>
@@ -76,13 +72,9 @@ export default async function InvitationsPage() {
                     Generate stunning video invitations with your photos
                   </p>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Video className="w-4 h-4" />
-                      <span>Default Videos</span>
-                    </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 font-semibold text-purple-600">
                       <Plus className="w-4 h-4" />
-                      <span>Custom Video</span>
+                      <span>Create Custom Video</span>
                     </div>
                   </div>
                 </div>
@@ -194,48 +186,6 @@ export default async function InvitationsPage() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Event Type Templates */}
-        <div className="mt-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Browse by Event Type</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link
-              href="/invitations/templates?type=birthday"
-              className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all border border-gray-200 hover:border-pink-500"
-            >
-              <div className="text-5xl mb-3">🎂</div>
-              <h3 className="font-semibold text-gray-900">Birthday</h3>
-              <p className="text-sm text-gray-500 mt-1">View templates</p>
-            </Link>
-
-            <Link
-              href="/invitations/templates?type=wedding"
-              className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all border border-gray-200 hover:border-pink-500"
-            >
-              <div className="text-5xl mb-3">💍</div>
-              <h3 className="font-semibold text-gray-900">Wedding</h3>
-              <p className="text-sm text-gray-500 mt-1">View templates</p>
-            </Link>
-
-            <Link
-              href="/invitations/templates?type=anniversary"
-              className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all border border-gray-200 hover:border-pink-500"
-            >
-              <div className="text-5xl mb-3">💐</div>
-              <h3 className="font-semibold text-gray-900">Anniversary</h3>
-              <p className="text-sm text-gray-500 mt-1">View templates</p>
-            </Link>
-
-            <Link
-              href="/invitations/templates?type=corporate"
-              className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all border border-gray-200 hover:border-pink-500"
-            >
-              <div className="text-5xl mb-3">🏢</div>
-              <h3 className="font-semibold text-gray-900">Corporate</h3>
-              <p className="text-sm text-gray-500 mt-1">View templates</p>
-            </Link>
-          </div>
         </div>
       </div>
     </div>
