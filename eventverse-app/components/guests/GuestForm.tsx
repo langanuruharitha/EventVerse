@@ -48,7 +48,9 @@ export default function GuestForm({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add guest');
+        const errorData = await response.json();
+        console.error('Guest add error:', errorData);
+        throw new Error(errorData.details || errorData.message || 'Failed to add guest');
       }
 
       const data = await response.json();
@@ -68,9 +70,9 @@ export default function GuestForm({
         notes: '',
         age_group: 'adult'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding guest:', error);
-      alert('Failed to add guest. Please try again.');
+      alert(`Failed to add guest: ${error.message}`);
     } finally {
       setLoading(false);
     }

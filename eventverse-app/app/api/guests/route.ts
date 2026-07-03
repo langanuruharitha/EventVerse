@@ -116,8 +116,18 @@ export async function POST(request: Request) {
 
     if (guestError) {
       console.error('Error creating guest:', guestError);
+      console.error('Guest error details:', {
+        code: guestError.code,
+        message: guestError.message,
+        details: guestError.details,
+        hint: guestError.hint
+      });
       return NextResponse.json(
-        { error: 'Failed to create guest' },
+        { 
+          error: 'Failed to create guest',
+          details: guestError.message,
+          code: guestError.code
+        },
         { status: 500 }
       );
     }
@@ -127,10 +137,14 @@ export async function POST(request: Request) {
       message: 'Guest added successfully' 
     }, { status: 201 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Guest creation error:', error);
+    console.error('Error stack:', error.stack);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        message: error.message 
+      },
       { status: 500 }
     );
   }
