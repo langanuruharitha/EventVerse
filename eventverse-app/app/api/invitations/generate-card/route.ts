@@ -273,7 +273,6 @@ function buildBeautifulCard(data: {
     box-shadow: 0 24px 80px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
     overflow: hidden;
   }
-  ${bgPattern}
 
   /* Gradient header strip */
   .header-strip {
