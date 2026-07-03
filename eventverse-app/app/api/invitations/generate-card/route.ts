@@ -179,70 +179,57 @@ function buildBeautifulCard(data: {
     </svg>`
   };
 
-  // Theme-based CSS background pattern
-  const themeLC = (data.themeDescription || '').toLowerCase();
-  let bgPattern = '';
-  let cardBg = `background: linear-gradient(160deg, ${c.bg} 0%, white 40%, ${c.light} 100%);`;
+  // Always white card background so decorations are always visible
+  const cardBg = `background: #ffffff;`;
 
-  if (themeLC.includes('floral') || themeLC.includes('flower') || themeLC.includes('rose')) {
-    bgPattern = `
-      .card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(ellipse 120px 80px at 5% 10%, ${c.light} 0%, transparent 70%),
-          radial-gradient(ellipse 100px 60px at 95% 5%, ${c.light} 0%, transparent 70%),
-          radial-gradient(ellipse 80px 120px at 8% 90%, ${c.light} 0%, transparent 70%),
-          radial-gradient(ellipse 100px 80px at 92% 88%, ${c.light} 0%, transparent 70%);
-        pointer-events: none;
-        border-radius: 20px;
-      }`;
-    cardBg = `background: linear-gradient(to bottom right, white, ${c.bg}, white);`;
-  } else if (themeLC.includes('elegant') || themeLC.includes('luxury') || themeLC.includes('royal')) {
-    bgPattern = `
-      .card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: repeating-linear-gradient(
-          45deg, transparent, transparent 60px,
-          ${c.light}30 60px, ${c.light}30 62px
-        );
-        pointer-events: none;
-        border-radius: 20px;
-      }`;
-  } else if (themeLC.includes('star') || themeLC.includes('night') || themeLC.includes('sparkle')) {
-    bgPattern = `
-      .card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(2px 2px at 20% 30%, ${c.secondary}60 0%, transparent 100%),
-          radial-gradient(2px 2px at 60% 15%, ${c.secondary}50 0%, transparent 100%),
-          radial-gradient(2px 2px at 80% 40%, ${c.secondary}60 0%, transparent 100%),
-          radial-gradient(2px 2px at 35% 70%, ${c.secondary}50 0%, transparent 100%),
-          radial-gradient(2px 2px at 70% 75%, ${c.secondary}60 0%, transparent 100%),
-          radial-gradient(2px 2px at 15% 80%, ${c.secondary}50 0%, transparent 100%);
-        pointer-events: none;
-        border-radius: 20px;
-      }`;
-  } else if (themeLC.includes('balloon') || themeLC.includes('party') || themeLC.includes('confetti')) {
-    bgPattern = `
-      .card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(circle 60px at 10% 20%, ${c.light} 0%, transparent 80%),
-          radial-gradient(circle 50px at 85% 15%, ${c.secondary}30 0%, transparent 80%),
-          radial-gradient(circle 70px at 20% 75%, ${c.light} 0%, transparent 80%),
-          radial-gradient(circle 55px at 80% 70%, ${c.secondary}30 0%, transparent 80%);
-        pointer-events: none;
-        border-radius: 20px;
-      }`;
-  }
+  // Vivid balloon SVGs placed in corners (always visible against white)
+  const balloonsSVG = `
+    <!-- Top-left balloons -->
+    <svg style="position:absolute;top:12px;left:12px;z-index:1;pointer-events:none" width="90" height="130" viewBox="0 0 90 130" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="22" cy="40" rx="14" ry="18" fill="#ef4444" opacity="0.9"/>
+      <line x1="22" y1="58" x2="20" y2="100" stroke="#9ca3af" stroke-width="1"/>
+      <path d="M22 58 Q18 62 22 58" fill="#ef4444"/>
+      <ellipse cx="46" cy="30" rx="13" ry="17" fill="#f59e0b" opacity="0.9"/>
+      <line x1="46" y1="47" x2="44" y2="100" stroke="#9ca3af" stroke-width="1"/>
+      <ellipse cx="68" cy="42" rx="12" ry="16" fill="${c.primary}" opacity="0.85"/>
+      <line x1="68" y1="58" x2="66" y2="100" stroke="#9ca3af" stroke-width="1"/>
+      <!-- confetti dots -->
+      <circle cx="10" cy="80" r="3" fill="#34d399" opacity="0.8"/>
+      <circle cx="55" cy="90" r="2" fill="#f472b6" opacity="0.8"/>
+      <circle cx="75" cy="75" r="3" fill="#f59e0b" opacity="0.8"/>
+      <rect x="30" y="95" width="5" height="5" rx="1" fill="#ef4444" opacity="0.7" transform="rotate(30 30 95)"/>
+    </svg>
+    <!-- Top-right balloons -->
+    <svg style="position:absolute;top:12px;right:12px;z-index:1;pointer-events:none" width="90" height="130" viewBox="0 0 90 130" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="22" cy="38" rx="13" ry="17" fill="#8b5cf6" opacity="0.9"/>
+      <line x1="22" y1="55" x2="24" y2="100" stroke="#9ca3af" stroke-width="1"/>
+      <ellipse cx="46" cy="28" rx="14" ry="18" fill="#10b981" opacity="0.9"/>
+      <line x1="46" y1="46" x2="48" y2="100" stroke="#9ca3af" stroke-width="1"/>
+      <ellipse cx="70" cy="40" rx="13" ry="17" fill="#ec4899" opacity="0.9"/>
+      <line x1="70" y1="57" x2="72" y2="100" stroke="#9ca3af" stroke-width="1"/>
+      <!-- confetti -->
+      <circle cx="14" cy="78" r="2" fill="#f59e0b" opacity="0.8"/>
+      <circle cx="55" cy="88" r="3" fill="#ef4444" opacity="0.8"/>
+      <rect x="78" y="72" width="5" height="5" rx="1" fill="#34d399" opacity="0.7" transform="rotate(20 78 72)"/>
+    </svg>
+    <!-- Bottom-left confetti -->
+    <svg style="position:absolute;bottom:50px;left:12px;z-index:1;pointer-events:none" width="70" height="60" viewBox="0 0 70 60" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="5" fill="#f59e0b" opacity="0.8"/>
+      <circle cx="35" cy="8" r="4" fill="#ef4444" opacity="0.8"/>
+      <circle cx="55" cy="18" r="5" fill="#8b5cf6" opacity="0.8"/>
+      <rect x="20" y="28" width="7" height="7" rx="1" fill="#10b981" opacity="0.7" transform="rotate(15 20 28)"/>
+      <rect x="45" y="35" width="6" height="6" rx="1" fill="#ec4899" opacity="0.7" transform="rotate(40 45 35)"/>
+      <circle cx="8" cy="45" r="4" fill="${c.primary}" opacity="0.7"/>
+    </svg>
+    <!-- Bottom-right confetti -->
+    <svg style="position:absolute;bottom:50px;right:12px;z-index:1;pointer-events:none" width="70" height="60" viewBox="0 0 70 60" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="58" cy="12" r="5" fill="#ec4899" opacity="0.8"/>
+      <circle cx="32" cy="8" r="4" fill="#10b981" opacity="0.8"/>
+      <circle cx="15" cy="20" r="5" fill="#f59e0b" opacity="0.8"/>
+      <rect x="48" y="30" width="7" height="7" rx="1" fill="#ef4444" opacity="0.7" transform="rotate(25 48 30)"/>
+      <rect x="22" y="38" width="6" height="6" rx="1" fill="#8b5cf6" opacity="0.7" transform="rotate(10 22 38)"/>
+      <circle cx="62" cy="45" r="4" fill="#34d399" opacity="0.7"/>
+    </svg>`;
 
   // Style-specific font
   const fontUrl = data.style === 'traditional'
@@ -486,6 +473,7 @@ function buildBeautifulCard(data: {
 <div class="wrapper">
   <div class="card">
     <div class="header-strip"></div>
+    ${balloonsSVG}
     <div class="frame"></div>
     <div class="corner corner-tl"></div>
     <div class="corner corner-tr"></div>
