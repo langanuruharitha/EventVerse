@@ -46,7 +46,7 @@ export default function NewEventPage() {
       const result = await createEvent(formData);
 
       if (result.success && result.data) {
-        router.push(`/events/event-detail-${result.data.eventId}`);
+        router.push(`/events/eventdetail/${result.data.eventId}`);
       } else {
         setError(result.error || 'Failed to create event');
       }
