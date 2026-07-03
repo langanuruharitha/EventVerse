@@ -128,3 +128,12 @@ BEGIN
   RAISE NOTICE '👉 Customer sends message from vendor profile page';
   RAISE NOTICE '👉 Vendor views in /vendor/inquiries page';
 END $$;
+  RAISE NOTICE '✅ vendor_inquiries table created successfully!';
+  RAISE NOTICE '📋 Table: vendor_inquiries';
+  RAISE NOTICE '📊 Indexes: 3 indexes created';
+  RAISE NOTICE '🔐 RLS Policies: 4 policies enabled';
+  RAISE NOTICE '';
+  RAISE NOTICE '✨ You can now use the internal messaging system!';
+  RAISE NOTICE '👉 Customer sends message from vendor profile page';
+  RAISE NOTICE '👉 Vendor views in /vendor/inquiries page';
+END $$;

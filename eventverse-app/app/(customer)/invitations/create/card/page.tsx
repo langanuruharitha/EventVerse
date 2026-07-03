@@ -10,7 +10,7 @@ function CreateCardInvitationContent() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1); // 1: Form, 2: Preview/Generated
   const [generating, setGenerating] = useState(false);
-  const [generatedCard, setGeneratedCard] = useState<string | null>(null);
+  const [generatedCard, setGeneratedCard] = useState<string | null>(null); // raw HTML string
 
   // Form data
   const [formData, setFormData] = useState({
@@ -29,15 +29,15 @@ function CreateCardInvitationContent() {
   });
 
   const handleGenerate = async () => {
-    if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
-      alert('Please fill all required fields');
+    if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue || !formData.themeDescription) {
+      alert('Please fill all required fields including the Creative Requirements & Theme Description');
       return;
     }
 
     setGenerating(true);
 
     try {
-      // Call AI to generate invitation card
+      // Call AI to generate invitation card with AI-generated background
       const response = await fetch('/api/invitations/generate-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,8 +46,8 @@ function CreateCardInvitationContent() {
 
       const data = await response.json();
 
-      if (response.ok && data.imageUrl) {
-        setGeneratedCard(data.imageUrl);
+      if (response.ok && data.htmlContent) {
+        setGeneratedCard(data.htmlContent);
         setStep(2);
       } else {
         alert(data.error || 'Failed to generate invitation card');
@@ -221,15 +221,19 @@ function CreateCardInvitationContent() {
               {/* Theme & Background Decoration Description */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Theme & Background Decoration Style
+                  Creative Requirements & Theme Description *
                 </label>
-                <input
-                  type="text"
+                <textarea
                   value={formData.themeDescription}
                   onChange={(e) => setFormData({ ...formData, themeDescription: e.target.value })}
-                  placeholder="e.g., Golden mandap background, floral arches, starry night, minimal botanical leaves"
+                  placeholder="Describe what you want: e.g., 'Create a warm, elegant invitation with golden decorations, floral borders, and a poetic message about celebration and togetherness. Use sophisticated language and make it feel special.'"
+                  rows={4}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 Be specific! AI will create unique content, design, and wording based on your description. Don't just repeat basic info - describe the style, mood, and creativity you want!
+                </p>
               </div>
 
               {/* Color Scheme */}
@@ -307,6 +311,7 @@ function CreateCardInvitationContent() {
                     !formData.date ||
                     !formData.time ||
                     !formData.venue ||
+                    !formData.themeDescription ||
                     generating
                   }
                   className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
@@ -314,18 +319,29 @@ function CreateCardInvitationContent() {
                   {generating ? (
                     <>
                       <div className="animate-spin">⏳</div>
-                      Generating with AI...
+                      <div className="text-center">
+                        <div className="font-bold">Gemini AI is creating your invitation...</div>
+                        <div className="text-sm mt-1">Generating unique creative content (5-10 seconds)</div>
+                      </div>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-6 h-6" />
-                      Generate Invitation Card with AI
+                      Generate Custom Invitation with AI
                     </>
                   )}
                 </button>
-                <p className="text-sm text-gray-500 mt-3 text-center">
-                  💡 AI will create a beautiful invitation card based on your details
-                </p>
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4 mt-3">
+                  <p className="text-sm text-purple-900 font-semibold mb-2">
+                    🤖 What Gemini AI Will Create For You:
+                  </p>
+                  <ul className="text-xs text-purple-800 space-y-1 ml-4">
+                    <li>✓ Unique creative text and greetings (NOT copy-paste of your input!)</li>
+                    <li>✓ Beautiful artistic gradient backgrounds based on your theme</li>
+                    <li>✓ Poetic, heartfelt messages that match your event mood</li>
+                    <li>✓ Professional design - completely original every time!</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -340,11 +356,12 @@ function CreateCardInvitationContent() {
 
             {/* Generated Card Preview */}
             <div className="mb-8">
-              <div className="border-4 border-purple-200 rounded-xl overflow-hidden bg-white max-w-2xl mx-auto">
-                <img
-                  src={generatedCard}
-                  alt="Generated Invitation Card"
-                  className="w-full h-auto"
+              <div className="border-4 border-purple-200 rounded-xl overflow-hidden bg-white max-w-2xl mx-auto shadow-2xl">
+                <iframe
+                  srcDoc={generatedCard || ''}
+                  style={{ width: '100%', height: '820px', border: 'none' }}
+                  title="Generated Invitation Card"
+                  sandbox="allow-same-origin"
                 />
               </div>
             </div>
@@ -357,14 +374,22 @@ function CreateCardInvitationContent() {
               >
                 Edit Details
               </button>
-              <a
-                href={generatedCard}
-                download="invitation-card.png"
+              <button
+                onClick={() => {
+                  if (!generatedCard) return;
+                  const blob = new Blob([generatedCard], { type: 'text/html;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'invitation-card.html';
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 flex items-center justify-center gap-2"
               >
                 <Download className="w-5 h-5" />
                 Download Card
-              </a>
+              </button>
               <button
                 onClick={() => router.push('/invitations')}
                 className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700"
