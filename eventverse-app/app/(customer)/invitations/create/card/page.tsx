@@ -22,7 +22,7 @@ function CreateCardInvitationContent() {
     time: '',
     venue: '',
     message: '',
-    colorScheme: 'purple',
+    colorScheme: '',
     style: 'elegant',
     includeRSVP: true,
     themeDescription: ''
@@ -236,34 +236,7 @@ function CreateCardInvitationContent() {
                 </p>
               </div>
 
-              {/* Color Scheme */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Color Scheme
-                </label>
-                <div className="grid grid-cols-4 gap-3">
-                  {['purple', 'blue', 'pink', 'gold', 'green', 'red'].map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setFormData({ ...formData, colorScheme: color })}
-                      className={`p-3 rounded-lg border-2 transition-all ${
-                        formData.colorScheme === color
-                          ? 'border-gray-900 ring-2 ring-gray-900'
-                          : 'border-gray-200'
-                      }`}
-                      style={{
-                        background: color === 'purple' ? '#9333ea' :
-                                   color === 'blue' ? '#3b82f6' :
-                                   color === 'pink' ? '#ec4899' :
-                                   color === 'gold' ? '#f59e0b' :
-                                   color === 'green' ? '#10b981' : '#ef4444'
-                      }}
-                    >
-                      <div className="text-white text-xs font-semibold capitalize">{color}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+
 
               {/* Style */}
               <div>

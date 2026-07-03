@@ -29,13 +29,30 @@ export async function POST(request: NextRequest) {
     // Generate AI creative text using Gemini
     const aiText = await generateWithGemini(eventType, eventName, fromName, themeDescription, message);
 
+    // Auto-detect best color scheme based on theme keywords or event type
+    let detectedColorScheme = 'purple';
+    const descLC = (themeDescription || '').toLowerCase();
+    if (descLC.includes('gold') || descLC.includes('yellow') || descLC.includes('royal') || descLC.includes('mandap')) {
+      detectedColorScheme = 'gold';
+    } else if (descLC.includes('blue') || descLC.includes('ocean') || descLC.includes('corporate') || eventType === 'corporate') {
+      detectedColorScheme = 'blue';
+    } else if (descLC.includes('pink') || descLC.includes('rose') || descLC.includes('love') || descLC.includes('romantic') || eventType === 'anniversary') {
+      detectedColorScheme = 'pink';
+    } else if (descLC.includes('green') || descLC.includes('garden') || descLC.includes('nature') || descLC.includes('forest') || descLC.includes('floral')) {
+      detectedColorScheme = 'green';
+    } else if (descLC.includes('red') || descLC.includes('crimson') || descLC.includes('warm')) {
+      detectedColorScheme = 'red';
+    } else if (eventType === 'wedding') {
+      detectedColorScheme = 'gold';
+    }
+
     // Generate beautiful HTML card
     const htmlContent = buildBeautifulCard({
       eventType, eventName, fromName, toName,
       formattedDate, time, venue,
       aiGreeting: aiText.greeting,
       aiMessage: aiText.message,
-      colorScheme: colorScheme || 'purple',
+      colorScheme: colorScheme || detectedColorScheme,
       style: style || 'elegant',
       includeRSVP: !!includeRSVP,
       themeDescription: themeDescription || ''
