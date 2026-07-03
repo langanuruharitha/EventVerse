@@ -22,7 +22,6 @@ function CreateCardInvitationContent() {
     time: '',
     venue: '',
     message: '',
-    colorScheme: '',
     style: 'elegant',
     includeRSVP: true,
     themeDescription: ''
