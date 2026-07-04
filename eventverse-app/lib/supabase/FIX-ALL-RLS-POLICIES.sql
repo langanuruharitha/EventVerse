@@ -14,6 +14,8 @@ END $$;
 -- ============================================
 -- 1. EXPENSES TABLE RLS
 -- ============================================
+-- NOTE: Expenses table has budget_id, not event_id
+-- Must join through budgets -> events
 
 DO $$
 BEGIN
@@ -26,31 +28,65 @@ DROP POLICY IF EXISTS "Users can view their event expenses" ON expenses;
 DROP POLICY IF EXISTS "Users can insert expenses for their events" ON expenses;
 DROP POLICY IF EXISTS "Users can update expenses for their events" ON expenses;
 DROP POLICY IF EXISTS "Users can delete expenses for their events" ON expenses;
+DROP POLICY IF EXISTS "Users can view their expenses" ON expenses;
+DROP POLICY IF EXISTS "Users can insert their expenses" ON expenses;
+DROP POLICY IF EXISTS "Users can update their expenses" ON expenses;
+DROP POLICY IF EXISTS "Users can delete their expenses" ON expenses;
 
--- Create new policies
-CREATE POLICY "Users can view their event expenses"
+-- Create new policies (join through budgets -> events)
+CREATE POLICY "Users can view their expenses"
 ON expenses FOR SELECT TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
+USING (
+  budget_id IN (
+    SELECT b.id FROM budgets b
+    JOIN events e ON b.event_id = e.id
+    WHERE e.user_id = auth.uid()
+  )
+);
 
-CREATE POLICY "Users can insert expenses for their events"
+CREATE POLICY "Users can insert their expenses"
 ON expenses FOR INSERT TO authenticated
-WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
+WITH CHECK (
+  budget_id IN (
+    SELECT b.id FROM budgets b
+    JOIN events e ON b.event_id = e.id
+    WHERE e.user_id = auth.uid()
+  )
+);
 
-CREATE POLICY "Users can update expenses for their events"
+CREATE POLICY "Users can update their expenses"
 ON expenses FOR UPDATE TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))
-WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
+USING (
+  budget_id IN (
+    SELECT b.id FROM budgets b
+    JOIN events e ON b.event_id = e.id
+    WHERE e.user_id = auth.uid()
+  )
+)
+WITH CHECK (
+  budget_id IN (
+    SELECT b.id FROM budgets b
+    JOIN events e ON b.event_id = e.id
+    WHERE e.user_id = auth.uid()
+  )
+);
 
-CREATE POLICY "Users can delete expenses for their events"
+CREATE POLICY "Users can delete their expenses"
 ON expenses FOR DELETE TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
+USING (
+  budget_id IN (
+    SELECT b.id FROM budgets b
+    JOIN events e ON b.event_id = e.id
+    WHERE e.user_id = auth.uid()
+  )
+);
 
 -- Enable RLS
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 
 DO $$
 BEGIN
-  RAISE NOTICE '✅ Expenses RLS fixed';
+  RAISE NOTICE '✅ Expenses RLS fixed (via budget_id -> events)';
   RAISE NOTICE '';
 END $$;
 
