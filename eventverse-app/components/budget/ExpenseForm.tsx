@@ -28,9 +28,7 @@ export default function ExpenseForm({
     amount: '',
     category_id: '',
     expense_date: new Date().toISOString().split('T')[0],
-    vendor_name: '',
-    payment_method: 'cash',
-    notes: '',
+    description: '',
     status: 'paid'
   });
 
@@ -66,9 +64,7 @@ export default function ExpenseForm({
         amount: '',
         category_id: '',
         expense_date: new Date().toISOString().split('T')[0],
-        vendor_name: '',
-        payment_method: 'cash',
-        notes: '',
+        description: '',
         status: 'paid'
       });
     } catch (error) {
@@ -158,7 +154,7 @@ export default function ExpenseForm({
             </div>
           </div>
 
-          {/* Date and Payment Method */}
+          {/* Date and Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -170,43 +166,6 @@ export default function ExpenseForm({
                 value={formData.expense_date}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payment Method *
-              </label>
-              <select
-                name="payment_method"
-                value={formData.payment_method}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="cash">Cash</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="debit_card">Debit Card</option>
-                <option value="upi">UPI</option>
-                <option value="bank_transfer">Bank Transfer</option>
-                <option value="cheque">Cheque</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Vendor Name and Status */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Vendor Name
-              </label>
-              <input
-                type="text"
-                name="vendor_name"
-                value={formData.vendor_name}
-                onChange={handleChange}
-                placeholder="e.g., ABC Caterers"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
@@ -229,14 +188,14 @@ export default function ExpenseForm({
             </div>
           </div>
 
-          {/* Notes */}
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes
+              Description
             </label>
             <textarea
-              name="notes"
-              value={formData.notes}
+              name="description"
+              value={formData.description}
               onChange={handleChange}
               rows={3}
               placeholder="Additional details about this expense..."

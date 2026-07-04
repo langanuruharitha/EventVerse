@@ -23,9 +23,7 @@ export async function POST(request: Request) {
       expense_name,
       amount,
       expense_date,
-      vendor_name,
-      payment_method,
-      notes,
+      description,
       status = 'paid'
     } = body;
 
@@ -44,11 +42,9 @@ export async function POST(request: Request) {
         budget_id,
         category_id,
         expense_name,
+        description,
         amount,
-        expense_date: expense_date || new Date().toISOString(),
-        vendor_name,
-        payment_method,
-        notes,
+        expense_date: expense_date || new Date().toISOString().split('T')[0],
         status
       })
       .select()
