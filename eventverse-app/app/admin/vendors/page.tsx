@@ -1,31 +1,71 @@
 'use client';
 
-import { useState } from 'react';
-
-const mockVendors = [
-  { id: 1, name: 'Epic Moments Photography', category: 'Photography', owner: 'Vikram Mehta', email: 'vikram@epicmoments.com', status: 'verified', doc: 'Aadhaar_Pan_Card.pdf', rating: 4.8 },
-  { id: 2, name: 'Golden Catering Services', category: 'Catering', owner: 'Ramesh Patel', email: 'ramesh@goldencatering.com', status: 'pending', doc: 'FSSAI_License.pdf', rating: 0.0 },
-  { id: 3, name: 'DJ Rhythm Beats', category: 'DJ Services', owner: 'Arjun Das', email: 'arjun@djrhythm.com', status: 'pending', doc: 'Shop_Establishment_Act.pdf', rating: 0.0 },
-  { id: 4, name: 'Dream Decorators', category: 'Decoration', owner: 'Nisha Singhal', email: 'nisha@dreamdecors.com', status: 'verified', doc: 'GST_Certificate.pdf', rating: 4.5 },
-  { id: 5, name: 'Royal Palace Venue', category: 'Venue', owner: 'Sanjay Dutt', email: 'sanjay@royalpalace.com', status: 'suspended', doc: 'Property_Tax_Receipt.pdf', rating: 3.2 },
-];
+import { useState, useEffect } from 'react';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 export default function AdminVendorsPage() {
-  const [vendors, setVendors] = useState(mockVendors);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selectedVendor, setSelectedVendor] = useState<any>(null);
 
-  const handleStatusChange = (id: number, newStatus: string) => {
-    setVendors(vendors.map(v => v.id === id ? { ...v, status: newStatus } : v));
-    if (selectedVendor?.id === id) {
-      setSelectedVendor({ ...selectedVendor, status: newStatus });
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const fetchVendors = async () => {
+    setLoading(true);
+    try {
+      const supabase = createBrowserClient();
+      const { data, error } = await supabase
+        .from('vendors')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setVendors(data || []);
+    } catch (err) {
+      console.error('Error fetching vendors:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      const supabase = createBrowserClient();
+      
+      // Update in database
+      const { error } = await supabase
+        .from('vendors')
+        .update({ 
+          verification_status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state
+      setVendors(vendors.map(v => v.id === id ? { ...v, verification_status: newStatus } : v));
+      if (selectedVendor?.id === id) {
+        setSelectedVendor({ ...selectedVendor, verification_status: newStatus });
+      }
+
+      alert(`Vendor status updated to ${newStatus}`);
+    } catch (err) {
+      console.error('Error updating vendor status:', err);
+      alert('Failed to update vendor status. Please try again.');
     }
   };
 
   const filtered = vendors.filter(v => {
-    const matchesSearch = v.name.toLowerCase().includes(search.toLowerCase()) || v.owner.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === 'all' ? true : v.status === filter;
+    const matchesSearch = 
+      v.business_name?.toLowerCase().includes(search.toLowerCase()) || 
+      v.owner_name?.toLowerCase().includes(search.toLowerCase()) ||
+      v.email?.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'all' ? true : v.verification_status === filter;
     return matchesSearch && matchesFilter;
   });
 
@@ -78,25 +118,38 @@ export default function AdminVendorsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 text-sm">
-                {filtered.map(vendor => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600 mx-auto"></div>
+                      <p className="text-xs mt-2">Loading vendors...</p>
+                    </td>
+                  </tr>
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-gray-500 font-semibold">
+                      No vendors found.
+                    </td>
+                  </tr>
+                ) : filtered.map(vendor => (
                   <tr key={vendor.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedVendor(vendor)}>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-gray-900">{vendor.name}</div>
-                      <div className="text-xs text-gray-500">By {vendor.owner} ({vendor.email})</div>
+                      <div className="font-semibold text-gray-900">{vendor.business_name || 'N/A'}</div>
+                      <div className="text-xs text-gray-500">By {vendor.owner_name || 'N/A'} ({vendor.email || 'N/A'})</div>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">{vendor.category}</td>
+                    <td className="px-6 py-4 text-gray-600">{vendor.category || 'N/A'}</td>
                     <td className="px-6 py-4">
                       <span className="flex items-center gap-1 font-semibold text-gray-700">⭐ {vendor.rating > 0 ? vendor.rating : 'N/A'}</span>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold border capitalize ${
-                        vendor.status === 'verified'
+                        vendor.verification_status === 'verified'
                           ? 'bg-green-50 text-green-700 border-green-200'
-                          : vendor.status === 'pending'
+                          : vendor.verification_status === 'pending'
                           ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
                           : 'bg-red-50 text-red-700 border-red-200'
                       }`}>
-                        {vendor.status}
+                        {vendor.verification_status || 'pending'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
@@ -125,45 +178,47 @@ export default function AdminVendorsPage() {
             <div className="space-y-4 text-sm text-gray-700">
               <div>
                 <p className="text-xs text-gray-400 font-semibold uppercase">Business Name</p>
-                <p className="font-bold text-gray-900 mt-1">{selectedVendor.name}</p>
+                <p className="font-bold text-gray-900 mt-1">{selectedVendor.business_name || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 font-semibold uppercase">Category</p>
-                <p className="font-semibold text-gray-800 mt-1">{selectedVendor.category}</p>
+                <p className="font-semibold text-gray-800 mt-1">{selectedVendor.category || 'N/A'}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-gray-400 font-semibold uppercase">Owner Name</p>
-                  <p className="font-semibold mt-1">{selectedVendor.owner}</p>
+                  <p className="font-semibold mt-1">{selectedVendor.owner_name || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 font-semibold uppercase">Email</p>
-                  <p className="font-semibold mt-1 truncate">{selectedVendor.email}</p>
+                  <p className="font-semibold mt-1 truncate">{selectedVendor.email || 'N/A'}</p>
                 </div>
               </div>
 
               {/* Uploaded Credential Document */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
-                <p className="text-xs text-gray-500 font-semibold mb-1.5">Submitted Identification Document</p>
-                <div className="flex items-center justify-between text-xs bg-white p-2.5 rounded-lg border border-gray-100">
-                  <span className="font-semibold truncate text-gray-700">📄 {selectedVendor.doc}</span>
-                  <button className="text-rose-600 hover:underline font-bold flex-shrink-0 ml-2">Download File</button>
+              {selectedVendor.documents && (
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
+                  <p className="text-xs text-gray-500 font-semibold mb-1.5">Submitted Identification Document</p>
+                  <div className="flex items-center justify-between text-xs bg-white p-2.5 rounded-lg border border-gray-100">
+                    <span className="font-semibold truncate text-gray-700">📄 {selectedVendor.documents}</span>
+                    <button className="text-rose-600 hover:underline font-bold flex-shrink-0 ml-2">Download File</button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Current Status Display */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500">Current Status:</span>
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${
-                  selectedVendor.status === 'verified' ? 'bg-green-100 text-green-700' : selectedVendor.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                  selectedVendor.verification_status === 'verified' ? 'bg-green-100 text-green-700' : selectedVendor.verification_status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                 }`}>
-                  {selectedVendor.status}
+                  {selectedVendor.verification_status || 'pending'}
                 </span>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-2 pt-4 border-t border-gray-100">
-                {selectedVendor.status === 'pending' && (
+                {selectedVendor.verification_status === 'pending' && (
                   <>
                     <button
                       onClick={() => handleStatusChange(selectedVendor.id, 'verified')}
@@ -179,7 +234,7 @@ export default function AdminVendorsPage() {
                     </button>
                   </>
                 )}
-                {selectedVendor.status === 'verified' && (
+                {selectedVendor.verification_status === 'verified' && (
                   <button
                     onClick={() => handleStatusChange(selectedVendor.id, 'suspended')}
                     className="w-full py-2.5 rounded-xl bg-red-100 text-red-600 font-semibold hover:bg-red-200 transition-colors"
@@ -187,7 +242,7 @@ export default function AdminVendorsPage() {
                     🚫 Suspend Account
                   </button>
                 )}
-                {selectedVendor.status === 'suspended' && (
+                {selectedVendor.verification_status === 'suspended' && (
                   <button
                     onClick={() => handleStatusChange(selectedVendor.id, 'verified')}
                     className="w-full py-2.5 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition-colors"
