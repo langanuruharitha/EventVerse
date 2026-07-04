@@ -38,12 +38,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             .eq('user_id', user.id)
             .single();
           
-          // Use full_name if available, otherwise extract username from email
-          const displayName = profile?.full_name || user.email?.split('@')[0]?.replace(/[._-]/g, ' ') || 'Admin';
+          // Use full_name if available, otherwise format username from email
+          let displayName = profile?.full_name;
+          
+          if (!displayName && user.email) {
+            // Extract username and format it properly
+            const username = user.email.split('@')[0];
+            // Convert "harithalanganuru" to "Haritha Langanuru"
+            displayName = username
+              .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capitals
+              .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+            
+            // If no capitals found, try to split intelligently (fallback)
+            if (!displayName.includes(' ') && displayName.length > 10) {
+              // For cases like "harithalanganuru", split in middle
+              const mid = Math.floor(displayName.length / 2);
+              displayName = displayName.slice(0, mid).charAt(0).toUpperCase() + displayName.slice(1, mid) + 
+                           ' ' + displayName.slice(mid).charAt(0).toUpperCase() + displayName.slice(mid + 1);
+            }
+          }
           
           setAdmin({
             email: user.email,
-            full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1), // Capitalize first letter
+            full_name: displayName || 'Admin',
             role: 'Admin'
           });
         } else {
