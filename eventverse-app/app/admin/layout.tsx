@@ -37,9 +37,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             .eq('user_id', user.id)
             .single();
           
+          // Use full_name if available, otherwise extract username from email
+          const displayName = profile?.full_name || user.email?.split('@')[0]?.replace(/[._-]/g, ' ') || 'Admin';
+          
           setAdmin({
             email: user.email,
-            full_name: profile?.full_name || user.email?.split('@')[0] || 'Admin',
+            full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1), // Capitalize first letter
             role: 'Admin'
           });
         } else {
