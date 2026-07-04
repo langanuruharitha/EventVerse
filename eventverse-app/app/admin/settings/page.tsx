@@ -1,6 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const ADMIN_SETTINGS_KEY = 'eventverse_admin_settings';
+
+const getInitialSettings = () => ({
+  commission: 10,
+  allowRegistration: true,
+  autoVerifyVendors: false,
+  maxUploadSize: 10,
+});
 
 export default function AdminSettingsPage() {
   const [commission, setCommission] = useState(10);
@@ -9,7 +18,31 @@ export default function AdminSettingsPage() {
   const [maxUploadSize, setMaxUploadSize] = useState(10); // MB
   const [successMsg, setSuccessMsg] = useState('');
 
+  useEffect(() => {
+    // Load settings from localStorage or use defaults
+    const storedSettings = localStorage.getItem(ADMIN_SETTINGS_KEY);
+    if (storedSettings) {
+      const settings = JSON.parse(storedSettings);
+      setCommission(settings.commission);
+      setAllowRegistration(settings.allowRegistration);
+      setAutoVerifyVendors(settings.autoVerifyVendors);
+      setMaxUploadSize(settings.maxUploadSize);
+    } else {
+      const initialSettings = getInitialSettings();
+      localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(initialSettings));
+    }
+  }, []);
+
   const handleSave = () => {
+    // Save settings to localStorage
+    const settings = {
+      commission,
+      allowRegistration,
+      autoVerifyVendors,
+      maxUploadSize,
+    };
+    localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(settings));
+    
     setSuccessMsg('Settings saved successfully! ✅');
     setTimeout(() => setSuccessMsg(''), 3000);
   };
