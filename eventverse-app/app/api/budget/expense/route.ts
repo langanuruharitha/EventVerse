@@ -58,7 +58,11 @@ export async function POST(request: Request) {
     if (expenseError) {
       console.error('Error creating expense:', expenseError);
       return NextResponse.json(
-        { error: 'Failed to create expense' },
+        { 
+          error: 'Failed to create expense',
+          details: expenseError.message,
+          code: expenseError.code
+        },
         { status: 500 }
       );
     }

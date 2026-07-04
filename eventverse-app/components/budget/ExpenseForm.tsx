@@ -52,7 +52,9 @@ export default function ExpenseForm({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add expense');
+        const errorData = await response.json();
+        const errorMsg = errorData.details || errorData.error || 'Failed to add expense';
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -71,7 +73,7 @@ export default function ExpenseForm({
       });
     } catch (error) {
       console.error('Error adding expense:', error);
-      alert('Failed to add expense. Please try again.');
+      alert(`Failed to add expense: ${error instanceof Error ? error.message : 'Please try again.'}`);
     } finally {
       setLoading(false);
     }
