@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const adminNav = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
+  { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
   { name: 'Vendors Moderation', href: '/admin/vendors', icon: '🏪' },
   { name: 'Users Management', href: '/admin/users', icon: '👥' },
   { name: 'Platform Bookings', href: '/admin/bookings', icon: '📅' },
@@ -20,6 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [admin, setAdmin] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     // Fetch actual logged-in user
@@ -73,7 +75,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
     
     fetchUser();
+    fetchUnreadNotifications();
+
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchUnreadNotifications, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchUnreadNotifications = async () => {
+    try {
+      const { createBrowserClient } = await import('@/lib/supabase/client');
+      const supabase = createBrowserClient();
+      
+      const { count } = await supabase
+        .from('admin_notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_read', false);
+
+      setUnreadCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching notifications count:', error);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -125,6 +148,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <span className="text-xl">{item.icon}</span>
               <span className="font-medium">{item.name}</span>
+              {item.name === 'Notifications' && unreadCount > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
