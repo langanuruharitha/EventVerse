@@ -254,6 +254,89 @@ export default function BudgetPage() {
     setShowExpenseForm(false);
   };
 
+  const handleViewAllExpenses = async () => {
+    if (!selectedBudget) {
+      alert('Please select a budget first');
+      return;
+    }
+
+    try {
+      const { data: allExpenses, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('budget_id', selectedBudget.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Create a modal or navigate to expenses page
+      const expensesList = allExpenses?.map((exp: Expense) => 
+        `${exp.expense_name}: ${formatCurrency(exp.amount)} (${new Date(exp.expense_date).toLocaleDateString()})`
+      ).join('\n');
+
+      alert(`All Expenses:\n\n${expensesList || 'No expenses found'}`);
+      
+    } catch (error) {
+      console.error('Error fetching all expenses:', error);
+      alert('Failed to fetch expenses');
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    if (!selectedBudget) {
+      alert('Please select a budget first');
+      return;
+    }
+
+    try {
+      // Fetch all data needed for report
+      const { data: allExpenses, error: expError } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('budget_id', selectedBudget.id)
+        .order('expense_date', { ascending: true });
+
+      if (expError) throw expError;
+
+      const { data: budgetCats, error: catError } = await supabase
+        .from('budget_categories')
+        .select('*')
+        .eq('budget_id', selectedBudget.id);
+
+      if (catError) throw catError;
+
+      // Generate CSV report
+      const csvHeader = 'Date,Category,Expense Name,Amount,Status\n';
+      const csvRows = allExpenses?.map((exp: any) => {
+        const category = budgetCats?.find((cat: any) => cat.id === exp.category_id);
+        return `${exp.expense_date},"${category?.category_name || 'N/A'}","${exp.expense_name}",${exp.amount},${exp.status}`;
+      }).join('\n') || '';
+
+      const csvContent = csvHeader + csvRows;
+      
+      // Create download link
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `budget-report-${selectedBudget.event?.event_name || 'event'}-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      alert('Report downloaded successfully!');
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report');
+    }
+  };
+    if (selectedBudget) {
+      fetchBudgetDetails(selectedBudget.id);
+    }
+    setShowExpenseForm(false);
+  };
+
   const checkForEvents = async () => {
     const { data: eventsData } = await supabase
       .from('events')
@@ -904,10 +987,16 @@ export default function BudgetPage() {
                 <Plus className="w-5 h-5 mr-2" />
                 Add Expense
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={() => handleViewAllExpenses()}
+              >
                 View All Expenses
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={() => handleGenerateReport()}
+              >
                 Generate Report
               </Button>
             </div>
