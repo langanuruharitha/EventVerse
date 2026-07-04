@@ -21,11 +21,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Check local session or simple mock admin credentials
-    setAdmin({ email: 'admin@eventverse.com', full_name: 'System Admin', role: 'Super Admin' });
+    // Fetch actual logged-in user
+    async function fetchUser() {
+      try {
+        const { createBrowserClient } = await import('@/lib/supabase/client');
+        const supabase = createBrowserClient();
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Fetch user profile for full name
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name')
+            .eq('user_id', user.id)
+            .single();
+          
+          setAdmin({
+            email: user.email,
+            full_name: profile?.full_name || user.email?.split('@')[0] || 'Admin',
+            role: 'Admin'
+          });
+        } else {
+          setAdmin({ email: 'admin@eventverse.com', full_name: 'System Admin', role: 'Super Admin' });
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        setAdmin({ email: 'admin@eventverse.com', full_name: 'System Admin', role: 'Super Admin' });
+      }
+    }
+    
+    fetchUser();
   }, []);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    try {
+      const { createBrowserClient } = await import('@/lib/supabase/client');
+      const supabase = createBrowserClient();
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
     router.push('/admin/login');
   };
 
