@@ -134,88 +134,66 @@ BEGIN
 END $$;
 
 -- ============================================
--- 3. TASKS TABLE RLS
+-- 3. TASKS TABLE RLS (if exists)
 -- ============================================
 
 DO $$
 BEGIN
-  RAISE NOTICE '🔧 Fixing tasks table RLS...';
-END $$;
-
--- Drop existing policies
-DROP POLICY IF EXISTS "Users can manage their event tasks" ON tasks;
-DROP POLICY IF EXISTS "Users can view their event tasks" ON tasks;
-DROP POLICY IF EXISTS "Users can insert tasks for their events" ON tasks;
-DROP POLICY IF EXISTS "Users can update tasks for their events" ON tasks;
-DROP POLICY IF EXISTS "Users can delete tasks for their events" ON tasks;
-
--- Create new policies
-CREATE POLICY "Users can view their event tasks"
-ON tasks FOR SELECT TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
-CREATE POLICY "Users can insert tasks for their events"
-ON tasks FOR INSERT TO authenticated
-WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
-CREATE POLICY "Users can update tasks for their events"
-ON tasks FOR UPDATE TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))
-WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
-CREATE POLICY "Users can delete tasks for their events"
-ON tasks FOR DELETE TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
--- Enable RLS
-ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
-
-DO $$
-BEGIN
-  RAISE NOTICE '✅ Tasks RLS fixed';
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'tasks') THEN
+    RAISE NOTICE '🔧 Fixing tasks table RLS...';
+    
+    -- Drop existing policies
+    EXECUTE 'DROP POLICY IF EXISTS "Users can manage their event tasks" ON tasks';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view their event tasks" ON tasks';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert tasks for their events" ON tasks';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update tasks for their events" ON tasks';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete tasks for their events" ON tasks';
+    
+    -- Create new policies
+    EXECUTE 'CREATE POLICY "Users can view their event tasks" ON tasks FOR SELECT TO authenticated USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can insert tasks for their events" ON tasks FOR INSERT TO authenticated WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can update tasks for their events" ON tasks FOR UPDATE TO authenticated USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid())) WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can delete tasks for their events" ON tasks FOR DELETE TO authenticated USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    
+    -- Enable RLS
+    EXECUTE 'ALTER TABLE tasks ENABLE ROW LEVEL SECURITY';
+    
+    RAISE NOTICE '✅ Tasks RLS fixed';
+  ELSE
+    RAISE NOTICE '⏭️  Tasks table not found, skipping';
+  END IF;
   RAISE NOTICE '';
 END $$;
 
 -- ============================================
--- 4. SHOPPING LIST RLS
+-- 4. SHOPPING LIST RLS (if exists)
 -- ============================================
 
 DO $$
 BEGIN
-  RAISE NOTICE '🔧 Fixing shopping_list table RLS...';
-END $$;
-
--- Drop existing policies
-DROP POLICY IF EXISTS "Users can manage their event shopping" ON shopping_list;
-DROP POLICY IF EXISTS "Users can view their event shopping" ON shopping_list;
-DROP POLICY IF EXISTS "Users can insert shopping for their events" ON shopping_list;
-DROP POLICY IF EXISTS "Users can update shopping for their events" ON shopping_list;
-DROP POLICY IF EXISTS "Users can delete shopping for their events" ON shopping_list;
-
--- Create new policies
-CREATE POLICY "Users can view their event shopping"
-ON shopping_list FOR SELECT TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
-CREATE POLICY "Users can insert shopping for their events"
-ON shopping_list FOR INSERT TO authenticated
-WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
-CREATE POLICY "Users can update shopping for their events"
-ON shopping_list FOR UPDATE TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))
-WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
-CREATE POLICY "Users can delete shopping for their events"
-ON shopping_list FOR DELETE TO authenticated
-USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()));
-
--- Enable RLS
-ALTER TABLE shopping_list ENABLE ROW LEVEL SECURITY;
-
-DO $$
-BEGIN
-  RAISE NOTICE '✅ Shopping list RLS fixed';
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'shopping_list') THEN
+    RAISE NOTICE '🔧 Fixing shopping_list table RLS...';
+    
+    -- Drop existing policies
+    EXECUTE 'DROP POLICY IF EXISTS "Users can manage their event shopping" ON shopping_list';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view their event shopping" ON shopping_list';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert shopping for their events" ON shopping_list';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update shopping for their events" ON shopping_list';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete shopping for their events" ON shopping_list';
+    
+    -- Create new policies
+    EXECUTE 'CREATE POLICY "Users can view their event shopping" ON shopping_list FOR SELECT TO authenticated USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can insert shopping for their events" ON shopping_list FOR INSERT TO authenticated WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can update shopping for their events" ON shopping_list FOR UPDATE TO authenticated USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid())) WITH CHECK (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can delete shopping for their events" ON shopping_list FOR DELETE TO authenticated USING (event_id IN (SELECT id FROM events WHERE user_id = auth.uid()))';
+    
+    -- Enable RLS
+    EXECUTE 'ALTER TABLE shopping_list ENABLE ROW LEVEL SECURITY';
+    
+    RAISE NOTICE '✅ Shopping list RLS fixed';
+  ELSE
+    RAISE NOTICE '⏭️  Shopping list table not found, skipping';
+  END IF;
   RAISE NOTICE '';
 END $$;
 
