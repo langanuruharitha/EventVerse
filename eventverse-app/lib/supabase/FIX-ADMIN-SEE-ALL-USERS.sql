@@ -44,6 +44,10 @@ DROP POLICY IF EXISTS "Users can view all users" ON public.users;
 DROP POLICY IF EXISTS "Users can view all profiles" ON public.user_profiles;
 DROP POLICY IF EXISTS "Public users are viewable by everyone" ON public.users;
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.user_profiles;
+DROP POLICY IF EXISTS "Authenticated users can view all users" ON public.users;
+DROP POLICY IF EXISTS "Authenticated users can view all profiles" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can update own record" ON public.users;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.user_profiles;
 
 -- Create policy: Anyone authenticated can view all users (for admin panel)
 CREATE POLICY "Authenticated users can view all users"
