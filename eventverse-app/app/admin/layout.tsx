@@ -12,6 +12,7 @@ const adminNav = [
   { name: 'Reviews Moderation', href: '/admin/reviews', icon: '⭐' },
   { name: 'Analytics', href: '/admin/analytics', icon: '📈' },
   { name: 'Settings', href: '/admin/settings', icon: '⚙️' },
+  { name: 'Profile', href: '/admin/profile', icon: '👤' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
