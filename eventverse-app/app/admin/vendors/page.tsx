@@ -3,6 +3,66 @@
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 
+const DEMO_VENDORS_KEY = 'eventverse_demo_vendors';
+
+const getInitialDemoVendors = () => [
+  { 
+    id: 'demo-1', 
+    business_name: 'Epic Moments Photography', 
+    category: 'Photography', 
+    owner_name: 'Vikram Mehta', 
+    email: 'vikram@epicmoments.com', 
+    verification_status: 'verified', 
+    documents: 'Aadhaar_Pan_Card.pdf', 
+    rating: 4.8,
+    created_at: new Date().toISOString()
+  },
+  { 
+    id: 'demo-2', 
+    business_name: 'Golden Catering Services', 
+    category: 'Catering', 
+    owner_name: 'Ramesh Patel', 
+    email: 'ramesh@goldencatering.com', 
+    verification_status: 'pending', 
+    documents: 'FSSAI_License.pdf', 
+    rating: 0.0,
+    created_at: new Date().toISOString()
+  },
+  { 
+    id: 'demo-3', 
+    business_name: 'DJ Rhythm Beats', 
+    category: 'DJ Services', 
+    owner_name: 'Arjun Das', 
+    email: 'arjun@djrhythm.com', 
+    verification_status: 'pending', 
+    documents: 'Shop_Establishment_Act.pdf', 
+    rating: 0.0,
+    created_at: new Date().toISOString()
+  },
+  { 
+    id: 'demo-4', 
+    business_name: 'Dream Decorators', 
+    category: 'Decoration', 
+    owner_name: 'Nisha Singhal', 
+    email: 'nisha@dreamdecors.com', 
+    verification_status: 'verified', 
+    documents: 'GST_Certificate.pdf', 
+    rating: 4.5,
+    created_at: new Date().toISOString()
+  },
+  { 
+    id: 'demo-5', 
+    business_name: 'Royal Palace Venue', 
+    category: 'Venue', 
+    owner_name: 'Sanjay Dutt', 
+    email: 'sanjay@royalpalace.com', 
+    verification_status: 'suspended', 
+    documents: 'Property_Tax_Receipt.pdf', 
+    rating: 3.2,
+    created_at: new Date().toISOString()
+  },
+];
+
 export default function AdminVendorsPage() {
   const [vendors, setVendors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,128 +85,30 @@ export default function AdminVendorsPage() {
 
       if (error) throw error;
       
-      // If no vendors in database, show demo vendors
+      // If no vendors in database, load demo vendors from localStorage or use initial
       if (!data || data.length === 0) {
-        setVendors([
-          { 
-            id: 'demo-1', 
-            business_name: 'Epic Moments Photography', 
-            category: 'Photography', 
-            owner_name: 'Vikram Mehta', 
-            email: 'vikram@epicmoments.com', 
-            verification_status: 'verified', 
-            documents: 'Aadhaar_Pan_Card.pdf', 
-            rating: 4.8,
-            created_at: new Date().toISOString()
-          },
-          { 
-            id: 'demo-2', 
-            business_name: 'Golden Catering Services', 
-            category: 'Catering', 
-            owner_name: 'Ramesh Patel', 
-            email: 'ramesh@goldencatering.com', 
-            verification_status: 'pending', 
-            documents: 'FSSAI_License.pdf', 
-            rating: 0.0,
-            created_at: new Date().toISOString()
-          },
-          { 
-            id: 'demo-3', 
-            business_name: 'DJ Rhythm Beats', 
-            category: 'DJ Services', 
-            owner_name: 'Arjun Das', 
-            email: 'arjun@djrhythm.com', 
-            verification_status: 'pending', 
-            documents: 'Shop_Establishment_Act.pdf', 
-            rating: 0.0,
-            created_at: new Date().toISOString()
-          },
-          { 
-            id: 'demo-4', 
-            business_name: 'Dream Decorators', 
-            category: 'Decoration', 
-            owner_name: 'Nisha Singhal', 
-            email: 'nisha@dreamdecors.com', 
-            verification_status: 'verified', 
-            documents: 'GST_Certificate.pdf', 
-            rating: 4.5,
-            created_at: new Date().toISOString()
-          },
-          { 
-            id: 'demo-5', 
-            business_name: 'Royal Palace Venue', 
-            category: 'Venue', 
-            owner_name: 'Sanjay Dutt', 
-            email: 'sanjay@royalpalace.com', 
-            verification_status: 'suspended', 
-            documents: 'Property_Tax_Receipt.pdf', 
-            rating: 3.2,
-            created_at: new Date().toISOString()
-          },
-        ]);
+        const storedDemoVendors = localStorage.getItem(DEMO_VENDORS_KEY);
+        if (storedDemoVendors) {
+          setVendors(JSON.parse(storedDemoVendors));
+        } else {
+          const initialVendors = getInitialDemoVendors();
+          setVendors(initialVendors);
+          localStorage.setItem(DEMO_VENDORS_KEY, JSON.stringify(initialVendors));
+        }
       } else {
         setVendors(data);
       }
     } catch (err) {
       console.error('Error fetching vendors:', err);
-      // Show demo vendors on error too
-      setVendors([
-        { 
-          id: 'demo-1', 
-          business_name: 'Epic Moments Photography', 
-          category: 'Photography', 
-          owner_name: 'Vikram Mehta', 
-          email: 'vikram@epicmoments.com', 
-          verification_status: 'verified', 
-          documents: 'Aadhaar_Pan_Card.pdf', 
-          rating: 4.8,
-          created_at: new Date().toISOString()
-        },
-        { 
-          id: 'demo-2', 
-          business_name: 'Golden Catering Services', 
-          category: 'Catering', 
-          owner_name: 'Ramesh Patel', 
-          email: 'ramesh@goldencatering.com', 
-          verification_status: 'pending', 
-          documents: 'FSSAI_License.pdf', 
-          rating: 0.0,
-          created_at: new Date().toISOString()
-        },
-        { 
-          id: 'demo-3', 
-          business_name: 'DJ Rhythm Beats', 
-          category: 'DJ Services', 
-          owner_name: 'Arjun Das', 
-          email: 'arjun@djrhythm.com', 
-          verification_status: 'pending', 
-          documents: 'Shop_Establishment_Act.pdf', 
-          rating: 0.0,
-          created_at: new Date().toISOString()
-        },
-        { 
-          id: 'demo-4', 
-          business_name: 'Dream Decorators', 
-          category: 'Decoration', 
-          owner_name: 'Nisha Singhal', 
-          email: 'nisha@dreamdecors.com', 
-          verification_status: 'verified', 
-          documents: 'GST_Certificate.pdf', 
-          rating: 4.5,
-          created_at: new Date().toISOString()
-        },
-        { 
-          id: 'demo-5', 
-          business_name: 'Royal Palace Venue', 
-          category: 'Venue', 
-          owner_name: 'Sanjay Dutt', 
-          email: 'sanjay@royalpalace.com', 
-          verification_status: 'suspended', 
-          documents: 'Property_Tax_Receipt.pdf', 
-          rating: 3.2,
-          created_at: new Date().toISOString()
-        },
-      ]);
+      // Load demo vendors from localStorage or use initial
+      const storedDemoVendors = localStorage.getItem(DEMO_VENDORS_KEY);
+      if (storedDemoVendors) {
+        setVendors(JSON.parse(storedDemoVendors));
+      } else {
+        const initialVendors = getInitialDemoVendors();
+        setVendors(initialVendors);
+        localStorage.setItem(DEMO_VENDORS_KEY, JSON.stringify(initialVendors));
+      }
     } finally {
       setLoading(false);
     }
@@ -172,13 +134,20 @@ export default function AdminVendorsPage() {
         if (error) throw error;
       }
 
-      // Update local state (for both demo and real vendors)
-      setVendors(vendors.map(v => v.id === id ? { ...v, verification_status: newStatus } : v));
+      // Update local state
+      const updatedVendors = vendors.map(v => v.id === id ? { ...v, verification_status: newStatus } : v);
+      setVendors(updatedVendors);
+      
       if (selectedVendor?.id === id) {
         setSelectedVendor({ ...selectedVendor, verification_status: newStatus });
       }
 
-      alert(`Vendor status updated to ${newStatus}${isDemoVendor ? ' (Demo mode - changes in memory only)' : ''}`);
+      // If demo vendor, persist changes to localStorage
+      if (isDemoVendor) {
+        localStorage.setItem(DEMO_VENDORS_KEY, JSON.stringify(updatedVendors));
+      }
+
+      alert(`Vendor status updated to ${newStatus}${isDemoVendor ? ' (Demo - changes saved in browser)' : ''}`);
     } catch (err) {
       console.error('Error updating vendor status:', err);
       alert('Failed to update vendor status. Please try again.');
