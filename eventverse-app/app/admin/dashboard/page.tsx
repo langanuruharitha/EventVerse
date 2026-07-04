@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const mockSystemStats = {
@@ -12,7 +12,9 @@ const mockSystemStats = {
   totalCommissionEarned: 428050,
 };
 
-const mockPendingVendors = [
+const DEMO_PENDING_VENDORS_KEY = 'eventverse_demo_pending_vendors';
+
+const getInitialPendingVendors = () => [
   { id: 1, name: 'Golden Catering Services', category: 'Catering', date: '2026-07-02', owner: 'Ramesh Patel' },
   { id: 2, name: 'DJ Rhythm Beats', category: 'DJ Services', date: '2026-07-01', owner: 'Arjun Das' },
   { id: 3, name: 'Royal Palace Venue', category: 'Venue', date: '2026-06-30', owner: 'Sanjay Dutt' },
@@ -26,10 +28,25 @@ const mockRecentLogs = [
 ];
 
 export default function AdminDashboardPage() {
-  const [pendingVendors, setPendingVendors] = useState(mockPendingVendors);
+  const [pendingVendors, setPendingVendors] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load pending vendors from localStorage or use initial demo data
+    const storedPendingVendors = localStorage.getItem(DEMO_PENDING_VENDORS_KEY);
+    if (storedPendingVendors) {
+      setPendingVendors(JSON.parse(storedPendingVendors));
+    } else {
+      const initialVendors = getInitialPendingVendors();
+      setPendingVendors(initialVendors);
+      localStorage.setItem(DEMO_PENDING_VENDORS_KEY, JSON.stringify(initialVendors));
+    }
+  }, []);
 
   const approveQuick = (id: number) => {
-    setPendingVendors(pendingVendors.filter(v => v.id !== id));
+    const updatedVendors = pendingVendors.filter(v => v.id !== id);
+    setPendingVendors(updatedVendors);
+    // Persist changes to localStorage
+    localStorage.setItem(DEMO_PENDING_VENDORS_KEY, JSON.stringify(updatedVendors));
   };
 
   return (
