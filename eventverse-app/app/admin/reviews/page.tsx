@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const mockSystemReviews = [
+const DEMO_REVIEWS_KEY = 'eventverse_demo_reviews';
+
+const getInitialDemoReviews = () => [
   { id: 1, customer: 'Vikram Patel', vendor: 'Epic Moments Photography', service: 'Wedding Photography', rating: 5, date: '2026-07-10', comment: 'Absolutely fantastic work! Every photo was a masterpiece. Captures every precious moment.', status: 'approved' },
   { id: 2, customer: 'Sunita Rao', vendor: 'Dream Decorators', service: 'Pre-Wedding Shoot', rating: 5, date: '2026-06-28', comment: 'Very professional, made us feel comfortable. The photos came out stunning.', status: 'approved' },
   { id: 3, customer: 'Deepak Kumar', vendor: 'Golden Catering Services', service: 'Birthday Photography', rating: 2, date: '2026-06-15', comment: 'Catering staff was rude. Food quality was not up to the standard pricing.', status: 'flagged' },
@@ -11,11 +13,26 @@ const mockSystemReviews = [
 ];
 
 export default function AdminReviewsPage() {
-  const [reviews, setReviews] = useState(mockSystemReviews);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [filter, setFilter] = useState('all');
 
+  useEffect(() => {
+    // Load reviews from localStorage or use initial demo data
+    const storedReviews = localStorage.getItem(DEMO_REVIEWS_KEY);
+    if (storedReviews) {
+      setReviews(JSON.parse(storedReviews));
+    } else {
+      const initialReviews = getInitialDemoReviews();
+      setReviews(initialReviews);
+      localStorage.setItem(DEMO_REVIEWS_KEY, JSON.stringify(initialReviews));
+    }
+  }, []);
+
   const updateReviewStatus = (id: number, newStatus: string) => {
-    setReviews(reviews.map(r => r.id === id ? { ...r, status: newStatus } : r));
+    const updatedReviews = reviews.map(r => r.id === id ? { ...r, status: newStatus } : r);
+    setReviews(updatedReviews);
+    // Persist changes to localStorage
+    localStorage.setItem(DEMO_REVIEWS_KEY, JSON.stringify(updatedReviews));
   };
 
   const filtered = filter === 'all' ? reviews : reviews.filter(r => r.status === filter);
