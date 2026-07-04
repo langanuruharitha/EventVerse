@@ -331,11 +331,6 @@ export default function BudgetPage() {
       alert('Failed to generate report');
     }
   };
-    if (selectedBudget) {
-      fetchBudgetDetails(selectedBudget.id);
-    }
-    setShowExpenseForm(false);
-  };
 
   const checkForEvents = async () => {
     const { data: eventsData } = await supabase
