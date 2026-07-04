@@ -49,8 +49,7 @@ export async function POST(request: Request) {
         vendor_name,
         payment_method,
         notes,
-        status,
-        created_by: user.id
+        status
       })
       .select()
       .single();
