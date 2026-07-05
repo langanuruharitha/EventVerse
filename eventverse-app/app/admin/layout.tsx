@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const adminNav = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-  { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
+  { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },  // Added notifications
   { name: 'Vendors Moderation', href: '/admin/vendors', icon: '🏪' },
   { name: 'Users Management', href: '/admin/users', icon: '👥' },
   { name: 'Platform Bookings', href: '/admin/bookings', icon: '📅' },
@@ -16,7 +16,7 @@ const adminNav = [
   { name: 'Profile', href: '/admin/profile', icon: '👤' },
 ];
 
-// Force cache bust - v2
+// Updated: v2.0 - Admin Notifications Feature
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
