@@ -19,10 +19,15 @@ export default function SignInPage() {
 
     const result = await signIn({ email, password });
 
+    console.log('SignIn Result:', result);
+
     if (result?.error) {
       setError(result.error);
       setLoading(false);
     } else if (result?.success) {
+      console.log('SignIn Success! Redirect to:', result.redirect);
+      console.log('User Role:', result.userData?.role);
+      
       // Send notification before redirecting
       if (result.shouldNotify && result.userData) {
         try {
@@ -41,6 +46,7 @@ export default function SignInPage() {
         }
       }
       
+      console.log('About to redirect to:', result.redirect || '/dashboard');
       // Redirect to appropriate dashboard
       router.push(result.redirect || '/dashboard');
     }

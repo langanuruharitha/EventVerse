@@ -54,11 +54,20 @@ export async function signIn(data: SignInData) {
   }
 
   // Fetch user role to determine redirect path
-  const { data: userData } = await supabase
+  const { data: userData, error: userError } = await supabase
     .from('users')
     .select('role, email')
     .eq('id', authData.user.id)
     .single();
+
+  // Log for debugging
+  console.log('SignIn Debug:', {
+    userId: authData.user.id,
+    email: data.email,
+    userData,
+    userError,
+    role: userData?.role
+  });
 
   // Get user profile for full name
   const { data: profile } = await supabase
@@ -74,6 +83,8 @@ export async function signIn(data: SignInData) {
     userData?.role === 'vendor' ? '/vendor/dashboard' :
     userData?.role === 'admin' ? '/admin/dashboard' : 
     '/dashboard';
+
+  console.log('SignIn Redirect Path:', redirectPath, 'for role:', userData?.role);
 
   // Return data for client-side notification
   return {
