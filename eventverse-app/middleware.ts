@@ -76,6 +76,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/signin', request.url));
   }
 
+  // If an authenticated user visits /dashboard/* routes, check their role
+  // and redirect vendors to the vendor portal instead of customer portal
+  if (isProtectedRoute && user) {
+    const { data: roleData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (roleData?.role === 'vendor') {
+      console.log('🏪 Middleware: Vendor user on customer route, redirecting to vendor dashboard');
+      return NextResponse.redirect(new URL('/vendor/dashboard', request.url));
+    }
+    if (roleData?.role === 'admin') {
+      console.log('🛡️ Middleware: Admin user on customer route, redirecting to admin dashboard');
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+  }
+
   // Check user role for admin routes — skip login/setup/debug pages
   const adminPublicPaths = ['/admin/login', '/admin/debug', '/admin/setup'];
   const isAdminPublicPath = adminPublicPaths.some(p => request.nextUrl.pathname.startsWith(p));
@@ -149,8 +168,20 @@ export async function middleware(request: NextRequest) {
     console.log('✅ Middleware: Vendor check passed');
   }
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages based on their role
   if (user && request.nextUrl.pathname.startsWith('/auth')) {
+    const { data: authRoleData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (authRoleData?.role === 'vendor') {
+      return NextResponse.redirect(new URL('/vendor/dashboard', request.url));
+    }
+    if (authRoleData?.role === 'admin') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
