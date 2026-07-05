@@ -21,13 +21,22 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
   const [user, setUser] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Skip auth check and render bare page for vendor login/register
+  const isPublicPath = pathname === '/vendor/login' || pathname === '/vendor/register';
+
   useEffect(() => {
+    if (isPublicPath) return;
     const supabase = createBrowserClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) setUser(user);
-      else router.push('/auth/signin');
+      else router.push('/vendor/login');
     });
-  }, []);
+  }, [isPublicPath]);
+
+  // Render login/register without sidebar wrapper
+  if (isPublicPath) {
+    return <>{children}</>;
+  }
 
   const handleSignOut = async () => {
     await signOut();

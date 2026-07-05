@@ -113,7 +113,7 @@ export async function middleware(request: NextRequest) {
 
   if (isVendorRoute && !isVendorPublicPath) {
     if (!user) {
-      return NextResponse.redirect(new URL('/auth/signin', request.url));
+      return NextResponse.redirect(new URL('/vendor/login', request.url));
     }
     console.log('🏪 Middleware: checking vendor route access for path:', request.nextUrl.pathname);
     
@@ -142,8 +142,8 @@ export async function middleware(request: NextRequest) {
     console.log('🔍 Middleware: vendorData result:', vendorData, 'Error:', vendorErr);
 
     if (!vendorData) {
-      console.log('❌ Middleware: No active vendor profile, redirecting to signin');
-      return NextResponse.redirect(new URL('/auth/signin', request.url));
+      console.log('❌ Middleware: No active vendor profile, redirecting to vendor login');
+      return NextResponse.redirect(new URL('/vendor/login', request.url));
     }
 
     console.log('✅ Middleware: Vendor check passed');
