@@ -116,7 +116,23 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/auth/signin', request.url));
     }
     console.log('🏪 Middleware: checking vendor route access for path:', request.nextUrl.pathname);
-    // Check vendor_profiles table
+    
+    // First check if user has vendor role in users table
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    
+    console.log('👤 Middleware: User role:', userData?.role);
+    
+    // If user has vendor role, allow access (skip vendor_profiles check for now)
+    if (userData?.role === 'vendor') {
+      console.log('✅ Middleware: User has vendor role, allowing access');
+      return response;
+    }
+    
+    // Otherwise check vendor_profiles table
     const { data: vendorData, error: vendorErr } = await supabase
       .from('vendor_profiles')
       .select('id, is_active')
