@@ -20,6 +20,8 @@ export default function AdminNotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'unread' | 'signup' | 'login'>('all');
 
+  // v1.0 - Admin Notifications System
+
   useEffect(() => {
     loadNotifications();
   }, []);
