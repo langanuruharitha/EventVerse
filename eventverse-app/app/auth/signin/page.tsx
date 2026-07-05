@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { signIn } from '@/lib/auth/actions';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,6 +22,27 @@ export default function SignInPage() {
     if (result?.error) {
       setError(result.error);
       setLoading(false);
+    } else if (result?.success) {
+      // Send notification before redirecting
+      if (result.shouldNotify && result.userData) {
+        try {
+          await fetch('/api/admin/notify-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: result.userData.email,
+              fullName: result.userData.fullName,
+              role: result.userData.role,
+              type: 'login',
+            }),
+          });
+        } catch (error) {
+          console.error('Failed to notify admin:', error);
+        }
+      }
+      
+      // Redirect to appropriate dashboard
+      router.push(result.redirect || '/dashboard');
     }
   };
 

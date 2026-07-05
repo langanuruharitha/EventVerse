@@ -82,34 +82,25 @@ export async function signIn(data: SignInData) {
     .eq('user_id', authData.user.id)
     .single();
 
-  // Notify admin about login (skip if admin is logging in)
-  if (userData?.role !== 'admin') {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/notify-signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: userData?.email || data.email,
-          fullName: profile?.full_name || 'Unknown User',
-          role: userData?.role || 'customer',
-          type: 'login',
-        }),
-      });
-    } catch (error) {
-      // Don't fail login if notification fails
-      console.error('Failed to notify admin:', error);
-    }
-  }
-
   revalidatePath('/', 'layout');
 
-  if (userData?.role === 'vendor') {
-    redirect('/vendor/dashboard');
-  } else if (userData?.role === 'admin') {
-    redirect('/admin/dashboard');
-  } else {
-    redirect('/dashboard');
-  }
+  // Return user info so client can handle notification
+  const redirectPath = 
+    userData?.role === 'vendor' ? '/vendor/dashboard' :
+    userData?.role === 'admin' ? '/admin/dashboard' : 
+    '/dashboard';
+
+  // Return data for client-side notification
+  return {
+    success: true,
+    redirect: redirectPath,
+    shouldNotify: userData?.role !== 'admin',
+    userData: {
+      email: userData?.email || data.email,
+      fullName: profile?.full_name || 'Unknown User',
+      role: userData?.role || 'customer',
+    }
+  };
 }
 
 export async function signOut() {
