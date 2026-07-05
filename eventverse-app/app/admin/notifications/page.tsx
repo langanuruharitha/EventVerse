@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 interface Notification {
   id: string;
@@ -28,7 +28,7 @@ export default function AdminNotificationsPage() {
 
   const loadNotifications = async () => {
     setLoading(true);
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase
       .from('admin_notifications')
@@ -45,7 +45,7 @@ export default function AdminNotificationsPage() {
   };
 
   const markAsRead = async (notificationId: string) => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase
       .from('admin_notifications')
@@ -60,7 +60,7 @@ export default function AdminNotificationsPage() {
   };
 
   const markAllAsRead = async () => {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
 
     const { error } = await supabase
       .from('admin_notifications')
