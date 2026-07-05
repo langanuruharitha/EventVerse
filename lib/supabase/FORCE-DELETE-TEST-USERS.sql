@@ -18,6 +18,56 @@ WHERE email IN (
 -- Step 2: Delete all related data for these users
 -- This prevents foreign key constraint errors
 
+-- Delete vendor lead actions BY these users (action_by column)
+DELETE FROM vendor_lead_actions 
+WHERE action_by IN (
+  SELECT id FROM users WHERE email IN (
+    'customer@gmail.com',
+    'customer1@gmail.com',
+    'customer2@gmail.com',
+    'vendor@gmail.com',
+    'vendor1@gmail.com'
+  )
+);
+
+-- Delete vendor lead actions FOR leads created by these users
+DELETE FROM vendor_lead_actions
+WHERE lead_id IN (
+  SELECT id FROM vendor_leads WHERE customer_id IN (
+    SELECT id FROM users WHERE email IN (
+      'customer@gmail.com',
+      'customer1@gmail.com',
+      'customer2@gmail.com',
+      'vendor@gmail.com',
+      'vendor1@gmail.com'
+    )
+  )
+);
+
+-- Delete vendor leads created by these users
+DELETE FROM vendor_leads 
+WHERE customer_id IN (
+  SELECT id FROM users WHERE email IN (
+    'customer@gmail.com',
+    'customer1@gmail.com',
+    'customer2@gmail.com',
+    'vendor@gmail.com',
+    'vendor1@gmail.com'
+  )
+);
+
+-- Delete vendor inquiries
+DELETE FROM vendor_inquiries 
+WHERE customer_id IN (
+  SELECT id FROM users WHERE email IN (
+    'customer@gmail.com',
+    'customer1@gmail.com',
+    'customer2@gmail.com',
+    'vendor@gmail.com',
+    'vendor1@gmail.com'
+  )
+);
+
 -- Delete events and all cascade data (guests, budgets, tasks, etc.)
 DELETE FROM events 
 WHERE user_id IN (

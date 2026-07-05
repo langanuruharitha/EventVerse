@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const adminNav = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
+  { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
   { name: 'Vendors Moderation', href: '/admin/vendors', icon: '🏪' },
   { name: 'Users Management', href: '/admin/users', icon: '👥' },
   { name: 'Platform Bookings', href: '/admin/bookings', icon: '📅' },
