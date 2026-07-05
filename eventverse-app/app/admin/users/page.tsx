@@ -49,8 +49,11 @@ export default function AdminUsersPage() {
     }
   };
 
+  const [actionError, setActionError] = useState('');
+
   const toggleUserStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+    setActionError('');
     try {
       const supabase = createBrowserClient();
       const { error } = await supabase
@@ -58,11 +61,17 @@ export default function AdminUsersPage() {
         .update({ status: newStatus })
         .eq('id', id);
 
-      if (error) throw error;
-      setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
-    } catch (err) {
-      console.warn('Database update failed, updating local state only:', err);
-      setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
+      if (error) {
+        console.error('DB update error:', error);
+        setActionError(`Failed to update user status: ${error.message}`);
+        return;
+      }
+
+      // Re-fetch from DB to confirm the change persisted
+      await fetchUsers();
+    } catch (err: any) {
+      console.error('Unexpected error:', err);
+      setActionError('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -83,6 +92,14 @@ export default function AdminUsersPage() {
           <p className="text-sm text-gray-500 mt-1">Manage customer, vendor, and administrator profiles on the platform</p>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {actionError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center justify-between">
+          <span>⚠️ {actionError}</span>
+          <button onClick={() => setActionError('')} className="text-red-400 hover:text-red-600 font-bold ml-4">✕</button>
+        </div>
+      )}
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
