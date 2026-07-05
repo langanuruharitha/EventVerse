@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { signUp } from '@/lib/auth/actions';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -23,11 +25,14 @@ export default function SignUpPage() {
 
     if (result.error) {
       setError(result.error);
+      setLoading(false);
     } else {
-      setMessage(result.message || 'Account created successfully!');
+      setMessage(result.message || 'Account created successfully! Redirecting to sign in...');
+      // Redirect to signin page after 2 seconds
+      setTimeout(() => {
+        router.push('/auth/signin');
+      }, 2000);
     }
-
-    setLoading(false);
   };
 
   return (
