@@ -2,9 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
-  turbopack: {
-    // Empty turbopack config to silence webpack warning
-  },
   images: {
     remotePatterns: [
       {
