@@ -28,6 +28,23 @@ export default function SignUpPage() {
       setLoading(false);
     } else {
       setMessage(result.message || 'Account created successfully! Redirecting to sign in...');
+      
+      // Send signup notification to admin
+      try {
+        await fetch('/api/admin/notify-signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            fullName: fullName,
+            role: role,
+            type: 'signup',
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to notify admin:', error);
+      }
+      
       // Redirect to signin page after 2 seconds
       setTimeout(() => {
         router.push('/auth/signin');

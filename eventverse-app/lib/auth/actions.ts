@@ -32,23 +32,8 @@ export async function signUp(data: SignUpData) {
       .eq('user_id', authData.user.id);
   }
 
-  // Notify admin about new signup
-  try {
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/notify-signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: data.email,
-        fullName: data.full_name,
-        role: data.role || 'customer',
-        type: 'signup',
-      }),
-    });
-  } catch (error) {
-    // Don't fail signup if notification fails
-    console.error('Failed to notify admin:', error);
-  }
-
+  // Note: Notification is now handled client-side in signup page
+  
   return { 
     success: true, 
     message: 'Account created successfully! You can now sign in.',
