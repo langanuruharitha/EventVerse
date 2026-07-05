@@ -45,14 +45,6 @@ export async function POST(request: NextRequest) {
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', vendor.id);
 
-    // Track vendor login for admin notifications
-    try {
-      await supabase.rpc('log_user_login');
-    } catch (loginError) {
-      console.error('Failed to log vendor login:', loginError);
-      // Don't block login if tracking fails
-    }
-
     return NextResponse.json({
       message: 'Login successful',
       vendor,

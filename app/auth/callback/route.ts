@@ -26,15 +26,6 @@ export async function GET(request: Request) {
     
     if (data?.session && data?.user) {
       console.log('User authenticated:', data.user.email);
-      
-      // Log user login for admin tracking
-      try {
-        await supabase.rpc('log_user_login');
-      } catch (loginError) {
-        console.error('Failed to log user login:', loginError);
-        // Don't block the login if tracking fails
-      }
-      
       return NextResponse.redirect(`${origin}/dashboard`);
     }
   }

@@ -58,14 +58,6 @@ export async function signIn(data: SignInData) {
     .eq('id', authData.user.id)
     .single();
 
-  // Track user login for admin notifications
-  try {
-    await supabase.rpc('log_user_login');
-  } catch (loginError) {
-    console.error('Failed to log user login:', loginError);
-    // Don't block login if tracking fails
-  }
-
   revalidatePath('/', 'layout');
 
   if (userData?.role === 'vendor') {
