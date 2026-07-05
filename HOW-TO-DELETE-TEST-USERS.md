@@ -1,49 +1,75 @@
-# 🗑️ How to Delete Test User Accounts
+# 🗑️ How to Delete Test User Accounts (UPDATED)
 
-## 📍 Quick Guide: Delete Via Supabase Dashboard (Easiest)
+## ⚠️ Important: Use SQL Method
 
-### Step 1: Go to Authentication
+The Supabase dashboard delete button fails because test users have related data (events, guests, budgets). We need to use SQL to delete everything properly.
+
+## 📍 Method: Delete Via SQL Editor (Works 100%)
+
+### Step 1: Go to SQL Editor
 
 1. Open: https://supabase.com/dashboard
 2. Select your **EventVerse** project
-3. Click **Authentication** in the left sidebar (the icon looks like a key 🔑)
-4. Click **Users** tab
+3. Click **SQL Editor** in the left sidebar
+4. Click **"New Query"** button
 
-### Step 2: Find and Delete Test Users
+### Step 2: Run the Delete Script
 
-You'll see a list of all registered users. Look for these test accounts:
-- customer@gmail.com
-- customer1@gmail.com
-- customer2@gmail.com
-- vendor@gmail.com
-- vendor1@gmail.com
-- customer (no email domain)
+1. Open the file: `lib/supabase/FORCE-DELETE-TEST-USERS.sql`
+2. Copy **ALL** the SQL code
+3. Paste it into the Supabase SQL Editor
+4. Click **"Run"** or press `Ctrl + Enter`
+5. Wait for success message
 
-**For each test user:**
+### Step 3: Verify Deletion
 
-1. Find the user in the list
-2. Click the **three dots (⋯)** on the right side of that row
-3. Click **"Delete user"**
-4. Confirm by clicking **"Delete"** in the popup
+After running the SQL, go to **Authentication → Users** and verify the test accounts are gone.
 
-**Repeat for all test accounts you want to remove.**
+## 🎯 What Gets Deleted:
 
-### Step 3: Verify
+When you run this SQL, it deletes:
+- ❌ customer@gmail.com and all their data
+- ❌ customer1@gmail.com and all their data
+- ❌ customer2@gmail.com and all their data
+- ❌ vendor@gmail.com and all their data
+- ❌ vendor1@gmail.com and all their data
 
-After deleting, refresh the page and verify the test accounts are gone.
+**Including:**
+- All events created by these users
+- All guests added by these users
+- All budgets created by these users
+- All tasks, shopping lists, etc.
+- Their user profiles
+- Their authentication accounts
 
-**Keep these accounts:**
-- ✅ harithalanganuru@gmail.com (your real admin account)
-- ✅ Any other real accounts you created
+**Keeps:**
+- ✅ harithalanganuru@gmail.com (your admin account)
+- ✅ Any other real accounts
 
-**Delete these accounts:**
-- ❌ customer@gmail.com
-- ❌ customer1@gmail.com
-- ❌ customer2@gmail.com
-- ❌ vendor@gmail.com
-- ❌ vendor1@gmail.com
+## 📋 Quick Steps:
 
-## 🔧 Alternative: Delete Via SQL (Advanced)
+
+1. Supabase Dashboard → **SQL Editor**
+2. Click **"New Query"**
+3. Open `lib/supabase/FORCE-DELETE-TEST-USERS.sql`
+4. Copy all SQL
+5. Paste in SQL Editor
+6. Click **"Run"**
+7. Done! ✅
+
+## ⚠️ Why Dashboard Delete Fails
+
+Error: "Failed to delete user: Database error deleting user"
+
+**Reason**: Test users have related data (foreign key constraints):
+- Events they created
+- Guests they added
+- Budgets they made
+- Tasks, shopping lists, etc.
+
+**Solution**: SQL script deletes related data first, then the user.
+
+## 🔧 Alternative: Manual Cleanup (Not Recommended)
 
 If you prefer SQL:
 
