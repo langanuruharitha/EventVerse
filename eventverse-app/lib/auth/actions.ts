@@ -32,6 +32,23 @@ export async function signUp(data: SignUpData) {
       .eq('user_id', authData.user.id);
   }
 
+  // Notify admin about new signup
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/notify-signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: data.email,
+        fullName: data.full_name,
+        role: data.role || 'customer',
+        type: 'signup',
+      }),
+    });
+  } catch (error) {
+    // Don't fail signup if notification fails
+    console.error('Failed to notify admin:', error);
+  }
+
   return { 
     success: true, 
     message: 'Account created successfully! You can now sign in.',
@@ -54,9 +71,35 @@ export async function signIn(data: SignInData) {
   // Fetch user role to determine redirect path
   const { data: userData } = await supabase
     .from('users')
-    .select('role')
+    .select('role, email')
     .eq('id', authData.user.id)
     .single();
+
+  // Get user profile for full name
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('full_name')
+    .eq('user_id', authData.user.id)
+    .single();
+
+  // Notify admin about login (skip if admin is logging in)
+  if (userData?.role !== 'admin') {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/notify-signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userData?.email || data.email,
+          fullName: profile?.full_name || 'Unknown User',
+          role: userData?.role || 'customer',
+          type: 'login',
+        }),
+      });
+    } catch (error) {
+      // Don't fail login if notification fails
+      console.error('Failed to notify admin:', error);
+    }
+  }
 
   revalidatePath('/', 'layout');
 
