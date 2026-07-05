@@ -16,6 +16,8 @@ const adminNav = [
   { name: 'Profile', href: '/admin/profile', icon: '👤' },
 ];
 
+// Force cache bust - v2
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
