@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
 
 const mockBookings = [
   { id: 'BK001', customer: 'Priya Sharma', phone: '+91 98765 43210', service: 'Wedding Photography', eventDate: '2026-08-15', bookingDate: '2026-07-01', amount: 45000, status: 'confirmed', location: 'Mumbai', note: 'Please arrive 1 hour early.' },
@@ -23,12 +24,57 @@ export default function VendorBookingsPage() {
   const [bookings, setBookings] = useState(mockBookings);
   const [filter, setFilter] = useState<Status>('all');
   const [selected, setSelected] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
+  // Load bookings from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('vendor_bookings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setBookings(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved bookings:', e);
+      }
+    }
+  }, []);
+
+  // Save to localStorage whenever bookings change
+  useEffect(() => {
+    localStorage.setItem('vendor_bookings', JSON.stringify(bookings));
+  }, [bookings]);
 
   const filtered = filter === 'all' ? bookings : bookings.filter(b => b.status === filter);
 
-  const updateStatus = (id: string, status: string) => {
-    setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
-    if (selected?.id === id) setSelected({ ...selected, status });
+  const updateStatus = async (id: string, status: string) => {
+    setLoading(true);
+    setSaveMessage('');
+    
+    try {
+      // Update local state
+      const updatedBookings = bookings.map(b => b.id === id ? { ...b, status } : b);
+      setBookings(updatedBookings);
+      
+      // Update selected if it's the current booking
+      if (selected?.id === id) {
+        setSelected({ ...selected, status });
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('vendor_bookings', JSON.stringify(updatedBookings));
+      
+      // Show success message
+      setSaveMessage('✅ Status updated successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+      
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      setSaveMessage('❌ Failed to save changes');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const counts = {
@@ -45,6 +91,13 @@ export default function VendorBookingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Bookings 📅</h1>
         <p className="text-gray-500 mt-1">Manage all your booking requests and confirmations</p>
+        {saveMessage && (
+          <div className={`mt-2 px-4 py-2 rounded-lg text-sm font-medium ${
+            saveMessage.includes('✅') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+          }`}>
+            {saveMessage}
+          </div>
+        )}
       </div>
 
       {/* Filter Tabs */}
@@ -155,24 +208,27 @@ export default function VendorBookingsPage() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => updateStatus(selected.id, 'confirmed')}
-                    className="flex-1 py-2.5 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors"
+                    disabled={loading}
+                    className="flex-1 py-2.5 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    ✅ Accept
+                    {loading ? '⏳ Saving...' : '✅ Accept'}
                   </button>
                   <button
                     onClick={() => updateStatus(selected.id, 'cancelled')}
-                    className="flex-1 py-2.5 rounded-xl bg-red-100 text-red-600 font-semibold hover:bg-red-200 transition-colors"
+                    disabled={loading}
+                    className="flex-1 py-2.5 rounded-xl bg-red-100 text-red-600 font-semibold hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    ❌ Reject
+                    {loading ? '⏳ Saving...' : '❌ Reject'}
                   </button>
                 </div>
               )}
               {selected.status === 'confirmed' && (
                 <button
                   onClick={() => updateStatus(selected.id, 'completed')}
-                  className="w-full py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+                  disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ✔️ Mark as Completed
+                  {loading ? '⏳ Saving...' : '✔️ Mark as Completed'}
                 </button>
               )}
             </div>
