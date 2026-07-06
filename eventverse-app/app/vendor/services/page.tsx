@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const serviceCategories = [
   'Photography', 'Videography', 'Decoration', 'Catering', 'Venue',
@@ -29,13 +29,28 @@ const mockServices = [
   },
 ];
 
+const STORAGE_KEY = 'vendor_services';
+
 export default function VendorServicesPage() {
-  const [services, setServices] = useState(mockServices);
+  const [services, setServices] = useState(() => {
+    if (typeof window === 'undefined') return mockServices;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : mockServices;
+    } catch {
+      return mockServices;
+    }
+  });
   const [showModal, setShowModal] = useState(false);
   const [editService, setEditService] = useState<any>(null);
   const [form, setForm] = useState({
     name: '', category: 'Photography', price: '', unit: 'per event', description: '', status: 'active',
   });
+
+  // Persist services to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(services));
+  }, [services]);
 
   const openAdd = () => {
     setEditService(null);
