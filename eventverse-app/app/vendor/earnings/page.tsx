@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const mockTransactions = [
   { id: 'TXN1001', customer: 'Priya Sharma', service: 'Wedding Photography', date: '2026-07-02', amount: 45000, commission: 4500, net: 40500, status: 'paid' },
@@ -19,17 +19,61 @@ export default function VendorEarningsPage() {
   const [payouts, setPayouts] = useState(mockPayouts);
   const [requestAmount, setRequestAmount] = useState('');
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
+  // Load payouts from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('vendor_payouts');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setPayouts(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved payouts:', e);
+      }
+    }
+  }, []);
+
+  // Save payouts to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('vendor_payouts', JSON.stringify(payouts));
+  }, [payouts]);
 
   const totalEarnings = transactions.reduce((a, t) => a + t.net, 0);
   const pendingPayout = transactions.filter(t => t.status === 'pending').reduce((a, t) => a + t.net, 0);
-  const paidPayout = payouts.reduce((a, p) => a + p.amount, 0);
+  const paidPayout = payouts.filter(p => p.status === 'completed').reduce((a, p) => a + p.amount, 0);
 
   const handleRequestPayout = () => {
-    if (!requestAmount || Number(requestAmount) <= 0) return;
+    if (!requestAmount || Number(requestAmount) <= 0) {
+      setSaveMessage('❌ Please enter a valid amount');
+      setTimeout(() => setSaveMessage(''), 3000);
+      return;
+    }
+    
     const amount = Number(requestAmount);
-    setPayouts([{ id: `PAY00${payouts.length + 1}`, date: new Date().toISOString().split('T')[0], amount, bank: 'HDFC Bank ****1234', status: 'pending' }, ...payouts]);
+    
+    if (amount > pendingPayout) {
+      setSaveMessage('❌ Amount exceeds withdrawable balance');
+      setTimeout(() => setSaveMessage(''), 3000);
+      return;
+    }
+    
+    const newPayout = { 
+      id: `PAY00${payouts.length + 1}`, 
+      date: new Date().toISOString().split('T')[0], 
+      amount, 
+      bank: 'HDFC Bank ****1234', 
+      status: 'pending' 
+    };
+    
+    const updatedPayouts = [newPayout, ...payouts];
+    setPayouts(updatedPayouts);
+    localStorage.setItem('vendor_payouts', JSON.stringify(updatedPayouts));
+    
     setShowRequestModal(false);
     setRequestAmount('');
+    setSaveMessage('✅ Payout request submitted successfully!');
+    setTimeout(() => setSaveMessage(''), 5000);
   };
 
   return (
@@ -39,6 +83,13 @@ export default function VendorEarningsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Earnings & Payouts 💰</h1>
           <p className="text-gray-500 mt-1">Track your revenue, platform fee, and withdraw payouts</p>
+          {saveMessage && (
+            <div className={`mt-2 px-4 py-2 rounded-lg text-sm font-medium ${
+              saveMessage.includes('✅') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {saveMessage}
+            </div>
+          )}
         </div>
         <button
           onClick={() => setShowRequestModal(true)}
