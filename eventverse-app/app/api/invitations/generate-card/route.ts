@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    const key = process.env.GEMINI_API_KEY;
+    const key = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
     let htmlContent = '';
 
@@ -109,18 +109,14 @@ ${data.message ? `- Additional Message: ${data.message}` : ''}
 - Include RSVP Section: ${data.includeRSVP ? 'Yes' : 'No'}
 
 DESIGN REQUIREMENTS:
-1. Palette & Theme: Choose a premium, harmonious color palette matching the theme description (e.g. deep royal blue and gold, pastel pink floral, modern dark cyberpunk, traditional red/gold marigold). Do NOT use generic, plain white backgrounds unless explicitly requested.
-2. Background: Use a stunning background matching the theme (e.g. premium CSS gradients, subtle geometric/floral patterns, or elegant textures using pure CSS).
+1. Palette & Theme: Choose a premium, harmonious color palette matching the theme description (e.g. deep royal blue and gold, pastel pink floral, modern dark cyberpunk, traditional red/gold marigold, space background with falling balloons and rose petals in pink brown theme). Do NOT use generic, plain white backgrounds unless explicitly requested.
+2. Background: Use a stunning background matching the theme (e.g. premium CSS gradients, subtle geometric/floral patterns, starry sky, falling rose petals, or elegant textures using pure CSS).
 3. Fonts: Load and use premium Google Fonts matching the theme (e.g. Playfair Display, Cinzel, Great Vibes, Cormorant Garamond, Montserrat, Outfit, Rochester). Apply beautiful letter-spacing, font-weight, and line-height.
-4. Decorations: Create theme-matching decorations using pure CSS and inline SVGs (e.g. golden frames, floral ornaments, starry night particles, abstract modern shapes, or traditional Indian borders). Do NOT use generic placeholders or external image URLs that might break.
+4. Decorations: Create theme-matching decorations using pure CSS and inline SVGs (e.g. golden frames, floral ornaments, starry night particles, falling rose petals, abstract modern shapes, or traditional Indian borders). Do NOT use generic placeholders or external image URLs that might break.
 5. Layout: The card must be centered, look outstanding, responsive, and fit beautifully on mobile and desktop screens. It should feel like a premium, state-of-the-art invitation.
 6. Content: Write unique, creative, poetic invitation greetings and messages matching the theme instead of basic templates.
 
-Return ONLY a JSON object with a single key "htmlContent":
-{
-  "htmlContent": "<!DOCTYPE html>..."
-}
-`;
+Output ONLY the raw HTML code of the invitation card. Start directly with <!DOCTYPE html> and end with </html>. Do not include markdown code block syntax (like \`\`\`html) or any conversational text.`;
 
   const resp = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${data.key}`,
@@ -130,7 +126,6 @@ Return ONLY a JSON object with a single key "htmlContent":
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          responseMimeType: "application/json",
           temperature: 0.9,
           maxOutputTokens: 8192
         }
@@ -140,15 +135,25 @@ Return ONLY a JSON object with a single key "htmlContent":
 
   if (!resp.ok) throw new Error(`Gemini error: ${resp.status}`);
   const json = await resp.json();
-  const raw = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (match) {
-    const parsed = JSON.parse(match[0]);
-    if (parsed.htmlContent) {
-      return parsed.htmlContent;
-    }
+  let raw = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  
+  // Clean markdown block wrappers if present
+  raw = raw.trim();
+  if (raw.startsWith('```html')) {
+    raw = raw.substring(7);
+  } else if (raw.startsWith('```')) {
+    raw = raw.substring(3);
   }
-  throw new Error('Could not parse htmlContent from Gemini response');
+  if (raw.endsWith('```')) {
+    raw = raw.substring(0, raw.length - 3);
+  }
+  raw = raw.trim();
+
+  if (raw.startsWith('<!DOCTYPE') || raw.includes('<html')) {
+    return raw;
+  }
+  
+  throw new Error('Response did not contain valid HTML');
 }
 
 // ─────────────────────────────────────────────
@@ -164,9 +169,20 @@ function buildFallbackCard(data: {
     blue:   { primary: '#1d4ed8', secondary: '#3b82f6', light: '#dbeafe', bg: '#eff6ff', gradient: 'linear-gradient(135deg, #1d4ed8, #3b82f6, #06b6d4)' },
     pink:   { primary: '#be185d', secondary: '#ec4899', light: '#fce7f3', bg: '#fdf2f8', gradient: 'linear-gradient(135deg, #be185d, #ec4899, #f97316)' },
     gold:   { primary: '#92400e', secondary: '#d97706', light: '#fde68a', bg: '#fffbeb', gradient: 'linear-gradient(135deg, #92400e, #d97706, #f59e0b)' },
+    brown:  { primary: '#78350f', secondary: '#b45309', light: '#fef3c7', bg: '#fffbeb', gradient: 'linear-gradient(135deg, #78350f, #d97706, #ec4899)' },
   };
 
-  const c = colors.purple;
+  const desc = (data.themeDescription || '').toLowerCase();
+  let c = colors.purple;
+  if (desc.includes('pink') || desc.includes('rose') || desc.includes('peach')) {
+    c = colors.pink;
+  } else if (desc.includes('brown')) {
+    c = colors.brown;
+  } else if (desc.includes('gold') || desc.includes('yellow') || desc.includes('marigold') || desc.includes('traditional')) {
+    c = colors.gold;
+  } else if (desc.includes('blue') || desc.includes('space') || desc.includes('sky') || desc.includes('night') || desc.includes('cyberpunk')) {
+    c = colors.blue;
+  }
 
   const fontUrl = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap';
   const fontFamily = "'Cormorant Garamond', 'Georgia', serif";
