@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const mockProfile = {
   businessName: 'Epic Moments Photography',
@@ -25,10 +25,94 @@ export default function VendorProfilePage() {
   const [profile, setProfile] = useState(mockProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({ ...mockProfile });
+  const [saveMessage, setSaveMessage] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load profile from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('vendor_profile');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setProfile(parsed);
+        setForm(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved profile:', e);
+      }
+    }
+  }, []);
 
   const handleSave = () => {
-    setProfile({ ...form });
-    setIsEditing(false);
+    try {
+      // Save to localStorage
+      localStorage.setItem('vendor_profile', JSON.stringify(form));
+      setProfile({ ...form });
+      setIsEditing(false);
+      
+      // Show success message
+      setSaveMessage('✅ Profile updated successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      setSaveMessage('❌ Failed to save profile');
+      setTimeout(() => setSaveMessage(''), 3000);
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveMessage('❌ Image must be less than 5MB');
+      setTimeout(() => setSaveMessage(''), 3000);
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      setSaveMessage('❌ Please upload an image file');
+      setTimeout(() => setSaveMessage(''), 3000);
+      return;
+    }
+
+    setUploading(true);
+
+    // Convert to base64 and add to portfolio
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageUrl = event.target?.result as string;
+      const updatedImages = [...form.portfolioImages, imageUrl];
+      const updatedForm = { ...form, portfolioImages: updatedImages };
+      
+      setForm(updatedForm);
+      localStorage.setItem('vendor_profile', JSON.stringify(updatedForm));
+      setProfile(updatedForm);
+      
+      setUploading(false);
+      setSaveMessage('✅ Image uploaded successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+    };
+    reader.onerror = () => {
+      setUploading(false);
+      setSaveMessage('❌ Failed to upload image');
+      setTimeout(() => setSaveMessage(''), 3000);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = profile.portfolioImages.filter((_, i) => i !== index);
+    const updatedProfile = { ...profile, portfolioImages: updatedImages };
+    
+    setProfile(updatedProfile);
+    setForm(updatedProfile);
+    localStorage.setItem('vendor_profile', JSON.stringify(updatedProfile));
+    
+    setSaveMessage('✅ Image removed');
+    setTimeout(() => setSaveMessage(''), 2000);
   };
 
   return (
@@ -38,6 +122,13 @@ export default function VendorProfilePage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">My Profile 🏪</h1>
           <p className="text-gray-500 mt-1">Manage your business profile details, portfolio, and credentials</p>
+          {saveMessage && (
+            <div className={`mt-2 px-4 py-2 rounded-lg text-sm font-medium ${
+              saveMessage.includes('✅') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {saveMessage}
+            </div>
+          )}
         </div>
         <button
           onClick={() => {
@@ -210,13 +301,40 @@ export default function VendorProfilePage() {
               {profile.portfolioImages.map((img, idx) => (
                 <div key={idx} className="relative aspect-video rounded-xl overflow-hidden group shadow-sm border border-gray-200">
                   <img src={img} alt="Portfolio Work" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
+                  <button
+                    onClick={() => handleRemoveImage(idx)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
-              <button className="aspect-video rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-orange-400 hover:text-orange-500 transition-colors">
-                <span className="text-xl">➕</span>
-                <span className="text-xs font-semibold mt-1">Upload Work</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="aspect-video rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-orange-400 hover:text-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploading ? (
+                  <>
+                    <span className="text-xl">⏳</span>
+                    <span className="text-xs font-semibold mt-1">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xl">➕</span>
+                    <span className="text-xs font-semibold mt-1">Upload Work</span>
+                  </>
+                )}
               </button>
             </div>
+            <p className="text-xs text-gray-400 mt-2">Max file size: 5MB. Supported: JPG, PNG, GIF, WebP</p>
           </div>
         </div>
       </div>
