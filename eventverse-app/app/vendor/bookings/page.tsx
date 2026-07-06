@@ -20,8 +20,22 @@ const statusColors: Record<string, string> = {
 
 type Status = 'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
+const BOOKINGS_KEY = 'vendor_bookings';
+
 export default function VendorBookingsPage() {
-  const [bookings, setBookings] = useState(mockBookings);
+  const [bookings, setBookings] = useState(() => {
+    if (typeof window === 'undefined') return mockBookings;
+    try {
+      const stored = localStorage.getItem(BOOKINGS_KEY);
+      return stored ? JSON.parse(stored) : mockBookings;
+    } catch {
+      return mockBookings;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+  }, [bookings]);
   const [filter, setFilter] = useState<Status>('all');
   const [selected, setSelected] = useState<any>(null);
   const [loading, setLoading] = useState(false);

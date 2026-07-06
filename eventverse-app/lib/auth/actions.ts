@@ -169,7 +169,7 @@ export async function requestAdminPasswordReset(email: string) {
   const supabase = await createServerClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/admin/reset-password`,
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/admin/reset-password`,
   });
 
   if (error) {
