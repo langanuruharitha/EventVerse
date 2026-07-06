@@ -96,7 +96,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check user role for admin routes — skip login/setup/debug pages
-  const adminPublicPaths = ['/admin/login', '/admin/debug', '/admin/setup'];
+  const adminPublicPaths = ['/admin/login', '/admin/debug', '/admin/setup', '/admin/forgot-password', '/admin/reset-password'];
   const isAdminPublicPath = adminPublicPaths.some(p => request.nextUrl.pathname.startsWith(p));
 
   if (isAdminRoute && !isAdminPublicPath) {

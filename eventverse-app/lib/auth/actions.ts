@@ -165,6 +165,20 @@ export async function requestPasswordReset(email: string) {
   return { success: true, message: 'Password reset email sent' };
 }
 
+export async function requestAdminPasswordReset(email: string) {
+  const supabase = await createServerClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/admin/reset-password`,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true, message: 'Password reset email sent' };
+}
+
 export async function updatePassword(newPassword: string) {
   const supabase = await createServerClient();
 
