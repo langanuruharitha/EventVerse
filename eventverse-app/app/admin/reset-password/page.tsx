@@ -25,23 +25,72 @@ export default function AdminResetPasswordPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Listen for the PASSWORD_RECOVERY event from Supabase
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    let resolved = false;
+
+    const markReady = () => {
+      if (!resolved) {
+        resolved = true;
+        setSessionReady(true);
+      }
+    };
+
+    const markError = () => {
+      if (!resolved) {
+        resolved = true;
+        setSessionError('This reset link has expired or is invalid. Please request a new one.');
+      }
+    };
+
+    // 1. PKCE flow: Supabase puts ?code=xxx in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+        if (error) {
+          markError();
+        } else if (data?.session) {
+          markReady();
+        } else {
+          markError();
+        }
+      });
+      return;
+    }
+
+    // 2. Implicit flow: Supabase puts #access_token=xxx&type=recovery in the hash
+    const hash = window.location.hash.substring(1);
+    const hashParams = new URLSearchParams(hash);
+    const accessToken = hashParams.get('access_token');
+    const tokenType = hashParams.get('type');
+
+    if (accessToken && tokenType === 'recovery') {
+      // onAuthStateChange will fire PASSWORD_RECOVERY — just wait for it
+    }
+
+    // 3. Listen for PASSWORD_RECOVERY / SIGNED_IN events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        setSessionReady(true);
+        markReady();
       } else if (event === 'SIGNED_IN' && session) {
-        setSessionReady(true);
+        markReady();
       }
     });
 
-    // Also check if there's already a session (in case user lands after token exchange)
+    // 4. Check if session already exists
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        setSessionReady(true);
+        markReady();
       }
     });
 
-    return () => subscription.unsubscribe();
+    // 5. Timeout fallback — if nothing resolves in 8s, show error
+    const timeout = setTimeout(markError, 8000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
