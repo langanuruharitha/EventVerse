@@ -2,6 +2,17 @@
 
 import { useState, useEffect } from 'react';
 
+interface Service {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  unit: string;
+  status: string;
+  description: string;
+  bookings: number;
+}
+
 const serviceCategories = [
   'Photography', 'Videography', 'Decoration', 'Catering', 'Venue',
   'Mehendi', 'Music Band', 'DJ Services', 'Cake Services', 'Makeup',
@@ -32,11 +43,11 @@ const mockServices = [
 const STORAGE_KEY = 'vendor_services';
 
 export default function VendorServicesPage() {
-  const [services, setServices] = useState(() => {
+  const [services, setServices] = useState<Service[]>(() => {
     if (typeof window === 'undefined') return mockServices;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : mockServices;
+      return stored ? (JSON.parse(stored) as Service[]) : mockServices;
     } catch {
       return mockServices;
     }
