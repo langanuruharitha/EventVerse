@@ -119,7 +119,7 @@ DESIGN REQUIREMENTS:
 Output ONLY the raw HTML code of the invitation card. Start directly with <!DOCTYPE html> and end with </html>. Do not include markdown code block syntax (like \`\`\`html) or any conversational text.`;
 
   const resp = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${data.key}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${data.key}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -329,7 +329,6 @@ function buildFallbackCard(data: {
       </div>
 
       ${data.message ? `<div class="message">"${e(data.message)}"</div>` : ''}
-      ${data.themeDescription ? `<div class="message" style="opacity: 0.8">Theme: ${e(data.themeDescription)}</div>` : ''}
 
       ${data.includeRSVP ? `
       <div class="rsvp">
