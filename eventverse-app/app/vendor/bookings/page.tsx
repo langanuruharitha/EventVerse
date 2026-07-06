@@ -1,7 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+
+interface Booking {
+  id: string;
+  customer: string;
+  phone: string;
+  service: string;
+  eventDate: string;
+  bookingDate: string;
+  amount: number;
+  status: string;
+  location: string;
+  note: string;
+}
 
 const mockBookings = [
   { id: 'BK001', customer: 'Priya Sharma', phone: '+91 98765 43210', service: 'Wedding Photography', eventDate: '2026-08-15', bookingDate: '2026-07-01', amount: 45000, status: 'confirmed', location: 'Mumbai', note: 'Please arrive 1 hour early.' },
@@ -23,11 +35,11 @@ type Status = 'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
 const BOOKINGS_KEY = 'vendor_bookings';
 
 export default function VendorBookingsPage() {
-  const [bookings, setBookings] = useState(() => {
+  const [bookings, setBookings] = useState<Booking[]>(() => {
     if (typeof window === 'undefined') return mockBookings;
     try {
       const stored = localStorage.getItem(BOOKINGS_KEY);
-      return stored ? JSON.parse(stored) : mockBookings;
+      return stored ? (JSON.parse(stored) as Booking[]) : mockBookings;
     } catch {
       return mockBookings;
     }
