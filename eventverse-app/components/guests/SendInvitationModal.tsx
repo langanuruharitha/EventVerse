@@ -47,34 +47,49 @@ export default function SendInvitationModal({
     setSending(true);
 
     try {
-      const response = await fetch(`/api/guests/${guest.id}/send-invitation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sendVia,
-          senderName,
-          eventName
-        })
-      });
+      const hostUrl = window.location.origin;
+      const rsvpLink = `${hostUrl}/rsvp/${guest.id}`;
+      const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to *${eventName}*!\n\nFrom,\n${senderName || 'Your Host'}\n\nPlease click here to confirm your RSVP:\n${rsvpLink}`;
 
-      if (!response.ok) {
-        throw new Error('Failed to send invitation');
+      // 1. Send WhatsApp via Click-to-Chat if selected
+      if ((sendVia === 'both' || sendVia === 'whatsapp') && guest.phone) {
+        let formattedPhone = guest.phone.replace(/\D/g, '');
+        if (!formattedPhone.startsWith('+') && formattedPhone.length === 10) {
+          formattedPhone = '91' + formattedPhone; // default to India for this example if 10 digits
+        }
+        const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(messageBody)}`;
+        window.open(whatsappUrl, '_blank');
       }
 
-      const result = await response.json();
-      
-      if (result.simulated) {
-        alert('Server says: "SIMULATED". This means your API keys are not loaded in Vercel yet! Make sure you added them to the Production environment in Vercel and redeployed.');
-        setSending(false);
-        return;
-      }
-      
-      if (!result.success && result.errors && result.errors.length > 0) {
-        // Show errors to user
-        alert('Failed to send completely:\n' + result.errors.join('\n'));
-        // We might still set sent to true if one succeeded, but let's just abort for now
-        setSending(false);
-        return;
+      // 2. Send Email via our Server API (Nodemailer) if selected
+      if (sendVia === 'both' || sendVia === 'email') {
+        const response = await fetch(`/api/guests/${guest.id}/send-invitation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sendVia: 'email', // force only email on the server
+            senderName,
+            eventName
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send email invitation');
+        }
+
+        const result = await response.json();
+        
+        if (result.simulated) {
+          alert('Server says: "SIMULATED". This means your SMTP API keys are not loaded in Vercel yet! Make sure you added them to the Production environment in Vercel and redeployed.');
+          setSending(false);
+          return;
+        }
+        
+        if (!result.success && result.errors && result.errors.length > 0) {
+          alert('Failed to send email:\n' + result.errors.join('\n'));
+          setSending(false);
+          return;
+        }
       }
 
       setSent(true);

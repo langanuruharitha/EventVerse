@@ -1,15 +1,6 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import twilio from 'twilio';
-
-// Initialize Resend (it will throw an error later if key is missing and we try to use it)
-const resend = new Resend(process.env.RESEND_API_KEY || 'missing');
-
-// Initialize Twilio
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
+import nodemailer from 'nodemailer';
 
 export async function POST(
   request: Request,
@@ -20,17 +11,12 @@ export async function POST(
     const body = await request.json();
     const { sendVia, senderName, eventName } = body;
 
-    const supabase = await createServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const supabase = createServiceClient();
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get guest
+    // Fetch guest details
     const { data: guest, error: guestError } = await supabase
       .from('guests')
-      .select('*, events(event_name, event_date)')
+      .select('*, events(event_name)')
       .eq('id', id)
       .single();
 
@@ -38,81 +24,54 @@ export async function POST(
       return NextResponse.json({ error: 'Guest not found' }, { status: 404 });
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const rsvpLink = `${siteUrl}/rsvp/${guest.id}`;
-
+    const hostUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const rsvpLink = `${hostUrl}/rsvp/${guest.id}`;
+    
     let emailSent = false;
-    let whatsappSent = false;
     let errors: string[] = [];
 
-    // Send Email
+    // Send Email via Nodemailer
     if ((sendVia === 'both' || sendVia === 'email') && guest.email) {
-      if (process.env.RESEND_API_KEY) {
+      if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
         try {
-          const resendResult = await resend.emails.send({
-            from: 'EventVerse <onboarding@resend.dev>', // Free testing domain
-            to: [guest.email],
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.SMTP_EMAIL,
+              pass: process.env.SMTP_PASSWORD,
+            },
+          });
+
+          await transporter.sendMail({
+            from: `"${senderName || 'EventVerse'}" <${process.env.SMTP_EMAIL}>`,
+            to: guest.email,
             subject: `You're invited to ${eventName}!`,
             html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>Hi ${guest.guest_name},</h2>
-                <p>You are warmly invited to <strong>${eventName}</strong>!</p>
-                <p>From: ${senderName || 'Your Host'}</p>
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #9333ea;">Hi ${guest.guest_name},</h2>
+                <p style="font-size: 16px;">You are warmly invited to <strong>${eventName}</strong>!</p>
+                <p style="font-size: 16px;">From: ${senderName || 'Your Host'}</p>
                 <div style="margin: 30px 0;">
-                  <a href="${rsvpLink}" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                  <a href="${rsvpLink}" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
                     Click here to RSVP
                   </a>
                 </div>
-                <p>We hope to see you there!</p>
+                <p style="font-size: 14px; color: #666;">We hope to see you there!</p>
               </div>
             `
           });
-          if (resendResult.error) {
-             errors.push(`Resend API Error: ${resendResult.error.message}`);
-          } else {
-             emailSent = true;
-          }
+          emailSent = true;
         } catch (error: any) {
-          console.error('Failed to send Resend email:', error);
-          errors.push(`Email Crash: ${error.message || 'Unknown error'}`);
+          console.error('Failed to send Nodemailer email:', error);
+          errors.push(`Email Error: ${error.message || 'Unknown SMTP error'}`);
         }
       } else {
-        console.warn('RESEND_API_KEY is missing. Simulating email sending.');
+        console.warn('SMTP_EMAIL or SMTP_PASSWORD is missing. Simulating email sending.');
         emailSent = true;
       }
     }
 
-    // Send WhatsApp via Twilio
-    if ((sendVia === 'both' || sendVia === 'whatsapp') && guest.phone) {
-      if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
-        try {
-          // Format phone number to E.164 format if it's not already
-          let formattedPhone = guest.phone.replace(/\D/g, '');
-          if (!formattedPhone.startsWith('+')) {
-             // Assuming Indian number +91 if no country code provided and length is 10
-             if (formattedPhone.length === 10) formattedPhone = '+91' + formattedPhone;
-             else formattedPhone = '+' + formattedPhone;
-          }
-
-          const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to *${eventName}*!\n\nFrom,\n${senderName || 'Your Host'}\n\nPlease click here to confirm your RSVP:\n${rsvpLink}`;
-
-          await twilioClient.messages.create({
-            body: messageBody,
-            from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-            to: `whatsapp:${formattedPhone}`
-          });
-          whatsappSent = true;
-        } catch (error: any) {
-          console.error('Failed to send Twilio WhatsApp:', error);
-          errors.push(`WhatsApp Error: ${error.message || 'Unknown Twilio error'}`);
-        }
-      } else {
-        console.warn('Twilio credentials missing. Simulating WhatsApp sending.');
-        whatsappSent = true;
-      }
-    }
-
-    // Update guest invitation status
+    // Update guest record to mark as sent
     await supabase
       .from('guests')
       .update({ invitation_sent: true })
@@ -120,13 +79,16 @@ export async function POST(
 
     return NextResponse.json({ 
       success: errors.length === 0, 
-      emailSent, 
-      whatsappSent,
-      simulated: !process.env.RESEND_API_KEY && !process.env.TWILIO_ACCOUNT_SID
+      emailSent,
+      whatsappSent: false, // Handled client-side now
+      simulated: !process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD,
+      errors 
     });
-
-  } catch (error: any) {
-    console.error('Error sending invitation:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    console.error('Error in send-invitation route:', error);
+    return NextResponse.json(
+      { error: 'Failed to process invitation request' },
+      { status: 500 }
+    );
   }
 }
