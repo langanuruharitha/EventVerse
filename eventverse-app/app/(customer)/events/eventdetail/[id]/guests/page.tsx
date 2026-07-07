@@ -20,7 +20,8 @@ import {
   Phone,
   CheckCircle,
   Users,
-  Send
+  Send,
+  Trash2
 } from 'lucide-react';
 
 interface Guest {
@@ -213,6 +214,25 @@ export default function GuestListPage() {
     // Refresh guest list
     fetchEventAndGuests();
     setShowGuestForm(false);
+  };
+
+  const handleDeleteGuest = async (guestId: string) => {
+    if (!window.confirm("Are you sure you want to remove this guest?")) return;
+
+    try {
+      const { error } = await supabase
+        .from('guests')
+        .delete()
+        .eq('id', guestId);
+
+      if (error) throw error;
+      
+      // Remove from UI
+      setGuests(guests.filter(g => g.id !== guestId));
+    } catch (err) {
+      console.error('Error deleting guest:', err);
+      alert('Failed to delete guest. Please try again.');
+    }
   };
 
   const getFilteredGuests = () => {
@@ -568,17 +588,28 @@ ALTER TABLE guests ADD COLUMN IF NOT EXISTS plus_ones_confirmed INT DEFAULT 0;`}
                           )}
                         </td>
                         <td className="py-4 px-4">
-                          {!guest.invitation_sent && (
+                          <div className="flex gap-2">
+                            {!guest.invitation_sent && (
+                              <Button
+                                onClick={() => setSelectedGuestForInvite(guest)}
+                                variant="outline"
+                                size="sm"
+                                className="flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                              >
+                                <Send className="w-4 h-4" />
+                                Send
+                              </Button>
+                            )}
                             <Button
-                              onClick={() => setSelectedGuestForInvite(guest)}
+                              onClick={() => handleDeleteGuest(guest.id)}
                               variant="outline"
                               size="sm"
-                              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                              className="flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 w-8 h-8 p-0"
+                              title="Remove Guest"
                             >
-                              <Send className="w-4 h-4" />
-                              Send
+                              <Trash2 className="w-4 h-4" />
                             </Button>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     ))}
