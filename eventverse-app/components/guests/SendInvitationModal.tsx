@@ -63,8 +63,8 @@ export default function SendInvitationModal({
 
       // 2. Send Email via our Server API (Nodemailer) if selected
       if (sendVia === 'both' || sendVia === 'email') {
-        if (selectedFile && selectedFile.size > 4.5 * 1024 * 1024) {
-          alert('The file is too large to attach to the email (max 4.5MB). Please choose a smaller file.');
+        if (selectedFile && selectedFile.size > 4.0 * 1024 * 1024) {
+          alert('The file is too large to attach to the email (max 4.0MB). Please choose a smaller file.');
           setSending(false);
           return;
         }
@@ -83,7 +83,8 @@ export default function SendInvitationModal({
         });
 
         if (!response.ok) {
-          throw new Error('Failed to send email invitation');
+          const errorText = await response.text();
+          throw new Error(`Server returned ${response.status}: ${errorText}`);
         }
 
         const result = await response.json();
@@ -109,9 +110,9 @@ export default function SendInvitationModal({
         onClose();
       }, 1500);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending invitation:', error);
-      alert('Network or server error failed to send invitation. Please try again.');
+      alert(`Error: ${error.message}`);
     } finally {
       setSending(false);
     }
