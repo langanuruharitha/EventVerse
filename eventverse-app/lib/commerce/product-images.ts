@@ -297,8 +297,8 @@ export function resolveProductImage(
   product: ProductLike,
   eventType?: string
 ): string {
-  // First priority: Use the database primary_image_url if available
-  if (product.primary_image_url && product.primary_image_url.trim() !== '') {
+  // First priority: Use the database primary_image_url if available (BUT ignore generic unsplash placeholders)
+  if (product.primary_image_url && product.primary_image_url.trim() !== '' && !product.primary_image_url.includes('unsplash.com')) {
     return product.primary_image_url;
   }
 
