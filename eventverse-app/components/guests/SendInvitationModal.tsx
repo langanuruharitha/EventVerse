@@ -24,7 +24,7 @@ export default function SendInvitationModal({
 }: SendInvitationModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [sendVia, setSendVia] = useState<'both' | 'email' | 'whatsapp'>('both');
+  const [sendVia, setSendVia] = useState<'email' | 'whatsapp'>(guest.email ? 'email' : 'whatsapp');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [senderName, setSenderName] = useState('');
@@ -52,7 +52,7 @@ export default function SendInvitationModal({
       const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to *${eventName}*!\n\nFrom,\n${senderName || 'Your Host'}\n\nPlease click here to confirm your RSVP:\n${rsvpLink}`;
 
       // 1. Send WhatsApp via Click-to-Chat if selected
-      if ((sendVia === 'both' || sendVia === 'whatsapp') && guest.phone) {
+      if (sendVia === 'whatsapp' && guest.phone) {
         let formattedPhone = guest.phone.replace(/\D/g, '');
         if (!formattedPhone.startsWith('+') && formattedPhone.length === 10) {
           formattedPhone = '91' + formattedPhone; // default to India for this example if 10 digits
@@ -62,7 +62,7 @@ export default function SendInvitationModal({
       }
 
       // 2. Send Email via our Server API (Nodemailer) if selected
-      if (sendVia === 'both' || sendVia === 'email') {
+      if (sendVia === 'email') {
         if (selectedFile && selectedFile.size > 4.0 * 1024 * 1024) {
           alert('The file is too large to attach to the email (max 4.0MB). Please choose a smaller file.');
           setSending(false);
@@ -143,7 +143,6 @@ export default function SendInvitationModal({
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Invitation Sent!</h3>
             <p className="text-gray-600">
-              {sendVia === 'both' && 'Invitation sent via Email & WhatsApp'}
               {sendVia === 'email' && 'Invitation sent via Email'}
               {sendVia === 'whatsapp' && 'Invitation sent via WhatsApp'}
             </p>
@@ -222,24 +221,7 @@ export default function SendInvitationModal({
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Send Via
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSendVia('both')}
-                  className={`p-4 border-2 rounded-lg text-left transition-all ${
-                    sendVia === 'both'
-                      ? 'border-purple-600 bg-purple-50'
-                      : 'border-gray-300 hover:border-purple-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Mail className="w-5 h-5 text-purple-600" />
-                    <MessageCircle className="w-5 h-5 text-green-600" />
-                  </div>
-                  <p className="font-semibold text-gray-900">Both</p>
-                  <p className="text-xs text-gray-600">Email & WhatsApp</p>
-                </button>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setSendVia('email')}
