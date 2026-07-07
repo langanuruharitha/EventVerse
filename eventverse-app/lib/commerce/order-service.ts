@@ -84,14 +84,14 @@ export async function createOrder(
     const orderItems = cart.items.map((item: any) => ({
       order_id: order.id,
       product_id: item.product_id,
-      variant_id: item.variant_id,
       product_name: item.product.name,
       product_sku: item.product.sku || 'SKU-PENDING',
       product_image_url: item.product.primary_image_url || 'https://via.placeholder.com/150',
       quantity: item.quantity,
       unit_price: item.unit_price,
       total_price: item.total_price,
-      return_eligible_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      selected_color: item.selectedColor || null,
+      selected_size: item.selectedSize || null,
     }));
 
     const { error: itemsError } = await supabase
