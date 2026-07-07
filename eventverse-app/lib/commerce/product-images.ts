@@ -302,7 +302,14 @@ export function resolveProductImage(
     return product.primary_image_url;
   }
 
-  // Fallback to type-based detection (for products without specific images)
+  // Second priority: Generate a PERFECT product image instantly using Pollinations AI
+  // based exactly on the product's name
+  if (product.name) {
+    const prompt = `${product.name}, high quality product photography, white background, cinematic lighting`;
+    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=600&height=600&nologo=true`;
+  }
+
+  // Fallback to type-based detection (for products without specific images or names)
   const type = getProductType(product);
   const event = eventType || getEventType(product);
   const seed = product.name || product.slug || type;

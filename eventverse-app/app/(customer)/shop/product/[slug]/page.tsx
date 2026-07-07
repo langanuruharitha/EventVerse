@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, ArrowLeft } from 'lucide-react';
 import ProductImage from '@/components/shop/ProductImage';
 import { resolveProductGallery } from '@/lib/commerce/product-images';
+import ProductReviews from '@/components/shop/ProductReviews';
 
 interface Product {
   id: string;
@@ -356,9 +357,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 variant="primary"
                 size="lg"
                 className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                onClick={(e) => {
+                disabled={addingToCart || product.stock_quantity === 0}
+                onClick={async (e) => {
                   e.stopPropagation();
-                  // Buy Now - placeholder (not functional yet)
+                  await handleAddToCart();
+                  router.push('/shop/cart/checkout');
                 }}
               >
                 Buy Now
@@ -452,6 +455,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <ProductReviews productId={product.id} />
       </div>
     </div>
   );
