@@ -43,7 +43,7 @@ export async function POST(
       if (process.env.RESEND_API_KEY) {
         try {
           await resend.emails.send({
-            from: 'EventVerse <invites@resend.dev>', // Use a verified domain in production
+            from: 'EventVerse <onboarding@resend.dev>', // Free testing domain
             to: [guest.email],
             subject: `You're invited to ${eventName}!`,
             html: `
