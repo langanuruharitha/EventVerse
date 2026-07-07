@@ -74,7 +74,6 @@ export async function createOrder(
         billing_address: checkoutData.billingAddress || checkoutData.shippingAddress,
         delivery_instructions: checkoutData.deliveryInstructions,
         payment_method: checkoutData.paymentMethod,
-        expected_delivery_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       })
       .select()
       .single();
