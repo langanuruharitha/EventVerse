@@ -43,12 +43,13 @@ export async function POST(
 
     let emailSent = false;
     let whatsappSent = false;
+    let errors: string[] = [];
 
     // Send Email
     if ((sendVia === 'both' || sendVia === 'email') && guest.email) {
       if (process.env.RESEND_API_KEY) {
         try {
-          await resend.emails.send({
+          const resendResult = await resend.emails.send({
             from: 'EventVerse <onboarding@resend.dev>', // Free testing domain
             to: [guest.email],
             subject: `You're invited to ${eventName}!`,
@@ -66,15 +67,18 @@ export async function POST(
               </div>
             `
           });
-          emailSent = true;
-        } catch (error) {
+          if (resendResult.error) {
+             errors.push(`Resend API Error: ${resendResult.error.message}`);
+          } else {
+             emailSent = true;
+          }
+        } catch (error: any) {
           console.error('Failed to send Resend email:', error);
-          // Don't fail the whole request if email fails, just log it
+          errors.push(`Email Crash: ${error.message || 'Unknown error'}`);
         }
       } else {
         console.warn('RESEND_API_KEY is missing. Simulating email sending.');
-        console.log(`[SIMULATED EMAIL to ${guest.email}] RSVP Link: ${rsvpLink}`);
-        emailSent = true; // Simulated success
+        emailSent = true;
       }
     }
 
@@ -98,13 +102,13 @@ export async function POST(
             to: `whatsapp:${formattedPhone}`
           });
           whatsappSent = true;
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to send Twilio WhatsApp:', error);
+          errors.push(`WhatsApp Error: ${error.message || 'Unknown Twilio error'}`);
         }
       } else {
         console.warn('Twilio credentials missing. Simulating WhatsApp sending.');
-        console.log(`[SIMULATED WHATSAPP to ${guest.phone}] RSVP Link: ${rsvpLink}`);
-        whatsappSent = true; // Simulated success
+        whatsappSent = true;
       }
     }
 
@@ -115,7 +119,7 @@ export async function POST(
       .eq('id', id);
 
     return NextResponse.json({ 
-      success: true, 
+      success: errors.length === 0, 
       emailSent, 
       whatsappSent,
       simulated: !process.env.RESEND_API_KEY && !process.env.TWILIO_ACCOUNT_SID

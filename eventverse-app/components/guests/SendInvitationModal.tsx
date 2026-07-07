@@ -66,6 +66,14 @@ export default function SendInvitationModal({
       if (result.simulated) {
         console.log('Sending was simulated because API keys are not configured.');
       }
+      
+      if (!result.success && result.errors && result.errors.length > 0) {
+        // Show errors to user
+        alert('Failed to send completely:\n' + result.errors.join('\n'));
+        // We might still set sent to true if one succeeded, but let's just abort for now
+        setSending(false);
+        return;
+      }
 
       setSent(true);
       
@@ -77,7 +85,7 @@ export default function SendInvitationModal({
 
     } catch (error) {
       console.error('Error sending invitation:', error);
-      alert('Failed to send invitation. Please try again.');
+      alert('Network or server error failed to send invitation. Please try again.');
     } finally {
       setSending(false);
     }
