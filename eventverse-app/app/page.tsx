@@ -116,10 +116,10 @@ export default function HomePage() {
           </div>
 
           <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow">
-            <div className="text-4xl mb-4">📸</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Memory Vault</h3>
+            <div className="text-4xl mb-4">🛍️</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Event Shop</h3>
             <p className="text-gray-600">
-              Preserve your special moments with AI-powered photo organization, face recognition, and smart albums.
+              Shop for decorations, party supplies, and event essentials. Browse our curated collection for every occasion.
             </p>
           </div>
         </div>
