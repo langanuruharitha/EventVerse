@@ -63,14 +63,23 @@ export default function SendInvitationModal({
 
       // 2. Send Email via our Server API (Nodemailer) if selected
       if (sendVia === 'both' || sendVia === 'email') {
+        if (selectedFile && selectedFile.size > 4.5 * 1024 * 1024) {
+          alert('The file is too large to attach to the email (max 4.5MB). Please choose a smaller file.');
+          setSending(false);
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('sendVia', 'email');
+        formData.append('senderName', senderName);
+        formData.append('eventName', eventName);
+        if (selectedFile) {
+          formData.append('file', selectedFile);
+        }
+
         const response = await fetch(`/api/guests/${guest.id}/send-invitation`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sendVia: 'email', // force only email on the server
-            senderName,
-            eventName
-          })
+          body: formData
         });
 
         if (!response.ok) {
