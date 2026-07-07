@@ -302,11 +302,10 @@ export function resolveProductImage(
     return product.primary_image_url;
   }
 
-  // Second priority: Generate a PERFECT product image instantly using Pollinations AI
-  // based exactly on the product's name
+  // Second priority: Generate a REAL image based on the product name using LoremFlickr
   if (product.name) {
-    const prompt = `${product.name}, high quality product photography, white background, cinematic lighting`;
-    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=600&height=600&nologo=true`;
+    const encodedPrompt = encodeURIComponent(product.name).replace(/%20/g, ',');
+    return `https://loremflickr.com/600/600/${encodedPrompt}`;
   }
 
   // Fallback to type-based detection (for products without specific images or names)

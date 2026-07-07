@@ -225,15 +225,15 @@ export default function PaymentPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax (GST 18%)</span>
-                    <span className="font-medium">₹{(cart.tax_amount ?? 0).toFixed(2)}</span>
+                    <span className="font-medium">₹{(cart.taxAmount ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping</span>
                     <span className="font-medium">
-                      {(cart.shipping_charges ?? 0) === 0 ? (
+                      {(cart.shippingCharges ?? 0) === 0 ? (
                         <span className="text-green-600">FREE</span>
                       ) : (
-                        `₹${(cart.shipping_charges ?? 0).toFixed(2)}`
+                        `₹${(cart.shippingCharges ?? 0).toFixed(2)}`
                       )}
                     </span>
                   </div>
@@ -244,7 +244,7 @@ export default function PaymentPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold">Total Amount</span>
                     <span className="text-2xl font-bold text-purple-600">
-                      ₹{(cart.total_amount ?? 0).toFixed(2)}
+                      ₹{(cart.totalAmount ?? 0).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -256,7 +256,7 @@ export default function PaymentPage() {
                   className="w-full"
                   size="lg"
                 >
-                  {processing ? 'Processing...' : `Pay ₹${(cart.total_amount ?? 0).toFixed(2)}`}
+                  {processing ? 'Processing...' : `Pay ₹${(cart.totalAmount ?? 0).toFixed(2)}`}
                 </Button>
 
                 {/* Terms */}
