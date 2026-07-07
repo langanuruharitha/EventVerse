@@ -49,21 +49,17 @@ export default function ProductImage({
     return { name, category, tags };
   }, [product, name, category, tags]);
 
-  const fallbacks = useMemo(() => {
-    if (src) {
-      return [src, placeholderSvg(resolvedProduct)];
-    }
-    const chain = getProductImageFallbacks(resolvedProduct, eventType);
-    return chain;
-  }, [resolvedProduct, eventType, src]);
+  // Use database image directly, no fallbacks
+  const imageUrl = src || resolvedProduct.primary_image_url || placeholderSvg(resolvedProduct);
+  
+  const [currentSrc, setCurrentSrc] = useState(imageUrl);
+  const [hasError, setHasError] = useState(false);
 
-  const [idx, setIdx] = useState(0);
-  const currentSrc = fallbacks[idx] || resolveProductImage(resolvedProduct, eventType);
-
-  // Reset the fallback index when the product/event changes.
+  // Reset when product changes
   useEffect(() => {
-    setIdx(0);
-  }, [resolvedProduct, eventType]);
+    setCurrentSrc(imageUrl);
+    setHasError(false);
+  }, [imageUrl]);
 
   const fitClass = contain ? 'object-contain' : 'object-cover';
 
@@ -73,7 +69,10 @@ export default function ProductImage({
       alt={alt}
       className={`w-full h-full ${fitClass} ${className}`}
       onError={() => {
-        setIdx((prev) => (prev < fallbacks.length - 1 ? prev + 1 : prev));
+        if (!hasError) {
+          setHasError(true);
+          setCurrentSrc(placeholderSvg(resolvedProduct));
+        }
       }}
       loading="lazy"
     />
