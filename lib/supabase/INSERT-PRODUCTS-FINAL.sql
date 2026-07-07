@@ -34,8 +34,8 @@ INSERT INTO products (
   'https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg?auto=compress&cs=tinysrgb&w=800',
   ARRAY[
     'https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg?w=800',
-    'https://images.pexels.com/photos/169198/pexels-photo-169198.jpeg?w=800',
-    'https://images.pexels.com/photos/2788792/pexels-photo-2788792.jpeg?w=800'
+    'https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg?w=800',
+    'https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg?w=800'
   ],
   'Transform your wedding venue with our premium decoration package featuring elegant floral arrangements, flowing drapes, and ambient lighting. Includes fresh flower bouquets, table centerpieces, backdrop setup, and professional installation.',
   'Complete wedding decoration with flowers, drapes & lighting',
