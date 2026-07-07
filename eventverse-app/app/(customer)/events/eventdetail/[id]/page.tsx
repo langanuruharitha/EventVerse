@@ -278,6 +278,12 @@ export default async function EventDetailPage({
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 justify-center mb-8">
           <Link
+            href={`/events/eventdetail/${event.id}/tasks`}
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl"
+          >
+            📋 Task Checklist
+          </Link>
+          <Link
             href={`/events/eventdetail/${event.id}/decoration`}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
           >

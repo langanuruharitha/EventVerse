@@ -26,11 +26,24 @@ export default function NewEventPage() {
     selected_addons: [],
   });
 
+const defaultEventTypes = [
+  { slug: 'birthday', name: 'Birthday Party', icon: '🎂' },
+  { slug: 'wedding', name: 'Wedding Ceremony', icon: '💍' },
+  { slug: 'engagement', name: 'Engagement Party', icon: '💕' },
+  { slug: 'baby-shower', name: 'Baby Shower', icon: '👶' },
+  { slug: 'anniversary', name: 'Anniversary', icon: '💐' },
+  { slug: 'housewarming', name: 'Housewarming', icon: '🏠' },
+  { slug: 'corporate', name: 'Corporate Event', icon: '🏢' },
+  { slug: 'festival', name: 'Festival Celebration', icon: '🎆' },
+];
+
   useEffect(() => {
     async function loadEventTypes() {
       const result = await getEventTypes();
-      if (result.success && result.data) {
+      if (result.success && result.data && result.data.length > 0) {
         setEventTypes(result.data);
+      } else {
+        setEventTypes(defaultEventTypes);
       }
     }
     loadEventTypes();

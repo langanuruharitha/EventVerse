@@ -24,13 +24,24 @@ export function calculateHealthScore(event: EventWithStats): {
     guests: calculateGuestScore(event),
   };
 
-  const overall = Math.min(100, Math.max(0,
-    breakdown.budget +
-    breakdown.vendors +
-    breakdown.shopping +
-    breakdown.timeline +
-    breakdown.guests
-  ));
+  let overall = 0;
+  const totalTasks = event.total_tasks || 0;
+  const completedTasks = event.completed_tasks || 0;
+  
+  const totalShopping = event.total_shopping_items || 0;
+  const purchasedShopping = event.purchased_items || 0;
+
+  if (totalTasks === 0 && totalShopping === 0) {
+    overall = 0;
+  } else if (totalTasks > 0 && totalShopping === 0) {
+    overall = (completedTasks / totalTasks) * 100;
+  } else if (totalTasks === 0 && totalShopping > 0) {
+    overall = (purchasedShopping / totalShopping) * 100;
+  } else {
+    overall = ((completedTasks / totalTasks) * 50) + ((purchasedShopping / totalShopping) * 50);
+  }
+  
+  overall = Math.min(100, Math.max(0, Math.round(overall)));
 
   // Determine status based on overall score
   let status: 'just_started' | 'in_progress' | 'on_track' | 'almost_ready';
