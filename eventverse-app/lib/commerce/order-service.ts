@@ -67,12 +67,12 @@ export async function createOrder(
         payment_status: 'pending',
         subtotal: cart.subtotal,
         discount_amount: cart.discountAmount || 0,
-        shipping_charges: cart.shippingCharges,
+        shipping_amount: cart.shippingCharges,
         tax_amount: cart.taxAmount,
         total_amount: cart.totalAmount,
         shipping_address: checkoutData.shippingAddress,
         billing_address: checkoutData.billingAddress || checkoutData.shippingAddress,
-        delivery_instructions: checkoutData.deliveryInstructions,
+        notes: checkoutData.deliveryInstructions,
         payment_method: checkoutData.paymentMethod,
       })
       .select()
