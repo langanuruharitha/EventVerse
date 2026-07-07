@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         age_group: age_group || 'adult',
         plus_ones_allowed: plus_ones_allowed || 0,
         plus_ones_confirmed: 0,
-        dietary_restrictions: dietary_restrictions || null,
+        dietary_restrictions: dietary_restrictions ? [dietary_restrictions] : null,
         special_requirements: special_requirements || null,
         notes: notes || null,
         rsvp_status: 'pending',

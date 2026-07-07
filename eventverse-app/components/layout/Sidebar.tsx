@@ -15,6 +15,7 @@ const customerNav = [
   { name: 'Venues', href: '/venues', icon: '🏛️' },
   { name: 'Shop', href: '/shop', icon: '🛍️' },
   { name: 'Guests', href: '/guests', icon: '👥' },
+  { name: 'Task Checklist', href: '/tasks', icon: '📋' },
   { name: 'Budget', href: '/dashboard/budget', icon: '💰' },
 ];
 
