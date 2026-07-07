@@ -1,9 +1,15 @@
 import { createServerClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import twilio from 'twilio';
 
 // Initialize Resend (it will throw an error later if key is missing and we try to use it)
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing');
+
+// Initialize Twilio
+const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  : null;
 
 export async function POST(
   request: Request,
@@ -72,12 +78,29 @@ export async function POST(
       }
     }
 
-    // Send WhatsApp (Twilio placeholder)
+    // Send WhatsApp via Twilio
     if ((sendVia === 'both' || sendVia === 'whatsapp') && guest.phone) {
-      if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-        // Here you would use the twilio client to send the SMS/WhatsApp
-        console.log('Twilio integration is configured. Sending...');
-        whatsappSent = true;
+      if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+        try {
+          // Format phone number to E.164 format if it's not already
+          let formattedPhone = guest.phone.replace(/\D/g, '');
+          if (!formattedPhone.startsWith('+')) {
+             // Assuming Indian number +91 if no country code provided and length is 10
+             if (formattedPhone.length === 10) formattedPhone = '+91' + formattedPhone;
+             else formattedPhone = '+' + formattedPhone;
+          }
+
+          const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to *${eventName}*!\n\nFrom,\n${senderName || 'Your Host'}\n\nPlease click here to confirm your RSVP:\n${rsvpLink}`;
+
+          await twilioClient.messages.create({
+            body: messageBody,
+            from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+            to: `whatsapp:${formattedPhone}`
+          });
+          whatsappSent = true;
+        } catch (error) {
+          console.error('Failed to send Twilio WhatsApp:', error);
+        }
       } else {
         console.warn('Twilio credentials missing. Simulating WhatsApp sending.');
         console.log(`[SIMULATED WHATSAPP to ${guest.phone}] RSVP Link: ${rsvpLink}`);
