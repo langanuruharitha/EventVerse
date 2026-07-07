@@ -163,6 +163,7 @@ export default async function ShopPage() {
                         {product.rating_average.toFixed(1)} ({product.review_count})
                       </span>
                     </div>
+                    <div className="text-xs text-green-600 font-medium mt-2">📅 Delivery in 4–7 days</div>
                   </div>
                 </Link>
               ))}
@@ -217,6 +218,7 @@ export default async function ShopPage() {
                         {product.sales_count} sold
                       </span>
                     </div>
+                    <div className="text-xs text-green-600 font-medium mt-2">📅 Delivery in 4–7 days</div>
                   </div>
                 </Link>
               ))}

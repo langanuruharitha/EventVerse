@@ -236,10 +236,21 @@ export async function cancelOrder(
 
     // Restore product stock
     for (const item of order.items) {
-      await supabase.rpc('increment_stock', {
-        product_id: item.product_id,
-        quantity: item.quantity,
-      });
+      const { data: prod } = await supabase
+        .from('products')
+        .select('stock_quantity, sales_count')
+        .eq('id', item.product_id)
+        .single();
+
+      if (prod) {
+        await supabase
+          .from('products')
+          .update({
+            stock_quantity: (prod.stock_quantity || 0) + item.quantity,
+            sales_count: Math.max(0, (prod.sales_count || 0) - item.quantity),
+          })
+          .eq('id', item.product_id);
+      }
     }
 
     // Process refund if payment was made

@@ -402,6 +402,26 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               </div>
             )}
 
+            {/* Estimated Delivery Date */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">📅</span>
+                <div>
+                  <p className="font-semibold text-green-800 text-sm">Estimated Delivery</p>
+                  <p className="text-green-700 font-bold text-base">
+                    {(() => {
+                      const today = new Date();
+                      const min = new Date(today); min.setDate(today.getDate() + 4);
+                      const max = new Date(today); max.setDate(today.getDate() + 7);
+                      const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                      return `${fmt(min)} – ${fmt(max)}`;
+                    })()}
+                  </p>
+                  <p className="text-xs text-green-600 mt-0.5">Order now for fastest delivery</p>
+                </div>
+              </div>
+            </div>
+
             {/* Features */}
             <div className="border-t pt-6 space-y-3">
               <div className="flex items-center gap-3 text-sm">
