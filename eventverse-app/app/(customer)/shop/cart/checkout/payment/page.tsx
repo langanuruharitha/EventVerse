@@ -297,6 +297,19 @@ export default function PaymentPage() {
                 className="w-full bg-green-600 hover:bg-green-700" 
                 size="lg"
                 onClick={async () => {
+                  try {
+                    await fetch('/api/payments/verify', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        orderId: createdOrderId,
+                        paymentId: 'UPI-MOCK-' + Date.now(),
+                        signature: 'mock_signature',
+                      }),
+                    });
+                  } catch (e) {
+                    console.error(e);
+                  }
                   await clearCart();
                   localStorage.removeItem('checkoutAddress');
                   router.push(`/shop/cart/checkout/success?orderId=${createdOrderId}`);
