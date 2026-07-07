@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import GuestForm from '@/components/guests/GuestForm';
 import SendInvitationModal from '@/components/guests/SendInvitationModal';
+import BulkSendInvitationModal from '@/components/guests/BulkSendInvitationModal';
 import Link from 'next/link';
 import { 
   ArrowLeft, 
@@ -53,6 +54,7 @@ export default function GuestListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showGuestForm, setShowGuestForm] = useState(false);
+  const [showBulkInvite, setShowBulkInvite] = useState(false);
   const [selectedGuestForInvite, setSelectedGuestForInvite] = useState<Guest | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -392,13 +394,23 @@ ALTER TABLE guests ADD COLUMN IF NOT EXISTS plus_ones_confirmed INT DEFAULT 0;`}
                 </p>
               )}
             </div>
-            <Button 
-              onClick={() => setShowGuestForm(true)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Guest
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowBulkInvite(true)}
+                variant="outline"
+                className="border-purple-200 text-purple-700 hover:bg-purple-50"
+              >
+                <Mail className="w-5 h-5 mr-2" />
+                Send All
+              </Button>
+              <Button 
+                onClick={() => setShowGuestForm(true)}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Add Guest
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -605,6 +617,19 @@ ALTER TABLE guests ADD COLUMN IF NOT EXISTS plus_ones_confirmed INT DEFAULT 0;`}
             onSent={() => {
               fetchEventAndGuests(); // Refresh to show updated "✓ Sent" status
               setSelectedGuestForInvite(null);
+            }}
+          />
+        )}
+
+        {/* Bulk Send Invitation Modal */}
+        {showBulkInvite && event && (
+          <BulkSendInvitationModal
+            guests={guests}
+            eventName={event.event_name}
+            onClose={() => setShowBulkInvite(false)}
+            onSent={() => {
+              fetchEventAndGuests();
+              setShowBulkInvite(false);
             }}
           />
         )}
