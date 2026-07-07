@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function POST(
@@ -14,7 +14,7 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid RSVP status' }, { status: 400 });
     }
 
-    const supabase = await createServerClient();
+    const supabase = createServiceClient();
 
     // Note: We don't check for user authentication here because this endpoint
     // is called by the guest (who is not logged in).
