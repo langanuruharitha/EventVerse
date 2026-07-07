@@ -61,6 +61,7 @@ export async function createOrder(
       .from('orders')
       .insert({
         user_id: user.id,
+        order_number: 'ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
         event_id: checkoutData.eventId,
         status: 'pending',
         payment_status: 'pending',
@@ -121,11 +122,11 @@ export async function createOrder(
       success: true,
       data: order,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating order:', error);
     return {
       success: false,
-      error: 'Failed to create order',
+      error: error.message || error.details || 'Failed to create order',
     };
   }
 }

@@ -15,6 +15,8 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'netbanking' | 'cod'>('card');
+  const [showUpiQR, setShowUpiQR] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     // Load cart and address
@@ -72,6 +74,10 @@ export default function PaymentPage() {
         await clearCart();
         localStorage.removeItem('checkoutAddress');
         router.push(`/shop/cart/checkout/success?orderId=${order.id}`);
+      } else if (paymentMethod === 'upi') {
+        // Show QR Code modal for UPI instead of Razorpay
+        setCreatedOrderId(order.id);
+        setShowUpiQR(true);
       } else {
         // Online payment via Razorpay
         const paymentResult = await processOrderPayment(order.id);
@@ -269,6 +275,43 @@ export default function PaymentPage() {
           </div>
         </div>
       </div>
+
+      {/* UPI QR Code Modal */}
+      {showUpiQR && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="p-8 max-w-sm w-full text-center space-y-6 bg-white">
+            <h3 className="text-xl font-bold">Scan to Pay</h3>
+            <p className="text-gray-600">Scan this QR code with any UPI app</p>
+            <div className="bg-gray-100 p-4 rounded-xl inline-block mx-auto border-2 border-purple-100">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=test@upi&pn=EventVerse&am=${(cart?.totalAmount ?? 0).toFixed(2)}`} 
+                alt="UPI QR Code" 
+                className="w-48 h-48 mix-blend-multiply" 
+              />
+            </div>
+            <div className="text-2xl font-bold text-purple-600">
+              ₹{(cart?.totalAmount ?? 0).toFixed(2)}
+            </div>
+            <div className="space-y-3 pt-4">
+              <Button 
+                className="w-full bg-green-600 hover:bg-green-700" 
+                size="lg"
+                onClick={async () => {
+                  await clearCart();
+                  localStorage.removeItem('checkoutAddress');
+                  router.push(`/shop/cart/checkout/success?orderId=${createdOrderId}`);
+                }}
+              >
+                <CheckCircle className="w-5 h-5 mr-2" />
+                I have paid successfully
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setShowUpiQR(false)}>
+                Cancel
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
