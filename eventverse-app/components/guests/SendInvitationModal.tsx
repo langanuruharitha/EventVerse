@@ -64,7 +64,9 @@ export default function SendInvitationModal({
       const result = await response.json();
       
       if (result.simulated) {
-        console.log('Sending was simulated because API keys are not configured.');
+        alert('Server says: "SIMULATED". This means your API keys are not loaded in Vercel yet! Make sure you added them to the Production environment in Vercel and redeployed.');
+        setSending(false);
+        return;
       }
       
       if (!result.success && result.errors && result.errors.length > 0) {
