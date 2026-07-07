@@ -47,33 +47,25 @@ export default function SendInvitationModal({
     setSending(true);
 
     try {
-      const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to ${eventName}!\n\nFrom,\n${senderName || 'Your Host'}`;
-      const subject = `Invitation to ${eventName}`;
-
-      if (sendVia === 'both' || sendVia === 'email') {
-        if (guest.email) {
-          const mailtoLink = `mailto:${guest.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
-          window.open(mailtoLink, '_blank');
-        }
-      }
-
-      if (sendVia === 'both' || sendVia === 'whatsapp') {
-        if (guest.phone) {
-          // Remove any non-numeric characters from phone
-          const cleanPhone = guest.phone.replace(/\D/g, '');
-          const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(messageBody)}`;
-          window.open(waLink, '_blank');
-        }
-      }
-
-      // Update database to mark invitation as sent
-      const response = await fetch(`/api/guests/${guest.id}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/guests/${guest.id}/send-invitation`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invitation_sent: true })
+        body: JSON.stringify({
+          sendVia,
+          senderName,
+          eventName
+        })
       });
 
-      if (!response.ok) throw new Error('Failed to update');
+      if (!response.ok) {
+        throw new Error('Failed to send invitation');
+      }
+
+      const result = await response.json();
+      
+      if (result.simulated) {
+        console.log('Sending was simulated because API keys are not configured.');
+      }
 
       setSent(true);
       
@@ -252,7 +244,7 @@ export default function SendInvitationModal({
             {/* Info Note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-900">
-                <span className="font-semibold">ℹ️ Note:</span> Clicking send will open your default Email client or WhatsApp with a pre-filled invitation message. The guest will then be marked as "Sent" in your list.
+                <span className="font-semibold">ℹ️ Note:</span> Clicking send will email/message the guest an invitation link automatically. They can confirm or decline, and their RSVP status will update automatically.
               </p>
             </div>
           </div>

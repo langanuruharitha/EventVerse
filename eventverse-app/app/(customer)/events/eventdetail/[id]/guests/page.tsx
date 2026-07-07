@@ -501,6 +501,7 @@ ALTER TABLE guests ADD COLUMN IF NOT EXISTS plus_ones_confirmed INT DEFAULT 0;`}
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">City</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">Contact</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
+                      <th className="text-left py-3 px-4 font-semibold text-gray-700">RSVP Status</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">Plus Ones</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">Invitation</th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">Action</th>
@@ -538,6 +539,9 @@ ALTER TABLE guests ADD COLUMN IF NOT EXISTS plus_ones_confirmed INT DEFAULT 0;`}
                         </td>
                         <td className="py-4 px-4">
                           <span className="text-sm text-gray-700 capitalize">{guest.category}</span>
+                        </td>
+                        <td className="py-4 px-4">
+                          {getStatusBadge(guest.rsvp_status)}
                         </td>
                         <td className="py-4 px-4">
                           <span className="text-sm text-gray-700">
