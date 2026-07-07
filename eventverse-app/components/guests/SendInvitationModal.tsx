@@ -27,6 +27,7 @@ export default function SendInvitationModal({
   const [sendVia, setSendVia] = useState<'both' | 'email' | 'whatsapp'>('both');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [senderName, setSenderName] = useState('');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,8 +47,24 @@ export default function SendInvitationModal({
     setSending(true);
 
     try {
-      // Simulate sending (default behavior - not real)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to ${eventName}!\n\nFrom,\n${senderName || 'Your Host'}`;
+      const subject = `Invitation to ${eventName}`;
+
+      if (sendVia === 'both' || sendVia === 'email') {
+        if (guest.email) {
+          const mailtoLink = `mailto:${guest.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageBody)}`;
+          window.open(mailtoLink, '_blank');
+        }
+      }
+
+      if (sendVia === 'both' || sendVia === 'whatsapp') {
+        if (guest.phone) {
+          // Remove any non-numeric characters from phone
+          const cleanPhone = guest.phone.replace(/\D/g, '');
+          const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(messageBody)}`;
+          window.open(waLink, '_blank');
+        }
+      }
 
       // Update database to mark invitation as sent
       const response = await fetch(`/api/guests/${guest.id}`, {
@@ -116,6 +133,20 @@ export default function SendInvitationModal({
               <p className="text-sm text-purple-900 mt-1">
                 <span className="font-semibold">Guest:</span> {guest.guest_name}
               </p>
+            </div>
+
+            {/* Sender Info */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sender Name (From)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. John Doe, The Smith Family"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
             </div>
 
             {/* Upload Invitation */}
@@ -221,7 +252,7 @@ export default function SendInvitationModal({
             {/* Info Note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-900">
-                <span className="font-semibold">ℹ️ Note:</span> This is a simulation. The invitation will be marked as "Sent" in your guest list, but no actual email/WhatsApp will be sent. You can manually share the invitation through your preferred method.
+                <span className="font-semibold">ℹ️ Note:</span> Clicking send will open your default Email client or WhatsApp with a pre-filled invitation message. The guest will then be marked as "Sent" in your list.
               </p>
             </div>
           </div>

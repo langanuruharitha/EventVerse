@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -54,10 +54,100 @@ export default function GuestListPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showGuestForm, setShowGuestForm] = useState(false);
   const [selectedGuestForInvite, setSelectedGuestForInvite] = useState<Guest | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const params = useParams();
   const eventId = params.id as string;
   const supabase = createBrowserClient();
+
+  const handleExportGuests = () => {
+    if (guests.length === 0) return;
+    
+    const headers = ['Name', 'Email', 'Phone', 'City', 'Category', 'RSVP Status', 'Plus Ones Allowed', 'Plus Ones Confirmed', 'Dietary Restrictions'];
+    
+    const csvRows = guests.map(guest => {
+      return [
+        `"${guest.guest_name || ''}"`,
+        `"${guest.email || ''}"`,
+        `"${guest.phone || ''}"`,
+        `"${guest.city || ''}"`,
+        `"${guest.category || 'general'}"`,
+        `"${guest.rsvp_status || 'pending'}"`,
+        guest.plus_ones_allowed || 0,
+        guest.plus_ones_confirmed || 0,
+        `"${guest.dietary_restrictions || ''}"`
+      ].join(',');
+    });
+    
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${event?.event_name || 'event'}_guests.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportGuests = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("User not authenticated");
+
+        const text = event.target?.result as string;
+        const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+        
+        if (lines.length <= 1) {
+          throw new Error("CSV file is empty or only contains headers.");
+        }
+
+        const newGuests = lines.slice(1).map(line => {
+          // Simple parsing that handles basic quotes
+          const values = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || line.split(',');
+          const cleanVals = values.map(v => v.replace(/^"|"$/g, '').trim());
+          
+          return {
+            event_id: eventId,
+            user_id: user.id,
+            guest_name: cleanVals[0] || 'Unknown',
+            email: cleanVals[1] || null,
+            phone: cleanVals[2] || null,
+            city: cleanVals[3] || null,
+            category: cleanVals[4] || 'general',
+            rsvp_status: cleanVals[5] || 'pending',
+            plus_ones_allowed: parseInt(cleanVals[6]) || 0,
+            plus_ones_confirmed: parseInt(cleanVals[7]) || 0,
+            dietary_restrictions: cleanVals[8] || null,
+            invitation_sent: false
+          };
+        });
+
+        const { error } = await supabase.from('guests').insert(newGuests);
+        if (error) throw error;
+        
+        alert(`Successfully imported ${newGuests.length} guests!`);
+        await fetchEventAndGuests();
+      } catch (err) {
+        console.error('Error importing guests:', err);
+        alert('Failed to import guests. Please check the CSV format.');
+        setLoading(false);
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsText(file);
+  };
 
   useEffect(() => {
     fetchEventAndGuests();
@@ -373,12 +463,19 @@ ALTER TABLE guests ADD COLUMN IF NOT EXISTS plus_ones_confirmed INT DEFAULT 0;`}
                   <option value="tentative">Tentative</option>
                 </select>
 
-                <Button variant="outline" className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept=".csv"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleImportGuests}
+                />
+                <Button variant="outline" className="flex items-center gap-2" onClick={handleImportClick}>
                   <Upload className="w-5 h-5" />
                   Import
                 </Button>
 
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2" onClick={handleExportGuests}>
                   <Download className="w-5 h-5" />
                   Export
                 </Button>
