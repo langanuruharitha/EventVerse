@@ -1,0 +1,325 @@
+-- =====================================================
+-- INSERT REAL SHOP PRODUCTS - FIXED VERSION
+-- =====================================================
+-- Matches your actual products table schema
+
+-- First, ensure categories exist and get their IDs
+DO $$
+DECLARE
+  cat_decorations UUID;
+  cat_cake UUID;
+  cat_photo UUID;
+  cat_flowers UUID;
+  cat_accessories UUID;
+  cat_party UUID;
+  cat_banners UUID;
+  cat_lighting UUID;
+BEGIN
+  -- Get or create category IDs
+  SELECT id INTO cat_decorations FROM product_categories WHERE slug = 'decorations' LIMIT 1;
+  SELECT id INTO cat_cake FROM product_categories WHERE slug = 'cake-decorations' LIMIT 1;
+  SELECT id INTO cat_photo FROM product_categories WHERE slug = 'photo-booth' LIMIT 1;
+  SELECT id INTO cat_flowers FROM product_categories WHERE slug = 'flowers' LIMIT 1;
+  SELECT id INTO cat_accessories FROM product_categories WHERE slug = 'accessories' LIMIT 1;
+  SELECT id INTO cat_party FROM product_categories WHERE slug = 'party-supplies' LIMIT 1;
+  SELECT id INTO cat_banners FROM product_categories WHERE slug = 'banners' LIMIT 1;
+  SELECT id INTO cat_lighting FROM product_categories WHERE slug = 'lighting' LIMIT 1;
+
+  -- Insert Wedding Products
+  INSERT INTO products (
+    sku, name, slug, category_id, event_types, price, original_price, discount_percentage,
+    primary_image, additional_images, long_description, short_description,
+    stock_quantity, rating_average, review_count, sales_count,
+    is_featured, is_bestseller, tags, status
+  ) VALUES
+  (
+    'SKU-WED-001',
+    'Premium Wedding Decoration Package - Flowers & Drapes',
+    'premium-wedding-decoration-flowers-drapes',
+    cat_decorations,
+    ARRAY['wedding', 'engagement'],
+    15999.00,
+    22999.00,
+    30.00,
+    'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop',
+    ARRAY[
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+      'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800',
+      'https://images.unsplash.com/photo-1525258974266-5bea8e41e588?w=800'
+    ],
+    'Transform your wedding venue with our premium decoration package featuring elegant floral arrangements, flowing drapes, and ambient lighting. Includes fresh flower bouquets, table centerpieces, backdrop setup, and professional installation.',
+    'Complete wedding decoration with flowers, drapes & lighting',
+    25,
+    4.8,
+    156,
+    342,
+    true,
+    true,
+    ARRAY['wedding', 'flowers', 'decorations', 'premium', 'bestseller'],
+    'active'
+  ),
+  (
+    'SKU-WED-002',
+    'Elegant Bride & Groom Cake Topper Set',
+    'elegant-bride-groom-cake-topper',
+    cat_cake,
+    ARRAY['wedding'],
+    899.00,
+    1299.00,
+    31.00,
+    'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=800&auto=format&fit=crop',
+    NULL,
+    'Beautiful handcrafted cake topper featuring bride and groom figurines. Made from premium materials with intricate detailing. Perfect keepsake for your special day.',
+    'Handcrafted wedding cake topper',
+    150,
+    4.9,
+    89,
+    567,
+    true,
+    true,
+    ARRAY['wedding', 'cake', 'topper', 'decoration'],
+    'active'
+  ),
+  (
+    'SKU-WED-003',
+    'Wedding Photo Booth Props Kit (25 Pieces)',
+    'wedding-photo-booth-props-kit',
+    cat_photo,
+    ARRAY['wedding', 'engagement'],
+    1499.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop',
+    NULL,
+    'Make your wedding photos memorable with our 25-piece photo booth props kit. Includes funny glasses, mustaches, speech bubbles, and themed signs.',
+    '25 fun photo booth props for wedding',
+    80,
+    4.7,
+    124,
+    289,
+    true,
+    false,
+    ARRAY['wedding', 'photo booth', 'props', 'entertainment'],
+    'active'
+  ),
+  (
+    'SKU-WED-004',
+    'Luxury Wedding Flower Bouquet - Mixed Roses',
+    'luxury-wedding-flower-bouquet-roses',
+    cat_flowers,
+    ARRAY['wedding'],
+    2499.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800&auto=format&fit=crop',
+    NULL,
+    'Stunning bridal bouquet featuring premium mixed roses in white, pink, and cream. Hand-tied with satin ribbon. Fresh flowers delivered on your wedding day.',
+    'Premium rose bridal bouquet',
+    40,
+    5.0,
+    78,
+    234,
+    true,
+    true,
+    ARRAY['wedding', 'flowers', 'bouquet', 'roses'],
+    'active'
+  ),
+  (
+    'SKU-WED-005',
+    'Wedding Ring Bearer Pillow - Ivory Lace',
+    'wedding-ring-bearer-pillow-ivory',
+    cat_accessories,
+    ARRAY['wedding'],
+    699.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1535424263334-b570d6c9f32a?w=800&auto=format&fit=crop',
+    NULL,
+    'Beautiful ivory lace ring bearer pillow with pearl embellishments. Elegant design perfect for traditional or modern weddings.',
+    'Ivory lace ring bearer pillow',
+    95,
+    4.8,
+    45,
+    178,
+    false,
+    false,
+    ARRAY['wedding', 'rings', 'accessories'],
+    'active'
+  );
+
+  -- Insert Birthday Products
+  INSERT INTO products (
+    sku, name, slug, category_id, event_types, price, original_price, discount_percentage,
+    primary_image, long_description, short_description,
+    stock_quantity, rating_average, review_count, sales_count,
+    is_featured, is_bestseller, tags, status
+  ) VALUES
+  (
+    'SKU-BIR-001',
+    'Birthday Balloon Decoration Set - 50 Pieces (Multi-Color)',
+    'birthday-balloon-decoration-set-50pcs',
+    cat_decorations,
+    ARRAY['birthday'],
+    799.00,
+    1199.00,
+    33.00,
+    'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&auto=format&fit=crop',
+    'Complete birthday balloon decoration set with 50 colorful balloons including latex balloons, foil number balloons, and confetti balloons. Perfect for all ages!',
+    '50-piece colorful balloon decoration set',
+    200,
+    4.6,
+    312,
+    892,
+    true,
+    true,
+    ARRAY['birthday', 'balloons', 'decorations', 'colorful', 'bestseller'],
+    'active'
+  ),
+  (
+    'SKU-BIR-002',
+    'Happy Birthday Banner & Bunting Set - Gold Rose',
+    'happy-birthday-banner-bunting-gold-rose',
+    cat_decorations,
+    ARRAY['birthday'],
+    449.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1464198016405-ee304365c3b7?w=800&auto=format&fit=crop',
+    'Elegant gold and rose gold happy birthday banner with matching bunting flags. Reusable and perfect for Instagram-worthy celebrations.',
+    'Gold rose birthday banner set',
+    175,
+    4.7,
+    189,
+    456,
+    true,
+    false,
+    ARRAY['birthday', 'banner', 'decorations', 'gold'],
+    'active'
+  ),
+  (
+    'SKU-BIR-003',
+    'Birthday Cake Number Candles Set (0-9)',
+    'birthday-cake-number-candles-set',
+    cat_cake,
+    ARRAY['birthday'],
+    299.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=800&auto=format&fit=crop',
+    'Complete set of number candles 0-9 with glitter finish. Perfect for milestone birthdays. Smokeless and long-lasting.',
+    'Glitter number candles (0-9)',
+    250,
+    4.5,
+    267,
+    1024,
+    false,
+    true,
+    ARRAY['birthday', 'cake', 'candles', 'numbers'],
+    'active'
+  ),
+  (
+    'SKU-BIR-004',
+    'Birthday Party Hat Pack - 10 Pieces (Assorted Colors)',
+    'birthday-party-hat-pack-10pcs',
+    cat_party,
+    ARRAY['birthday'],
+    349.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&auto=format&fit=crop',
+    'Fun party hats in assorted bright colors with elastic chin straps. Perfect for kids and adults. Pack of 10.',
+    'Colorful party hat pack (10pcs)',
+    320,
+    4.4,
+    156,
+    678,
+    false,
+    false,
+    ARRAY['birthday', 'party', 'hats', 'fun'],
+    'active'
+  ),
+  (
+    'SKU-BIR-005',
+    'Birthday Party Tableware Set - Serves 20 People',
+    'birthday-party-tableware-set-20',
+    cat_party,
+    ARRAY['birthday'],
+    899.00,
+    NULL,
+    0.00,
+    'https://images.unsplash.com/photo-1567696153798-5ebeb43e67b0?w=800&auto=format&fit=crop',
+    'Complete disposable tableware set including plates, cups, napkins, and cutlery for 20 people. Eco-friendly materials.',
+    'Complete party tableware for 20',
+    145,
+    4.6,
+    98,
+    345,
+    false,
+    false,
+    ARRAY['birthday', 'party', 'tableware', 'eco-friendly'],
+    'active'
+  );
+
+  -- Insert Universal Party Supplies
+  INSERT INTO products (
+    sku, name, slug, category_id, event_types, price,
+    primary_image, long_description, short_description,
+    stock_quantity, rating_average, review_count, sales_count,
+    is_featured, is_bestseller, tags, status
+  ) VALUES
+  (
+    'SKU-UNI-001',
+    'LED String Lights - Warm White (10 Meters)',
+    'led-string-lights-warm-white-10m',
+    cat_lighting,
+    ARRAY['wedding', 'birthday', 'anniversary', 'engagement'],
+    799.00,
+    'https://images.unsplash.com/photo-1515600051222-a3c338ff16f6?w=800&auto=format&fit=crop',
+    'Beautiful warm white LED string lights perfect for any event. 10 meters long with 100 LED bulbs. Waterproof and energy efficient.',
+    'Warm white LED lights (10m)',
+    250,
+    4.7,
+    456,
+    1234,
+    true,
+    true,
+    ARRAY['lighting', 'LED', 'decorations', 'all events'],
+    'active'
+  ),
+  (
+    'SKU-UNI-002',
+    'Confetti Cannon Set - Multicolor (6 Pieces)',
+    'confetti-cannon-set-multicolor-6',
+    cat_party,
+    ARRAY['wedding', 'birthday', 'anniversary'],
+    699.00,
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop',
+    'Fun confetti cannons for celebrations! Pack of 6 with multicolor biodegradable confetti. Easy to use and creates magical moments.',
+    'Confetti cannon party pack (6pcs)',
+    180,
+    4.8,
+    234,
+    678,
+    true,
+    true,
+    ARRAY['party', 'confetti', 'celebration', 'fun'],
+    'active'
+  );
+
+END $$;
+
+-- Verify inserted products
+SELECT 
+  sku,
+  name,
+  price,
+  rating_average,
+  sales_count,
+  is_featured,
+  is_bestseller,
+  '✅ Product inserted!' as status
+FROM products
+ORDER BY created_at DESC
+LIMIT 12;
+
+SELECT COUNT(*) as total_products, '✅ Total products in database' as info FROM products;

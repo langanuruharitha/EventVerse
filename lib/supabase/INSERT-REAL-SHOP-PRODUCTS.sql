@@ -25,15 +25,16 @@ ON CONFLICT (slug) DO UPDATE SET
 
 -- Insert Wedding Products
 INSERT INTO products (
-  name, slug, category, event_types, price, original_price, discount_percentage,
-  primary_image, additional_images, description, short_description,
-  stock_quantity, in_stock, rating_average, review_count, sales_count,
+  sku, name, slug, category_id, event_types, price, original_price, discount_percentage,
+  primary_image, additional_images, long_description, short_description,
+  stock_quantity, rating_average, review_count, sales_count,
   is_featured, is_bestseller, tags, status
 ) VALUES
 (
+  'SKU-WED-001',
   'Premium Wedding Decoration Package - Flowers & Drapes',
   'premium-wedding-decoration-flowers-drapes',
-  'Decorations',
+  (SELECT id FROM product_categories WHERE slug = 'decorations' LIMIT 1),
   ARRAY['wedding', 'engagement'],
   15999,
   22999,
@@ -47,7 +48,6 @@ INSERT INTO products (
   'Transform your wedding venue with our premium decoration package featuring elegant floral arrangements, flowing drapes, and ambient lighting. Includes fresh flower bouquets, table centerpieces, backdrop setup, and professional installation.',
   'Complete wedding decoration with flowers, drapes & lighting',
   25,
-  true,
   4.8,
   156,
   342,
