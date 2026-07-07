@@ -59,22 +59,22 @@ export async function POST(
           }
 
           await transporter.sendMail({
-            from: \`"\${senderName || 'EventVerse'}" <\${process.env.SMTP_EMAIL}>\`,
+            from: `"${senderName || 'EventVerse'}" <${process.env.SMTP_EMAIL}>`,
             to: guest.email,
-            subject: \`You're invited to \${eventName}!\`,
-            html: \`
+            subject: `You're invited to ${eventName}!`,
+            html: `
               <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #9333ea;">Hi \${guest.guest_name},</h2>
-                <p style="font-size: 16px;">You are warmly invited to <strong>\${eventName}</strong>!</p>
-                <p style="font-size: 16px;">From: \${senderName || 'Your Host'}</p>
+                <h2 style="color: #9333ea;">Hi ${guest.guest_name},</h2>
+                <p style="font-size: 16px;">You are warmly invited to <strong>${eventName}</strong>!</p>
+                <p style="font-size: 16px;">From: ${senderName || 'Your Host'}</p>
                 <div style="margin: 30px 0;">
-                  <a href="\${rsvpLink}" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                  <a href="${rsvpLink}" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
                     Click here to RSVP
                   </a>
                 </div>
                 <p style="font-size: 14px; color: #666;">We hope to see you there!</p>
               </div>
-            \`,
+            `,
             attachments
           });
           emailSent = true;
