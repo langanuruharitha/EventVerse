@@ -44,9 +44,9 @@ SELECT
   policyname,
   cmd as command_type,
   CASE 
-    WHEN 'anon' = ANY(string_to_array(roles, ',')) THEN '✅ Has anon role'
-    WHEN roles = '{public}' THEN '✅ Public (includes anon)'
-    ELSE '⚠️ No anon access: ' || roles
+    WHEN roles::text LIKE '%anon%' THEN '✅ Has anon role'
+    WHEN roles::text = '{public}' THEN '✅ Public (includes anon)'
+    ELSE '⚠️ Check roles: ' || roles::text
   END as anon_access
 FROM pg_policies
 WHERE tablename = 'venue_inquiries'
