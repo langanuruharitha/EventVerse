@@ -92,30 +92,50 @@ export default function VenueDetailPage() {
     e.preventDefault();
     setInquirySubmitting(true);
 
-    const { error } = await supabase.from('venue_inquiries').insert({
-      venue_id: venue.id,
-      customer_name: inquiryForm.name,
-      customer_email: inquiryForm.email,
-      customer_phone: inquiryForm.phone,
-      event_date: inquiryForm.eventDate,
-      guest_count: parseInt(inquiryForm.guestCount),
-      message: inquiryForm.message,
-      inquiry_status: 'pending',
-    });
+    try {
+      const supabase = createBrowserClient();
+      
+      const insertData = {
+        venue_id: venue.id,
+        full_name: inquiryForm.name,
+        email: inquiryForm.email,
+        phone: inquiryForm.phone,
+        event_date: inquiryForm.eventDate,
+        guest_count: parseInt(inquiryForm.guestCount),
+        message: inquiryForm.message,
+        status: 'pending',
+      };
 
-    setInquirySubmitting(false);
+      console.log('Submitting inquiry:', insertData);
 
-    if (!error) {
-      setInquirySuccess(true);
-      setInquiryForm({
-        name: '',
-        email: '',
-        phone: '',
-        eventDate: '',
-        guestCount: '',
-        message: '',
-      });
-      setTimeout(() => setInquirySuccess(false), 5000);
+      const { data, error } = await supabase
+        .from('venue_inquiries')
+        .insert(insertData)
+        .select();
+
+      console.log('Inquiry response:', { data, error });
+
+      if (error) {
+        console.error('Inquiry error:', error);
+        alert(`Failed to send inquiry: ${error.message}`);
+      } else {
+        setInquirySuccess(true);
+        setInquiryForm({
+          name: '',
+          email: '',
+          phone: '',
+          eventDate: '',
+          guestCount: '',
+          message: '',
+        });
+        alert('✅ Inquiry sent successfully! We will contact you soon.');
+        setTimeout(() => setInquirySuccess(false), 5000);
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      alert('An unexpected error occurred. Please try again.');
+    } finally {
+      setInquirySubmitting(false);
     }
   }
 
