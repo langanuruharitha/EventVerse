@@ -277,7 +277,6 @@ export const VENDOR_CATEGORIES = [
   'Catering',
   'Decoration',
   'Entertainment',
-  'Venue',
   'Painting',
   'Total Event Management'
 ];
