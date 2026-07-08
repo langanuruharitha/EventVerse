@@ -73,9 +73,9 @@ export default function VenueDetailPage() {
     // Fetch reviews
     const { data: reviewsData } = await supabase
       .from('venue_reviews')
-      .select('*')
+      .select('*, user_profiles(full_name)')
       .eq('venue_id', venueData.id)
-      .eq('status', 'approved')
+      .eq('is_approved', true)
       .order('created_at', { ascending: false })
       .limit(10);
 
@@ -385,10 +385,10 @@ export default function VenueDetailPage() {
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                                {review.reviewer_name?.charAt(0).toUpperCase()}
+                                {review.user_profiles?.full_name?.charAt(0).toUpperCase() || 'C'}
                               </div>
                               <div>
-                                <p className="font-semibold">{review.reviewer_name}</p>
+                                <p className="font-semibold">{review.user_profiles?.full_name || 'Customer'}</p>
                                 <div className="flex items-center gap-2">
                                   <div className="flex">
                                     {[...Array(5)].map((_, i) => (
@@ -409,6 +409,7 @@ export default function VenueDetailPage() {
                               </div>
                             </div>
                           </div>
+                          {review.title && <h4 className="font-semibold text-gray-900 mb-2">{review.title}</h4>}
                           <p className="text-gray-700">{review.review_text}</p>
                         </div>
                       ))
