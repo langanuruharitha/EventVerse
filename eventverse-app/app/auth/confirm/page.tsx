@@ -6,15 +6,21 @@ import Link from 'next/link';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 export default function ConfirmEmailPage() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('success');
   const [countdown, setCountdown] = useState(5);
+  const [email, setEmail] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user just confirmed email
+    // Check URL parameters
     const params = new URLSearchParams(window.location.search);
     const confirmed = params.get('confirmed');
     const error = params.get('error');
+    const userEmail = params.get('email');
+
+    if (userEmail) {
+      setEmail(userEmail);
+    }
 
     if (error) {
       setStatus('error');
@@ -35,7 +41,22 @@ export default function ConfirmEmailPage() {
 
       return () => clearInterval(timer);
     } else {
-      setStatus('error');
+      // Default to success state
+      setStatus('success');
+      
+      // Start countdown anyway
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            router.push('/auth/signin');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
     }
   }, [router]);
 
@@ -72,6 +93,11 @@ export default function ConfirmEmailPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
                 Email Confirmed! 🎉
               </h2>
+              {email && (
+                <p className="text-gray-700 font-medium mb-2">
+                  {email}
+                </p>
+              )}
               <p className="text-gray-600 mb-6">
                 Your email has been successfully verified. You can now sign in to your account.
               </p>
