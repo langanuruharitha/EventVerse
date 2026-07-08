@@ -95,8 +95,12 @@ export default function VenueDetailPage() {
     try {
       const supabase = createBrowserClient();
       
+      // Get current user (if logged in)
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const insertData = {
         venue_id: venue.id,
+        user_id: user?.id || null, // Allow null for anonymous users
         full_name: inquiryForm.name,
         email: inquiryForm.email,
         phone: inquiryForm.phone,
