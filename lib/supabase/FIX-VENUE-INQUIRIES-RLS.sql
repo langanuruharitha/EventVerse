@@ -34,7 +34,7 @@ CREATE POLICY "Venue owners can view their venue inquiries"
   FOR SELECT
   USING (
     venue_id IN (
-      SELECT id FROM venues WHERE vendor_id = auth.uid()
+      SELECT id FROM venues WHERE owner_id = auth.uid()
     )
   );
 
@@ -45,7 +45,7 @@ CREATE POLICY "Authorized users can update inquiries"
   USING (
     auth.uid() IN (SELECT id FROM users WHERE role = 'admin')
     OR
-    venue_id IN (SELECT id FROM venues WHERE vendor_id = auth.uid())
+    venue_id IN (SELECT id FROM venues WHERE owner_id = auth.uid())
   );
 
 SELECT '✅ Venue inquiries RLS policies fixed!' as result;
