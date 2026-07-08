@@ -31,10 +31,22 @@ interface Product {
   event_types?: string[];
 }
 
+interface Review {
+  id: string;
+  rating: number;
+  title: string;
+  review_text: string;
+  created_at: string;
+  user_profiles?: {
+    full_name: string;
+  };
+}
+
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter();
   const resolvedParams = use(params);
   const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVariant, setSelectedVariant] = useState({ color: '', size: '' });
   const [quantity, setQuantity] = useState(1);
@@ -46,6 +58,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   useEffect(() => {
     fetchProduct();
+    fetchReviews();
   }, [slug]);
 
   useEffect(() => {
@@ -117,6 +130,39 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       console.error('Error fetching product:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const supabase = createBrowserClient();
+      const { data: productData } = await supabase
+        .from('products')
+        .select('id')
+        .eq('slug', slug)
+        .single();
+
+      if (productData) {
+        const { data: reviewsData } = await supabase
+          .from('product_reviews')
+          .select(`
+            id,
+            rating,
+            title,
+            review_text,
+            created_at,
+            user_id,
+            user_profiles!inner(full_name)
+          `)
+          .eq('product_id', productData.id)
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        setReviews(reviewsData || []);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
     }
   };
 
@@ -452,6 +498,62 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         )}
+
+        {/* Customer Reviews */}
+        <div className="mt-12">
+          <Card className="p-6">
+            <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+            
+            {reviews.length > 0 ? (
+              <div className="space-y-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="border-b last:border-b-0 pb-6 last:pb-0">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {review.user_profiles?.full_name?.charAt(0) || 'C'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <p className="font-semibold text-gray-900">
+                              {review.user_profiles?.full_name || 'Customer'}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="flex">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${
+                                      i < review.rating
+                                        ? 'fill-yellow-400 text-yellow-400'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm text-gray-500">
+                                {new Date(review.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {review.title && (
+                          <h4 className="font-semibold text-gray-900 mb-2">{review.title}</h4>
+                        )}
+                        <p className="text-gray-700">{review.review_text}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Star className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No reviews yet. Be the first to review this product!</p>
+              </div>
+            )}
+          </Card>
+        </div>
       </div>
     </div>
   );
