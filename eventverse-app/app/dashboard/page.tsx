@@ -27,6 +27,22 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(4);
 
+  // Get user's venue inquiries
+  const { data: venueInquiries } = await supabase
+    .from('venue_inquiries')
+    .select(`
+      *,
+      venues:venue_id (
+        name,
+        location,
+        primary_image_url,
+        slug
+      )
+    `)
+    .or(`user_id.eq.${user.id},email.eq.${user.email}`)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
   // Calculate statistics
   const totalEvents = events?.length || 0;
   const upcomingEvents = events?.filter(e => new Date(e.event_date) >= new Date()).length || 0;
@@ -165,7 +181,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Dashboard Grid for Events and Hires */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Upcoming Events Column */}
           <div className="lg:col-span-1 bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-6">
@@ -290,6 +306,84 @@ export default async function DashboardPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Venue Inquiries Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">My Venue Inquiries</h2>
+            <Link
+              href="/venues"
+              className="text-purple-600 hover:text-purple-700 font-semibold text-sm"
+            >
+              Browse Venues
+            </Link>
+          </div>
+          {venueInquiries && venueInquiries.length > 0 ? (
+            <div className="space-y-4">
+              {venueInquiries.map((inquiry) => (
+                <div
+                  key={inquiry.id}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all"
+                >
+                  <div className="flex gap-4">
+                    <img
+                      src={inquiry.venues?.primary_image_url || '/placeholder-venue.jpg'}
+                      alt={inquiry.venues?.name || 'Venue'}
+                      className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-gray-900 text-lg truncate">
+                            {inquiry.venues?.name || 'Unknown Venue'}
+                          </h3>
+                          <p className="text-sm text-gray-600 truncate">
+                            📍 {inquiry.venues?.location || 'Location not available'}
+                          </p>
+                        </div>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border whitespace-nowrap ${
+                          inquiry.status === 'pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                          inquiry.status === 'responded' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                          inquiry.status === 'converted' ? 'bg-green-100 text-green-800 border-green-200' :
+                          'bg-red-100 text-red-800 border-red-200'
+                        }`}>
+                          {inquiry.status.charAt(0).toUpperCase() + inquiry.status.slice(1)}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                        <div>
+                          📅 {new Date(inquiry.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </div>
+                        <div>
+                          👥 {inquiry.guest_count} guests
+                        </div>
+                        <div>
+                          🕐 {new Date(inquiry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </div>
+                      </div>
+                      {inquiry.venues?.slug && (
+                        <Link
+                          href={`/venues/${inquiry.venues.slug}`}
+                          className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700 font-medium mt-2"
+                        >
+                          View Venue →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-4xl mb-2">🏛️</div>
+              <p className="text-sm">You haven't inquired about any venues yet.</p>
+              <Link href="/venues" className="text-purple-600 text-xs font-semibold hover:underline mt-1 inline-block">
+                Browse Venues →
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
