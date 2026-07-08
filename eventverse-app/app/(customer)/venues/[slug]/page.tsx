@@ -71,13 +71,17 @@ export default function VenueDetailPage() {
     }
 
     // Fetch reviews
-    const { data: reviewsData } = await supabase
+    const { data: reviewsData, error: reviewsError } = await supabase
       .from('venue_reviews')
-      .select('*, user_profiles(full_name)')
+      .select('*')
       .eq('venue_id', venueData.id)
       .eq('is_approved', true)
       .order('created_at', { ascending: false })
       .limit(10);
+
+    if (reviewsError) {
+      console.error('Reviews fetch error:', reviewsError);
+    }
 
     setVenue(venueData);
     setReviews(reviewsData || []);
@@ -385,10 +389,10 @@ export default function VenueDetailPage() {
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                                {review.user_profiles?.full_name?.charAt(0).toUpperCase() || 'C'}
+                                C
                               </div>
                               <div>
-                                <p className="font-semibold">{review.user_profiles?.full_name || 'Customer'}</p>
+                                <p className="font-semibold">Verified Customer</p>
                                 <div className="flex items-center gap-2">
                                   <div className="flex">
                                     {[...Array(5)].map((_, i) => (
