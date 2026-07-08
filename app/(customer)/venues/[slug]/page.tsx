@@ -90,13 +90,13 @@ export default function VenueDetailPage() {
 
     const { error } = await supabase.from('venue_inquiries').insert({
       venue_id: venue.id,
-      customer_name: inquiryForm.name,
-      customer_email: inquiryForm.email,
-      customer_phone: inquiryForm.phone,
+      full_name: inquiryForm.name,
+      email: inquiryForm.email,
+      phone: inquiryForm.phone,
       event_date: inquiryForm.eventDate,
       guest_count: parseInt(inquiryForm.guestCount),
       message: inquiryForm.message,
-      inquiry_status: 'pending',
+      status: 'pending',
     });
 
     setInquirySubmitting(false);
@@ -112,6 +112,9 @@ export default function VenueDetailPage() {
         message: '',
       });
       setTimeout(() => setInquirySuccess(false), 5000);
+    } else {
+      console.error('Inquiry error:', error);
+      alert('Failed to send inquiry. Please try again.');
     }
   }
 

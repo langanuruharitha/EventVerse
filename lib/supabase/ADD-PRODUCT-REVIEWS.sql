@@ -1,41 +1,88 @@
 -- =====================================================
 -- ADD PRODUCT REVIEWS - 5 REVIEWS PER PRODUCT
 -- =====================================================
--- Run this AFTER inserting products
+-- Uses existing users (admin or vendor) for reviews
 
--- Add reviews for each product
-INSERT INTO product_reviews (product_id, user_id, rating, review_text, reviewer_name, is_verified_purchase, status)
+-- Add 5 reviews for EACH product
+INSERT INTO product_reviews (
+  product_id, 
+  user_id, 
+  rating, 
+  title,
+  review_text, 
+  is_verified_purchase, 
+  is_approved,
+  created_at
+)
 SELECT 
   p.id,
-  (SELECT id FROM users WHERE email = 'harithalanganuru@gmail.com' LIMIT 1),
-  ratings.rating,
-  ratings.review_text,
-  ratings.reviewer_name,
+  (SELECT id FROM users LIMIT 1) as user_id,
+  5 as rating,
+  'Excellent Product!' as title,
+  'Great quality and perfect for events!' as review_text,
   true,
-  'approved'
+  true,
+  NOW() - INTERVAL '30 days'
 FROM products p
-CROSS JOIN (
-  VALUES
-    (5, 'Absolutely stunning! The decorations made our wedding unforgettable. Highly recommend!', 'Priya Sharma'),
-    (5, 'Best quality products! Arrived on time and looked exactly like the pictures.', 'Rahul Mehta'),
-    (4, 'Great value for money. The decorations were beautiful and easy to set up.', 'Anjali Singh'),
-    (5, 'Exceeded expectations! Everyone at the event loved the decorations.', 'Vikram Patel'),
-    (4, 'Very good quality. Would definitely buy again for future events.', 'Meera Joshi')
-) AS ratings(rating, review_text, reviewer_name)
 WHERE p.sku LIKE 'SKU-%'
-ON CONFLICT DO NOTHING;
+UNION ALL
+SELECT 
+  p.id,
+  (SELECT id FROM users LIMIT 1) as user_id,
+  5 as rating,
+  'Worth Every Penny!' as title,
+  'Exceeded our expectations. Highly recommend!' as review_text,
+  true,
+  true,
+  NOW() - INTERVAL '25 days'
+FROM products p
+WHERE p.sku LIKE 'SKU-%'
+UNION ALL
+SELECT 
+  p.id,
+  (SELECT id FROM users LIMIT 1) as user_id,
+  4 as rating,
+  'Very Good Quality' as title,
+  'Good value for money. Will buy again.' as review_text,
+  true,
+  true,
+  NOW() - INTERVAL '18 days'
+FROM products p
+WHERE p.sku LIKE 'SKU-%'
+UNION ALL
+SELECT 
+  p.id,
+  (SELECT id FROM users LIMIT 1) as user_id,
+  5 as rating,
+  'Highly Recommended!' as title,
+  'Perfect for our wedding. Beautiful product!' as review_text,
+  true,
+  true,
+  NOW() - INTERVAL '12 days'
+FROM products p
+WHERE p.sku LIKE 'SKU-%'
+UNION ALL
+SELECT 
+  p.id,
+  (SELECT id FROM users LIMIT 1) as user_id,
+  4 as rating,
+  'Happy With Purchase' as title,
+  'Good quality and arrived on time.' as review_text,
+  true,
+  true,
+  NOW() - INTERVAL '8 days'
+FROM products p
+WHERE p.sku LIKE 'SKU-%';
 
--- Verify reviews were added
+-- Verify reviews
 SELECT 
   p.name,
-  p.sku,
-  COUNT(pr.id) as review_count,
-  AVG(pr.rating) as avg_rating,
-  '✅ Reviews added!' as status
+  COUNT(pr.id) as reviews,
+  ROUND(AVG(pr.rating)::numeric, 1) as avg_rating
 FROM products p
 LEFT JOIN product_reviews pr ON pr.product_id = p.id
 WHERE p.sku LIKE 'SKU-%'
-GROUP BY p.id, p.name, p.sku
-ORDER BY p.sku;
+GROUP BY p.name
+ORDER BY p.name;
 
-SELECT '✅ Product reviews added successfully!' as result;
+SELECT '✅ Reviews added! Each product has 5 reviews.' as result;
