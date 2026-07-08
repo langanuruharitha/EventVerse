@@ -10,6 +10,7 @@ const vendorNav = [
   { name: 'Dashboard', href: '/vendor/dashboard', icon: '📊' },
   { name: 'My Services', href: '/vendor/services', icon: '🛍️' },
   { name: 'Bookings', href: '/vendor/bookings', icon: '📅' },
+  { name: 'Inquiries', href: '/vendor/inquiries', icon: '📬' },
   { name: 'Earnings', href: '/vendor/earnings', icon: '💰' },
   { name: 'Reviews', href: '/vendor/reviews', icon: '⭐' },
   { name: 'My Profile', href: '/vendor/profile', icon: '🏪' },
