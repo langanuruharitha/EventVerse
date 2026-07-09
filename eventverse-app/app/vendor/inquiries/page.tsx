@@ -23,6 +23,7 @@ export default function VendorInquiriesPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
     loadInquiries();
@@ -66,6 +67,30 @@ export default function VendorInquiriesPage() {
     };
     return styles[status as keyof typeof styles] || styles.pending;
   };
+
+  async function updateInquiryStatus(inquiryId: string, newStatus: string) {
+    setUpdating(inquiryId);
+    
+    const supabase = createBrowserClient();
+    const { error } = await supabase
+      .from('venue_inquiries')
+      .update({ status: newStatus })
+      .eq('id', inquiryId);
+
+    if (error) {
+      alert('Failed to update status: ' + error.message);
+    } else {
+      // Update local state
+      setInquiries(prev => 
+        prev.map(inq => 
+          inq.id === inquiryId ? { ...inq, status: newStatus } : inq
+        )
+      );
+      alert(`✅ Status updated to ${newStatus}!`);
+    }
+    
+    setUpdating(null);
+  }
 
   if (loading) {
     return (
@@ -166,7 +191,7 @@ export default function VendorInquiriesPage() {
                   <Clock className="w-4 h-4" />
                   <span>Received {new Date(inquiry.created_at).toLocaleDateString()}</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {inquiry.status === 'pending' && (
                     <>
                       <a
@@ -174,7 +199,7 @@ export default function VendorInquiriesPage() {
                         className="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition flex items-center gap-2"
                       >
                         <Mail className="w-4 h-4" />
-                        Respond via Email
+                        Email
                       </a>
                       <a
                         href={`tel:${inquiry.phone}`}
@@ -183,7 +208,44 @@ export default function VendorInquiriesPage() {
                         <Phone className="w-4 h-4" />
                         Call
                       </a>
+                      <button
+                        onClick={() => updateInquiryStatus(inquiry.id, 'responded')}
+                        disabled={updating === inquiry.id}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Mark Responded
+                      </button>
                     </>
+                  )}
+                  {inquiry.status === 'responded' && (
+                    <>
+                      <button
+                        onClick={() => updateInquiryStatus(inquiry.id, 'converted')}
+                        disabled={updating === inquiry.id}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Convert to Booking
+                      </button>
+                      <button
+                        onClick={() => updateInquiryStatus(inquiry.id, 'rejected')}
+                        disabled={updating === inquiry.id}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  {(inquiry.status === 'converted' || inquiry.status === 'rejected') && (
+                    <button
+                      onClick={() => updateInquiryStatus(inquiry.id, 'pending')}
+                      disabled={updating === inquiry.id}
+                      className="px-4 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition disabled:opacity-50"
+                    >
+                      Reopen
+                    </button>
                   )}
                 </div>
               </div>
