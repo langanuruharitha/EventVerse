@@ -104,19 +104,25 @@ ${data.toName ? `- Guest Name: ${data.toName}` : ''}
 - Time: ${data.time}
 - Venue: ${data.venue}
 - Style Preference: ${data.style}
-- Theme Description & Creative Requirements: ${data.themeDescription}
+- USER'S EXACT THEME REQUEST: "${data.themeDescription}"
 ${data.message ? `- Additional Message: ${data.message}` : ''}
 - Include RSVP Section: ${data.includeRSVP ? 'Yes' : 'No'}
 
-DESIGN REQUIREMENTS:
-1. Palette & Theme: Choose a premium, harmonious color palette matching the theme description (e.g. deep royal blue and gold, pastel pink floral, modern dark cyberpunk, traditional red/gold marigold, space background with falling balloons and rose petals in pink brown theme). Do NOT use generic, plain white backgrounds unless explicitly requested.
-2. Background: Use a stunning background matching the theme (e.g. premium CSS gradients, subtle geometric/floral patterns, starry sky, falling rose petals, or elegant textures using pure CSS).
-3. Fonts: Load and use premium Google Fonts matching the theme (e.g. Playfair Display, Cinzel, Great Vibes, Cormorant Garamond, Montserrat, Outfit, Rochester). Apply beautiful letter-spacing, font-weight, and line-height.
-4. Decorations: Create theme-matching decorations using pure CSS and inline SVGs (e.g. golden frames, floral ornaments, starry night particles, falling rose petals, abstract modern shapes, or traditional Indian borders). Do NOT use generic placeholders or external image URLs that might break.
-5. Layout: The card must be centered, look outstanding, responsive, and fit beautifully on mobile and desktop screens. It should feel like a premium, state-of-the-art invitation.
-6. Content: Write unique, creative, poetic invitation greetings and messages matching the theme instead of basic templates.
+CRITICAL INSTRUCTION - THEME COMPLIANCE IS MANDATORY:
+You must strictly follow the USER'S EXACT THEME REQUEST ("${data.themeDescription}"). 
+- If they ask for "ocean theme", you MUST use ocean blues, water-like gradients, and include pure CSS/SVG elements like waves, seashells, or bubbles.
+- If they ask for "balloon falling theme", you MUST create beautiful CSS-animated balloons falling from the top of the card.
+- If they ask for "floral theme", you MUST include elegant CSS/SVG flowers, vines, or petals.
+- Do NOT output a generic card. The entire card's background, colors, borders, and decorative SVG elements must perfectly embody the requested theme.
 
-Output ONLY the raw HTML code of the invitation card. Start directly with <!DOCTYPE html> and end with </html>. Do not include markdown code block syntax (like \`\`\`html) or any conversational text.`;
+DESIGN REQUIREMENTS:
+1. Background & Colors: Use stunning, premium CSS gradients or patterns that perfectly match the requested theme.
+2. Fonts: Load premium Google Fonts (e.g. Cinzel, Great Vibes, Outfit, Cormorant Garamond, Playfair Display) that fit the style.
+3. Decorations & Animations: You MUST write custom CSS and inline SVGs to decorate the card according to the theme. Include smooth, elegant CSS animations (like falling balloons, floating petals, pulsing stars, gently swaying flowers, floating bubbles) if it fits the theme. DO NOT use generic placeholders or external images.
+4. Layout: The card must be centered, responsive, with a premium look (box-shadows, rounded corners, glassmorphism if applicable).
+5. Content: Write unique, creative, poetic invitation greetings and messages matching the theme.
+
+Output ONLY the raw HTML code of the invitation card. Start directly with <!DOCTYPE html> and end with </html>. Do not include markdown block syntax like \`\`\`html.`;
 
   const resp = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${data.key}`,
