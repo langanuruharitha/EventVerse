@@ -1,9 +1,10 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SAMPLE_VENDORS } from '@/lib/data/vendors';
 import { notFound } from 'next/navigation';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 const EVENT_TYPES_MAP: Record<string, { name: string; icon: string }> = {
   'birthday': { name: 'Birthday Party', icon: '🎂' },
@@ -59,6 +60,27 @@ export default function VendorProfilePage({
     notFound();
   }
 
+  // Check if vendor is saved on mount
+  useEffect(() => {
+    checkIfSaved();
+  }, [vendorId]);
+
+  const checkIfSaved = async () => {
+    const supabase = createBrowserClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('saved_vendors')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('vendor_id', vendorId)
+      .single();
+
+    setIsSaved(!!data);
+  };
+
   // Handler functions
   const handleContactVendor = () => {
     // Default phone call action
@@ -66,10 +88,46 @@ export default function VendorProfilePage({
     window.location.href = `tel:${phone}`;
   };
 
-  const handleSaveVendor = () => {
-    setIsSaved(!isSaved);
-    // TODO: Save to database
-    alert(isSaved ? 'Vendor removed from saved list!' : 'Vendor saved successfully!');
+  const handleSaveVendor = async () => {
+    const supabase = createBrowserClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      alert('Please sign in to save vendors');
+      return;
+    }
+
+    try {
+      if (isSaved) {
+        // Unsave: Delete from database
+        const { error } = await supabase
+          .from('saved_vendors')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('vendor_id', vendorId);
+
+        if (error) throw error;
+        
+        setIsSaved(false);
+        alert('✅ Vendor removed from saved list!');
+      } else {
+        // Save: Insert into database
+        const { error } = await supabase
+          .from('saved_vendors')
+          .insert({
+            user_id: user.id,
+            vendor_id: vendorId
+          });
+
+        if (error) throw error;
+        
+        setIsSaved(true);
+        alert('✅ Vendor saved successfully! View in Dashboard.');
+      }
+    } catch (error) {
+      console.error('Error saving vendor:', error);
+      alert('❌ Failed to save vendor. Please try again.');
+    }
   };
 
   const handleHireVendor = async () => {
