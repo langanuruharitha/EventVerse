@@ -28,8 +28,8 @@ function CreateCardInvitationContent() {
   });
 
   const handleGenerate = async () => {
-    if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue || !formData.themeDescription) {
-      alert('Please fill all required fields including the Creative Requirements & Theme Description');
+    if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
+      alert('Please fill all required fields');
       return;
     }
 
@@ -220,7 +220,7 @@ function CreateCardInvitationContent() {
               {/* Theme & Background Decoration Description */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Creative Requirements & Theme Description *
+                  Creative Requirements & Theme Description (Optional)
                 </label>
                 <textarea
                   value={formData.themeDescription}
@@ -228,7 +228,6 @@ function CreateCardInvitationContent() {
                   placeholder="Describe what you want: e.g., 'Create a warm, elegant invitation with golden decorations, floral borders, and a poetic message about celebration and togetherness. Use sophisticated language and make it feel special.'"
                   rows={4}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   💡 Be specific! AI will create unique content, design, and wording based on your description. Don't just repeat basic info - describe the style, mood, and creativity you want!
@@ -283,7 +282,6 @@ function CreateCardInvitationContent() {
                     !formData.date ||
                     !formData.time ||
                     !formData.venue ||
-                    !formData.themeDescription ||
                     generating
                   }
                   className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
