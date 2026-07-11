@@ -81,7 +81,7 @@ Return ONLY valid JSON matching this exact structure:
 }`;
 
   const resp = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -95,7 +95,10 @@ Return ONLY valid JSON matching this exact structure:
     }
   );
 
-  if (!resp.ok) throw new Error(`Gemini error: ${resp.status}`);
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`Gemini API error (${resp.status}): ${errText}`);
+  }
   const json = await resp.json();
   let raw = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
   
