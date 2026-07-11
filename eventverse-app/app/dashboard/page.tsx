@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { DeleteSavedVendorButton, DeleteEnquiryButton } from '@/components/dashboard/DeleteButtons';
 
 export default async function DashboardPage() {
   const supabase = await createServerClient();
@@ -265,7 +266,7 @@ export default async function DashboardPage() {
                 {enquiries.map((enquiry) => (
                   <div
                     key={enquiry.id}
-                    className="p-4 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors flex flex-col justify-between"
+                    className="relative p-4 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors flex flex-col justify-between pr-10"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
@@ -301,6 +302,7 @@ export default async function DashboardPage() {
                         })}
                       </span>
                     </div>
+                    <DeleteEnquiryButton enquiryId={enquiry.id} />
                   </div>
                 ))}
               </div>
@@ -333,7 +335,7 @@ export default async function DashboardPage() {
                 <Link
                   key={saved.id}
                   href={`/events/birthday/vendors/${saved.vendor_id}`}
-                  className="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all hover:border-purple-300"
+                  className="relative border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all hover:border-purple-300 pr-10"
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-3xl flex-shrink-0">
@@ -359,6 +361,7 @@ export default async function DashboardPage() {
                       )}
                     </div>
                   </div>
+                  <DeleteSavedVendorButton savedId={saved.id} />
                 </Link>
               ))}
             </div>
