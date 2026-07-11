@@ -28,14 +28,19 @@ export async function POST(request: NextRequest) {
     const key = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
     let themeConfig = null;
+    let geminiError = null;
 
     if (key && themeDescription) {
       try {
         console.log('Generating custom JSON theme config with Gemini...');
         themeConfig = await generateThemeConfigWithGemini(themeDescription, key);
-      } catch (err) {
-        console.error('Gemini JSON generation failed, using pure fallback:', err);
+        console.log('Gemini theme config generated successfully:', !!themeConfig);
+      } catch (err: any) {
+        geminiError = err?.message || String(err);
+        console.error('Gemini JSON generation failed:', geminiError);
       }
+    } else {
+      console.log('Skipping Gemini: key present=', !!key, ', theme present=', !!themeDescription);
     }
 
     console.log('Building HTML card with themeConfig:', themeConfig ? 'Custom AI Theme' : 'Fallback Theme');
@@ -54,7 +59,12 @@ export async function POST(request: NextRequest) {
       themeConfig
     });
 
-    return NextResponse.json({ success: true, htmlContent });
+    return NextResponse.json({
+      success: true,
+      htmlContent,
+      aiThemeApplied: !!themeConfig,
+      geminiError: geminiError || undefined
+    });
 
   } catch (error) {
     console.error('Error generating invitation card:', error);

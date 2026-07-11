@@ -44,12 +44,13 @@ function CreateCardInvitationContent() {
       });
 
       const data = await response.json();
+      console.log('API Response:', { ok: response.ok, hasHtml: !!data.htmlContent, aiTheme: data.aiThemeApplied, error: data.error });
 
       if (response.ok && data.htmlContent) {
         setGeneratedCard(data.htmlContent);
         setStep(2);
       } else {
-        alert(data.error || 'Failed to generate invitation card');
+        alert('Error: ' + (data.error || 'Failed to generate invitation card'));
       }
     } catch (error) {
       console.error('Error generating card:', error);
@@ -333,7 +334,7 @@ function CreateCardInvitationContent() {
                   srcDoc={generatedCard || ''}
                   style={{ width: '100%', height: '820px', border: 'none' }}
                   title="Generated Invitation Card"
-                  sandbox="allow-same-origin"
+                  sandbox="allow-same-origin allow-scripts"
                 />
               </div>
             </div>
