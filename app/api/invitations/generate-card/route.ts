@@ -127,7 +127,7 @@ DESIGN REQUIREMENTS:
 Output ONLY the raw HTML code of the invitation card. Start directly with <!DOCTYPE html> and end with </html>. Do not include markdown block syntax like \`\`\`html.`;
 
   const resp = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${data.key}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${data.key}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
