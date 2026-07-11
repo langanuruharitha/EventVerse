@@ -99,8 +99,7 @@ Return ONLY valid JSON matching this exact structure:
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.8,
-          maxOutputTokens: 2048,
-          responseMimeType: "application/json"
+          maxOutputTokens: 2048
         }
       })
     }

@@ -44,7 +44,7 @@ function CreateCardInvitationContent() {
       });
 
       const data = await response.json();
-      console.log('API Response:', { ok: response.ok, hasHtml: !!data.htmlContent, aiTheme: data.aiThemeApplied, error: data.error });
+      console.log('API Response:', { ok: response.ok, hasHtml: !!data.htmlContent, aiTheme: data.aiThemeApplied, geminiError: data.geminiError, error: data.error });
 
       if (response.ok && data.htmlContent) {
         setGeneratedCard(data.htmlContent);
