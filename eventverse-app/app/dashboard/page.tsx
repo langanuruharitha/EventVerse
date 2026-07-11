@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { SAMPLE_VENDORS } from '@/lib/data/vendors';
 
 export default async function DashboardPage() {
   const supabase = await createServerClient();
@@ -330,46 +329,38 @@ export default async function DashboardPage() {
           </div>
           {savedVendors && savedVendors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {savedVendors.map((saved) => {
-                const vendor = SAMPLE_VENDORS.find(v => v.id === saved.vendor_id);
-                if (!vendor) return null;
-                
-                return (
-                  <Link
-                    key={saved.id}
-                    href={`/vendors/${vendor.id}`}
-                    className="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all hover:border-purple-300"
-                  >
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={vendor.image}
-                        alt={vendor.name}
-                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-gray-900 text-sm truncate">
-                          {vendor.name}
-                        </h3>
-                        <p className="text-xs text-gray-500 capitalize">
-                          {vendor.category}
-                        </p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-yellow-400 text-xs">⭐</span>
-                          <span className="text-xs font-medium text-gray-700">
-                            {vendor.rating}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            ({vendor.reviews})
-                          </span>
-                        </div>
-                        <p className="text-xs font-semibold text-purple-600 mt-1">
-                          ₹{vendor.priceRange.min.toLocaleString()} - ₹{vendor.priceRange.max.toLocaleString()}
-                        </p>
-                      </div>
+              {savedVendors.map((saved: any) => (
+                <Link
+                  key={saved.id}
+                  href={`/events/birthday/vendors/${saved.vendor_id}`}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all hover:border-purple-300"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-3xl flex-shrink-0">
+                      {saved.vendor_image || '🏪'}
                     </div>
-                  </Link>
-                );
-              })}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 text-sm truncate">
+                        {saved.vendor_name || 'Vendor'}
+                      </h3>
+                      <p className="text-xs text-gray-500 capitalize">
+                        {saved.vendor_category}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="text-yellow-400 text-xs">⭐</span>
+                        <span className="text-xs font-medium text-gray-700">
+                          {saved.vendor_rating || '4.5'}
+                        </span>
+                      </div>
+                      {saved.vendor_price_range && (
+                        <p className="text-xs font-semibold text-purple-600 mt-1">
+                          {saved.vendor_price_range}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">

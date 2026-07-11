@@ -1,0 +1,62 @@
+SAVED VENDORS NOT SHOWING - TROUBLESHOOTING
+============================================
+
+## Possible Issues:
+
+### 1. SQL TABLE NOT CREATED ⚠️
+**Problem:** The `saved_vendors` table doesn't exist in Supabase yet
+**Solution:** 
+- Open Supabase Dashboard
+- Go to SQL Editor
+- Run: lib/supabase/CREATE-SAVED-VENDORS-TABLE.sql
+- This creates the table and RLS policies
+
+### 2. VERCEL DEPLOYMENT PENDING 🔄
+**Problem:** GitHub was updated but Vercel hasn't deployed yet
+**Solution:**
+- Go to: https://vercel.com/dashboard
+- Check if deployment is "Building" or "Ready"
+- Wait for deployment to complete (usually 1-2 minutes)
+
+### 3. CACHE ISSUE 🔄
+**Problem:** Browser is showing old cached version
+**Solution:**
+- Hard refresh: Ctrl + Shift + R (Windows)
+- Or clear browser cache
+
+### 4. CODE ERROR 🐛
+**Problem:** There might be a runtime error
+**Solution:**
+- Open browser DevTools (F12)
+- Check Console tab for errors
+- Look for red error messages
+
+## How to Verify:
+
+1. Check Vercel Dashboard:
+   - Latest commit should be: "Add saved vendors feature"
+   - Status should be: "Ready" (green checkmark)
+
+2. Check Supabase:
+   - Go to Table Editor
+   - Look for "saved_vendors" table
+   - If missing, run the SQL script
+
+3. Check Browser Console:
+   - Should NOT show errors about "saved_vendors" table
+   - Should NOT show "relation does not exist" errors
+
+## Expected Behavior:
+
+After SQL script runs and deployment completes, you should see:
+- New section called "🔖 Saved Vendors"
+- Located above "My Venue Inquiries"
+- Shows message: "No saved vendors yet" (if you haven't saved any)
+- "Browse Vendors" button
+
+## Quick Fix Steps:
+
+1. ✅ GitHub: Already updated (commit b33f0da)
+2. ⏳ Supabase: Run CREATE-SAVED-VENDORS-TABLE.sql
+3. ⏳ Vercel: Wait for auto-deployment
+4. ⏳ Browser: Hard refresh (Ctrl + Shift + R)

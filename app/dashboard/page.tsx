@@ -27,6 +27,14 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(4);
 
+  // Get user's saved vendors
+  const { data: savedVendors } = await supabase
+    .from('saved_vendors')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(6);
+
   // Calculate statistics
   const totalEvents = events?.length || 0;
   const upcomingEvents = events?.filter(e => new Date(e.event_date) >= new Date()).length || 0;
@@ -290,6 +298,66 @@ export default async function DashboardPage() {
               </div>
             )}
           </div>
+        </div>
+        {/* Saved Vendors Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">🔖 Saved Vendors</h2>
+            <Link
+              href="/events/birthday/vendors"
+              className="text-purple-600 hover:text-purple-700 font-semibold text-sm"
+            >
+              Browse More
+            </Link>
+          </div>
+          {savedVendors && savedVendors.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {savedVendors.map((saved: any) => (
+                <Link
+                  key={saved.id}
+                  href={`/events/birthday/vendors/${saved.vendor_id}`}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all hover:border-purple-300 flex items-start gap-3"
+                >
+                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-3xl flex-shrink-0">
+                    {saved.vendor_image || '🏪'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-900 text-sm truncate">
+                      {saved.vendor_name || 'Vendor'}
+                    </h3>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {saved.vendor_category}
+                    </p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-yellow-400 text-xs">⭐</span>
+                      <span className="text-xs font-medium text-gray-700">
+                        {saved.vendor_rating || '4.5'}
+                      </span>
+                    </div>
+                    {saved.vendor_price_range && (
+                      <p className="text-xs font-semibold text-purple-600 mt-1">
+                        {saved.vendor_price_range}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-5xl mb-3">🔖</div>
+              <p className="text-sm font-medium">No saved vendors yet</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Browse vendors and click &quot;Save Vendor&quot; to bookmark them
+              </p>
+              <Link
+                href="/events/birthday/vendors"
+                className="inline-block mt-4 px-6 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Browse Vendors
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

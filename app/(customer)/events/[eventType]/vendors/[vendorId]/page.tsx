@@ -1,9 +1,10 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SAMPLE_VENDORS } from '@/lib/data/vendors';
 import { notFound } from 'next/navigation';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 const EVENT_TYPES_MAP: Record<string, { name: string; icon: string }> = {
   'birthday': { name: 'Birthday Party', icon: '🎂' },
@@ -30,6 +31,8 @@ export default function VendorProfilePage({
   const [emailMessage, setEmailMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   
   // State for hire vendor modal
   const [showHireModal, setShowHireModal] = useState(false);
@@ -59,6 +62,31 @@ export default function VendorProfilePage({
     notFound();
   }
 
+  // Check if vendor is already saved on mount
+  useEffect(() => {
+    checkIfSaved();
+  }, [vendorId]);
+
+  const checkIfSaved = async () => {
+    const supabase = createBrowserClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('saved_vendors')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('vendor_id', vendorId)
+      .maybeSingle();
+
+    setIsSaved(!!data);
+  };
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   // Handler functions
   const handleContactVendor = () => {
     // Default phone call action
@@ -66,10 +94,54 @@ export default function VendorProfilePage({
     window.location.href = `tel:${phone}`;
   };
 
-  const handleSaveVendor = () => {
-    setIsSaved(!isSaved);
-    // TODO: Save to database
-    alert(isSaved ? 'Vendor removed from saved list!' : 'Vendor saved successfully!');
+  const handleSaveVendor = async () => {
+    if (isSaving) return;
+    const supabase = createBrowserClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      showToast('Please sign in to save vendors', 'error');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (isSaved) {
+        // Unsave: Delete from database
+        const { error } = await supabase
+          .from('saved_vendors')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('vendor_id', vendorId);
+
+        if (error) throw error;
+        setIsSaved(false);
+        showToast('✅ Vendor removed from saved list!');
+      } else {
+        // Save: Insert into database with vendor details
+        const { error } = await supabase
+          .from('saved_vendors')
+          .insert({
+            user_id: user.id,
+            vendor_id: vendorId,
+            vendor_name: vendor!.name,
+            vendor_category: vendor!.category,
+            vendor_image: vendor!.image,
+            vendor_rating: vendor!.rating,
+            vendor_price_range: vendor!.priceRange,
+            vendor_location: vendor!.location,
+          });
+
+        if (error) throw error;
+        setIsSaved(true);
+        showToast('✅ Vendor saved! View in Dashboard.');
+      }
+    } catch (error) {
+      console.error('Error saving vendor:', error);
+      showToast('❌ Failed to save vendor. Please try again.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleHireVendor = async () => {
@@ -226,6 +298,14 @@ Best regards`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-6">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl font-semibold text-white transition-all animate-pulse ${
+          toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        }`}>
+          {toast.message}
+        </div>
+      )}
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
         <Link
@@ -403,13 +483,14 @@ Best regards`;
               
               <button 
                 onClick={handleSaveVendor}
+                disabled={isSaving}
                 className={`w-full py-4 ${
                   isSaved 
-                    ? 'bg-green-500 border-green-500 text-white' 
-                    : 'bg-white border-gray-300 text-gray-700'
-                } border-2 font-bold rounded-lg hover:bg-gray-50 transition-all text-lg`}
+                    ? 'bg-green-500 border-green-500 text-white hover:bg-green-600' 
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                } border-2 font-bold rounded-lg transition-all text-lg disabled:opacity-60 disabled:cursor-not-allowed`}
               >
-                {isSaved ? '✓ Saved' : '🔖 Save Vendor'}
+                {isSaving ? '⏳ Saving...' : isSaved ? '✓ Saved' : '🔖 Save Vendor'}
               </button>
 
               <div className="mt-6 pt-6 border-t border-gray-200">
