@@ -1,13 +1,30 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+/**
+ * LEAN MIDDLEWARE — only refreshes the session cookie and protects routes
+ * from completely unauthenticated users.
+ *
+ * WHY: Vercel Edge Middleware has a strict ~1-2 s timeout.
+ * Making multiple Supabase DB queries (users, admin_users, vendor_profiles)
+ * in middleware caused MIDDLEWARE_INVOCATION_TIMEOUT (504) errors.
+ *
+ * Role-based redirects (admin / vendor) now live in the respective
+ * Server Component layouts where there is NO timeout limit.
+ */
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Build request headers including x-pathname so Server Component layouts
+  // can know the current route without relying on Edge-only APIs.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
+
   let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+    request: { headers: requestHeaders },
   });
 
+  // Create a Supabase client that can read/write cookies on the Edge
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -17,172 +34,52 @@ export async function middleware(request: NextRequest) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
+          request.cookies.set({ name, value, ...options });
+          response = NextResponse.next({ request: { headers: requestHeaders } });
+          response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
+          request.cookies.set({ name, value: '', ...options });
+          response = NextResponse.next({ request: { headers: requestHeaders } });
+          response.cookies.set({ name, value: '', ...options });
         },
       },
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Single auth call — refreshes the session token in the cookie if needed.
+  // No DB queries here; role checks are handled in layout.tsx files.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Protected routes that require authentication
-  const protectedRoutes = ['/dashboard', '/profile'];
-  const adminRoutes = ['/admin'];
-  const vendorRoutes = ['/vendor'];
-
-  const isProtectedRoute = protectedRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  );
-  const isAdminRoute = adminRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  );
-  const isVendorRoute = vendorRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  );
-
-  // Redirect to sign in if accessing protected route without authentication
-  if (isProtectedRoute && !user) {
+  // ── Unauthenticated user trying to access a protected area ──────────────
+  const protectedPrefixes = ['/dashboard', '/profile'];
+  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p));
+  if (isProtected && !user) {
     return NextResponse.redirect(new URL('/auth/signin', request.url));
   }
 
-  // If an authenticated user visits /dashboard/* routes, check their role
-  // and redirect vendors to the vendor portal instead of customer portal
-  if (isProtectedRoute && user) {
-    const { data: roleData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (roleData?.role === 'vendor') {
-      console.log('🏪 Middleware: Vendor user on customer route, redirecting to vendor dashboard');
-      return NextResponse.redirect(new URL('/vendor/dashboard', request.url));
-    }
-    if (roleData?.role === 'admin') {
-      console.log('🛡️ Middleware: Admin user on customer route, redirecting to admin dashboard');
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-    }
+  // /admin routes — block unauthenticated users, allow the rest through.
+  // Role verification (admin_users table) is done in app/admin/layout.tsx.
+  const adminPublicPaths = [
+    '/admin/login',
+    '/admin/debug',
+    '/admin/setup',
+    '/admin/forgot-password',
+    '/admin/reset-password',
+  ];
+  const isAdminPublicPath = adminPublicPaths.some((p) => pathname.startsWith(p));
+  if (pathname.startsWith('/admin') && !isAdminPublicPath && !user) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  // Check user role for admin routes — skip login/setup/debug pages
-  const adminPublicPaths = ['/admin/login', '/admin/debug', '/admin/setup', '/admin/forgot-password', '/admin/reset-password'];
-  const isAdminPublicPath = adminPublicPaths.some(p => request.nextUrl.pathname.startsWith(p));
-
-  if (isAdminRoute && !isAdminPublicPath) {
-    console.log('🛡️ Middleware: checking admin route access for path:', request.nextUrl.pathname);
-    console.log('👤 Middleware: User:', user ? user.email : 'No user');
-
-    if (!user) {
-      console.log('❌ Middleware: No authenticated user, redirecting to login');
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-    
-    // Check admin_users table (not users.role)
-    const { data: adminUser, error: adminErr } = await supabase
-      .from('admin_users')
-      .select('id, is_active')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .single();
-
-    console.log('🔍 Middleware: adminUser result:', adminUser, 'Error:', adminErr);
-
-    if (!adminUser) {
-      console.log('❌ Middleware: Not an active admin user, redirecting to login');
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-    
-    console.log('✅ Middleware: Admin check passed');
-  }
-
-  // Check user role for vendor routes — skip login page
+  // /vendor routes — block unauthenticated users, allow the rest through.
+  // Role verification (vendor_profiles table) is done in app/vendor/layout.tsx.
   const vendorPublicPaths = ['/vendor/login', '/vendor/register'];
-  const isVendorPublicPath = vendorPublicPaths.some(p => request.nextUrl.pathname.startsWith(p));
-
-  if (isVendorRoute && !isVendorPublicPath) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/vendor/login', request.url));
-    }
-    console.log('🏪 Middleware: checking vendor route access for path:', request.nextUrl.pathname);
-    
-    // First check if user has vendor role in users table
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    
-    console.log('👤 Middleware: User role:', userData?.role);
-    
-    // If user has vendor role, allow access (skip vendor_profiles check for now)
-    if (userData?.role === 'vendor') {
-      console.log('✅ Middleware: User has vendor role, allowing access');
-      return response;
-    }
-    
-    // Otherwise check vendor_profiles table
-    const { data: vendorData, error: vendorErr } = await supabase
-      .from('vendor_profiles')
-      .select('id, is_active')
-      .eq('user_id', user.id)
-      .single();
-
-    console.log('🔍 Middleware: vendorData result:', vendorData, 'Error:', vendorErr);
-
-    if (!vendorData) {
-      console.log('❌ Middleware: No active vendor profile, redirecting to vendor login');
-      return NextResponse.redirect(new URL('/vendor/login', request.url));
-    }
-
-    console.log('✅ Middleware: Vendor check passed');
-  }
-
-  // Redirect authenticated users away from auth pages based on their role
-  if (user && request.nextUrl.pathname.startsWith('/auth')) {
-    const { data: authRoleData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (authRoleData?.role === 'vendor') {
-      return NextResponse.redirect(new URL('/vendor/dashboard', request.url));
-    }
-    if (authRoleData?.role === 'admin') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-    }
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  const isVendorPublicPath = vendorPublicPaths.some((p) => pathname.startsWith(p));
+  if (pathname.startsWith('/vendor') && !isVendorPublicPath && !user) {
+    return NextResponse.redirect(new URL('/vendor/login', request.url));
   }
 
   return response;
@@ -190,6 +87,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    /*
+     * Match all paths EXCEPT:
+     *   - _next/static  (static files)
+     *   - _next/image   (image optimisation)
+     *   - favicon.ico
+     *   - auth/callback (OAuth callback — must NOT be blocked)
+     *   - image files (svg, png, jpg …)
+     */
     '/((?!_next/static|_next/image|favicon.ico|auth/callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
