@@ -168,8 +168,9 @@ export default function HomePage() {
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           
           {/* Logo */}
-          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-            <img src="/eventverse-logo.png" alt="EventVerse" style={{ height: 52, width: 'auto', objectFit: 'contain' }} />
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src="/eventverse-logo.png" alt="EventVerse" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
+            <span className="ornate-title" style={{ fontSize: 22, fontWeight: 700, color: '#1F1E1B', letterSpacing: '-0.5px' }}>EventVerse</span>
           </Link>
 
           {/* Links */}
@@ -493,8 +494,9 @@ export default function HomePage() {
           
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 64 }}>
             <div>
-              <div style={{ marginBottom: 16 }}>
-                <img src="/eventverse-logo.png" alt="EventVerse" style={{ height: 52, width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                <img src="/eventverse-logo.png" alt="EventVerse" style={{ height: 44, width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                <span className="ornate-title" style={{ fontSize: 20, fontWeight: 700, color: '#FAF6F0' }}>EventVerse</span>
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(250,246,240,0.5)', maxWidth: 260 }}>
                 Combining centuries of hosting traditions with the ease of modern digital coordination.
