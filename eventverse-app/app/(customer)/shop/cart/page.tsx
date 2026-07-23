@@ -11,9 +11,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadCart();
-  }, []);
+  useEffect(() => { loadCart(); }, []);
 
   const loadCart = async () => {
     setLoading(true);
@@ -39,10 +37,10 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF6F0] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your cart...</p>
+          <div className="text-4xl mb-3">🛒</div>
+          <p className="text-xs text-[#1F1E1B]/50 italic font-sans">Loading your cart...</p>
         </div>
       </div>
     );
@@ -50,16 +48,16 @@ export default function CartPage() {
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF6F0] flex items-center justify-center font-serif">
         <div className="text-center">
-          <div className="text-8xl mb-4">🛒</div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Cart is Empty</h2>
-          <p className="text-gray-600 mb-6">Start shopping to add items to your cart!</p>
+          <div className="text-7xl mb-4">🛒</div>
+          <h2 className="text-2xl font-bold text-[#2C1810] mb-2">Your Cart is Empty</h2>
+          <p className="text-xs text-[#1F1E1B]/50 italic mb-6 font-sans">Browse our curated collection to begin adding items</p>
           <Link
             href="/shop"
-            className="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg"
+            className="inline-block px-6 py-2.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold rounded hover:shadow-lg transition font-sans"
           >
-            Browse Products
+            Browse Collection
           </Link>
         </div>
       </div>
@@ -67,66 +65,71 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">🛒 Shopping Cart</h1>
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B] p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Header */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[#2C1810]">🛒 Shopping Cart</h1>
+            <p className="text-xs text-[#1F1E1B]/50 italic mt-1 font-sans">Review your selected items before checkout</p>
+          </div>
+          <Link href="/shop" className="text-xs font-semibold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans">
+            ← Continue Shopping
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map((item: any) => (
-              <div key={item.id} className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex gap-6">
-                  <div className="w-32 h-32 flex-shrink-0">
+              <div key={item.id} className="bg-white border border-[#DDD0BB] rounded shadow-sm p-5">
+                <div className="flex gap-4">
+                  <div className="w-24 h-24 flex-shrink-0 rounded border border-[#EDE0CC] overflow-hidden bg-[#FAF6F0]">
                     <ProductImage
                       product={item.product}
                       alt={item.product?.name || 'Product image'}
-                      className="rounded-lg"
+                      className="rounded"
                     />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2 mb-3">
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">{item.product?.name}</h3>
+                        <h3 className="font-bold text-sm text-[#1F1E1B]">{item.product?.name}</h3>
                         {item.is_ai_recommended && (
-                          <span className="inline-block mt-1 px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-[#8A1C2C]/10 border border-[#8A1C2C]/20 text-[#8A1C2C] text-[9px] font-bold uppercase tracking-wider rounded font-sans">
                             🤖 AI Recommended
                           </span>
                         )}
                       </div>
                       <button
                         onClick={() => handleRemove(item.id)}
-                        className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-300 rounded-lg font-semibold transition-all flex items-center gap-2"
+                        className="text-[10px] font-semibold text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-2 py-1 rounded font-sans transition"
                       >
-                        <span>🗑️</span>
                         Remove
                       </button>
                     </div>
-                    
-                    <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center gap-3">
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+                          className="w-7 h-7 rounded border border-[#DDD0BB] bg-[#FAF6F0] hover:bg-[#EDE0CC] flex items-center justify-center font-bold text-sm text-[#1F1E1B] font-sans transition"
                         >
                           −
                         </button>
-                        <span className="font-semibold text-lg">{item.quantity}</span>
+                        <span className="font-bold text-sm w-6 text-center font-sans">{item.quantity}</span>
                         <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center font-bold"
+                          className="w-7 h-7 rounded border border-[#8A1C2C] bg-[#8A1C2C] hover:bg-[#6B1522] text-[#FAF0E0] flex items-center justify-center font-bold text-sm font-sans transition"
                         >
                           +
                         </button>
                       </div>
-                      
-                      <div className="text-right">
-                        <div className="text-sm text-gray-500">
-                          ₹{item.unit_price.toLocaleString('en-IN')} each
-                        </div>
-                        <div className="text-xl font-bold text-purple-600">
-                          ₹{item.total_price.toLocaleString('en-IN')}
-                        </div>
+                      <div className="text-right font-sans">
+                        <div className="text-[10px] text-[#1F1E1B]/40">₹{item.unit_price.toLocaleString('en-IN')} each</div>
+                        <div className="text-base font-bold text-[#8A1C2C]">₹{item.total_price.toLocaleString('en-IN')}</div>
                       </div>
                     </div>
                   </div>
@@ -137,63 +140,49 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-xl p-6 sticky top-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
-              
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold">₹{cart.subtotal?.toLocaleString('en-IN')}</span>
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm p-6 sticky top-6 space-y-4">
+              <h2 className="text-base font-bold text-[#2C1810] pb-3 border-b border-[#FAF6F0]">Order Summary</h2>
+
+              <div className="space-y-2.5 text-xs font-sans">
+                <div className="flex justify-between text-[#1F1E1B]/70">
+                  <span>Subtotal</span>
+                  <span className="font-semibold text-[#1F1E1B]">₹{cart.subtotal?.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax (18% GST)</span>
-                  <span className="font-semibold">₹{cart.tax_amount?.toLocaleString('en-IN')}</span>
+                <div className="flex justify-between text-[#1F1E1B]/70">
+                  <span>Tax (18% GST)</span>
+                  <span className="font-semibold text-[#1F1E1B]">₹{cart.tax_amount?.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-semibold text-green-600">
+                <div className="flex justify-between text-[#1F1E1B]/70">
+                  <span>Shipping</span>
+                  <span className={`font-semibold ${cart.shipping_charges === 0 ? 'text-green-600' : 'text-[#1F1E1B]'}`}>
                     {cart.shipping_charges === 0 ? 'FREE' : `₹${cart.shipping_charges}`}
                   </span>
                 </div>
                 {cart.subtotal < 999 && (
-                  <div className="text-sm text-gray-500">
-                    Add ₹{(999 - cart.subtotal).toFixed(0)} more for free shipping!
+                  <div className="text-[10px] text-[#C5A880] italic">
+                    Add ₹{(999 - cart.subtotal).toFixed(0)} more for free shipping
                   </div>
                 )}
-                <div className="border-t pt-4 flex justify-between text-xl font-bold">
-                  <span>Total</span>
-                  <span className="text-purple-600">₹{cart.total_amount?.toLocaleString('en-IN')}</span>
+                <div className="border-t border-[#FAF6F0] pt-3 flex justify-between">
+                  <span className="font-bold text-sm text-[#1F1E1B]">Total</span>
+                  <span className="font-bold text-base text-[#8A1C2C]">₹{cart.total_amount?.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 
               <Link
                 href="/shop/cart/checkout"
-                className="block w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center font-bold text-lg rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg mb-4"
+                className="block w-full py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-center text-xs font-bold rounded hover:shadow-lg transition font-sans"
               >
-                Proceed to Checkout
-              </Link>
-
-              <Link
-                href="/shop"
-                className="block w-full py-3 bg-white border-2 border-purple-600 text-purple-600 text-center font-semibold rounded-lg hover:bg-purple-50 transition-all"
-              >
-                Continue Shopping
+                Proceed to Checkout →
               </Link>
 
               {/* Trust Badges */}
-              <div className="mt-6 pt-6 border-t space-y-3 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span>Secure checkout</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span>Free returns within 7 days</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span>100% authentic products</span>
-                </div>
+              <div className="pt-3 border-t border-[#FAF6F0] space-y-1.5 text-[10px] text-[#1F1E1B]/50 font-sans">
+                {['Secure & encrypted checkout', 'Free returns within 7 days', '100% authentic products'].map((txt, i) => (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <span className="text-green-500">✓</span> {txt}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

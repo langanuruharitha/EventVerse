@@ -61,18 +61,17 @@ function CreateCardInvitationContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-8">
+      <div className="bg-[#2C1810] text-[#FAF0E0] py-8 border-b border-[#C5A880]/30 relative">
         <div className="max-w-7xl mx-auto px-4">
           <Link
             href="/invitations"
-            className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C5A880] hover:text-[#FAF0E0] uppercase tracking-wider font-sans mb-3 transition"
           >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Invitations
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to Invitations
           </Link>
-          <h1 className="text-4xl font-bold mb-2">✨ Create Custom Invitation Card</h1>
+          <h1 className="text-3xl font-bold mb-1">⚜ Create Custom Invitation Card</h1>
           <p className="text-purple-100">
             {step === 1 && 'Fill in your event details and AI will create a beautiful invitation'}
             {step === 2 && 'Your custom invitation card is ready!'}
@@ -285,32 +284,32 @@ function CreateCardInvitationContent() {
                     !formData.venue ||
                     generating
                   }
-                  className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+                  className="w-full py-3.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-sans"
                 >
                   {generating ? (
                     <>
-                      <div className="animate-spin">⏳</div>
-                      <div className="text-center">
-                        <div className="font-bold">Gemini AI is creating your invitation...</div>
-                        <div className="text-sm mt-1">Generating unique creative content (5-10 seconds)</div>
+                      <div className="animate-spin text-base">⚜</div>
+                      <div className="text-center font-serif">
+                        <div className="font-bold text-sm">Gemini AI is formulating your blueprint...</div>
+                        <div className="text-[10px] italic opacity-80">Generating bespoke artistic content (5-10 seconds)</div>
                       </div>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-6 h-6" />
-                      Generate Custom Invitation with AI
+                      <Sparkles className="w-4 h-4" />
+                      Generate Bespoke Invitation with AI
                     </>
                   )}
                 </button>
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4 mt-3">
-                  <p className="text-sm text-purple-900 font-semibold mb-2">
-                    🤖 What Gemini AI Will Create For You:
+                <div className="bg-[#FAF6F0] border border-[#DDD0BB] rounded-lg p-4 mt-3 font-sans">
+                  <p className="text-xs text-[#2C1810] font-bold mb-2 font-serif">
+                    ⚜ What Gemini AI Will Create For You:
                   </p>
-                  <ul className="text-xs text-purple-800 space-y-1 ml-4">
-                    <li>✓ Unique creative text and greetings (NOT copy-paste of your input!)</li>
-                    <li>✓ Beautiful artistic gradient backgrounds based on your theme</li>
-                    <li>✓ Poetic, heartfelt messages that match your event mood</li>
-                    <li>✓ Professional design - completely original every time!</li>
+                  <ul className="text-[11px] text-[#1F1E1B]/70 space-y-1 ml-4 list-disc">
+                    <li>Unique creative text and royal greetings customized to your ceremony</li>
+                    <li>Beautiful traditional backgrounds and gold filigree styling</li>
+                    <li>Poetic, heartfelt messages matching your event mood</li>
+                    <li>Professional bespoken design - completely original every time!</li>
                   </ul>
                 </div>
               </div>
@@ -320,14 +319,14 @@ function CreateCardInvitationContent() {
 
         {/* Step 2: Generated Card */}
         {step === 2 && generatedCard && (
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+          <div className="bg-white rounded border border-[#DDD0BB] shadow-sm p-8">
+            <h2 className="text-xl font-bold text-[#2C1810] mb-6 text-center">
               🎉 Your Custom Invitation Card is Ready!
             </h2>
 
             {/* Generated Card Preview */}
             <div className="mb-8">
-              <div className="border-4 border-purple-200 rounded-xl overflow-hidden bg-white max-w-2xl mx-auto shadow-2xl">
+              <div className="border-2 border-double border-[#C5A880] rounded overflow-hidden bg-white max-w-2xl mx-auto shadow-lg">
                 <iframe
                   srcDoc={generatedCard || ''}
                   style={{ width: '100%', height: '820px', border: 'none' }}
@@ -338,10 +337,10 @@ function CreateCardInvitationContent() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 font-sans text-xs">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+                className="flex-1 py-3 border border-[#DDD0BB] text-[#7A6652] font-semibold rounded hover:bg-[#FAF6F0] transition"
               >
                 Edit Details
               </button>
@@ -356,14 +355,14 @@ function CreateCardInvitationContent() {
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:shadow transition"
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-4 h-4" />
                 Download Card
               </button>
               <button
                 onClick={() => router.push('/invitations')}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700"
+                className="flex-1 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800 uppercase tracking-wider transition"
               >
                 Done
               </button>

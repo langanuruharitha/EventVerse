@@ -486,28 +486,46 @@ export default function BudgetPage() {
   const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#FAF6F0] text-[#1F1E1B] font-serif p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-4"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Back to Dashboard
-            </Link>
-            <h1 className="text-4xl font-bold text-gray-900">Budget Tracker</h1>
-            <p className="text-gray-600 mt-2">Manage your event expenses and stay on budget</p>
+        <div className="relative bg-white rounded-lg border-2 border-double border-[#C5A880] p-8 shadow-md">
+          {/* Decorative Corner Ornaments */}
+          <div className="absolute top-2 left-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute top-2 right-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute bottom-2 left-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute bottom-2 right-2 text-sm text-[#C5A880]">❦</div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative">
+            <div className="space-y-2">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans mb-2"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+              </Link>
+              <h1 className="text-3xl font-bold tracking-tight text-[#2C1810]">
+                Budget Tracker
+              </h1>
+              <p className="text-sm text-[#1F1E1B]/70 italic">
+                Manage your event expenses, allocate funds, and optimize your budget.
+              </p>
+            </div>
+            <div>
+              <Button
+                onClick={() => setShowBudgetWizard(true)}
+                className="py-3 px-6 text-sm font-semibold tracking-widest uppercase rounded transition-all duration-200"
+                style={{
+                  background: 'linear-gradient(135deg, #8A1C2C 0%, #6B1522 100%)',
+                  color: '#FAF0E0',
+                  boxShadow: '0 4px 16px rgba(138,28,44,0.2)',
+                }}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create New Budget
+              </Button>
+            </div>
           </div>
-          <Button
-            onClick={() => setShowBudgetWizard(true)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Create New Budget
-          </Button>
         </div>
 
         {/* Budget Selector */}
@@ -974,23 +992,30 @@ export default function BudgetPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex flex-wrap gap-4">
               <Button 
                 onClick={() => setShowExpenseForm(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                className="py-3 px-6 text-xs font-semibold uppercase tracking-wider rounded transition-all duration-200"
+                style={{
+                  background: 'linear-gradient(135deg, #8A1C2C 0%, #6B1522 100%)',
+                  color: '#FAF0E0',
+                  boxShadow: '0 4px 16px rgba(138,28,44,0.2)',
+                }}
               >
-                <Plus className="w-5 h-5 mr-2" />
+                <Plus className="w-4 h-4 mr-2" />
                 Add Expense
               </Button>
               <Button 
                 variant="outline"
                 onClick={() => handleViewAllExpenses()}
+                className="px-5 py-3 rounded text-xs font-semibold uppercase tracking-wider border border-[#DDD0BB] text-[#7A6652] hover:bg-[#FAF6F0] transition-all"
               >
                 View All Expenses
               </Button>
               <Button 
                 variant="outline"
                 onClick={() => handleGenerateReport()}
+                className="px-5 py-3 rounded text-xs font-semibold uppercase tracking-wider border border-[#DDD0BB] text-[#7A6652] hover:bg-[#FAF6F0] transition-all"
               >
                 Generate Report
               </Button>

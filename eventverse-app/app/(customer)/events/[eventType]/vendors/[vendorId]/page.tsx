@@ -300,11 +300,11 @@ Best regards`;
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-6">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B] p-6">
       {/* Toast Notification */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl font-semibold text-white transition-all ${
-          toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        <div className={`fixed top-4 right-4 z-50 px-4 py-2.5 rounded shadow-xl text-xs font-bold text-white transition-all font-sans ${
+          toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
         }`}>
           {toast.message}
         </div>
@@ -313,76 +313,62 @@ Best regards`;
         {/* Back Button */}
         <Link
           href={`/events/${eventType}/vendors`}
-          className="inline-flex items-center text-gray-600 hover:text-purple-600 transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans mb-6"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Vendors
+          ← Back to Vendors
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-5">
             {/* Vendor Header */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="flex items-start gap-6">
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm p-6">
+              <div className="flex items-start gap-5">
                 {/* Vendor Icon */}
-                <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-8 flex-shrink-0">
-                  <div className="text-8xl">{vendor.image}</div>
+                <div className="bg-[#EDE0CC] rounded border border-[#DDD0BB] p-5 flex-shrink-0">
+                  <div className="text-6xl">{vendor.image}</div>
                 </div>
 
                 {/* Vendor Info */}
                 <div className="flex-1">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        {vendor.name}
-                      </h1>
-                      <div className="flex items-center gap-3">
-                        <span className="inline-block bg-purple-100 text-purple-700 text-sm px-3 py-1 rounded-full font-semibold">
-                          {vendor.category}
+                  <div className="mb-3">
+                    <h1 className="text-xl font-bold text-[#2C1810] mb-1.5">
+                      {vendor.name}
+                    </h1>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-block bg-[#8A1C2C]/10 border border-[#8A1C2C]/20 text-[#8A1C2C] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-sans">
+                        {vendor.category}
+                      </span>
+                      {vendor.verified && (
+                        <span className="inline-block bg-green-500/10 border border-green-500/20 text-green-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-sans">
+                          ✓ Verified
                         </span>
-                        {vendor.verified && (
-                          <span className="inline-block bg-green-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
-                            ✓ Verified Vendor
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
 
                   {/* Rating */}
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={i < Math.floor(vendor.rating) ? 'text-yellow-400 text-xl' : 'text-gray-300 text-xl'}
-                        >
+                        <span key={i} className={i < Math.floor(vendor.rating) ? 'text-yellow-500 text-sm' : 'text-[#DDD0BB] text-sm'}>
                           ⭐
                         </span>
                       ))}
                     </div>
-                    <span className="text-xl font-bold text-gray-900">
-                      {vendor.rating}
-                    </span>
-                    <span className="text-gray-600">
-                      ({vendor.reviews} reviews)
-                    </span>
+                    <span className="font-bold text-sm text-[#1F1E1B] font-sans">{vendor.rating}</span>
+                    <span className="text-[10px] text-[#1F1E1B]/50 font-sans">({vendor.reviews} reviews)</span>
                   </div>
 
                   {/* Location & Price */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <span className="text-xl">📍</span>
-                      <span className="font-medium">{vendor.location}, {vendor.state}</span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs text-[#1F1E1B]/60 font-sans">
+                      <span>📍</span>
+                      <span>{vendor.location}, {vendor.state}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">💰</span>
-                      <span className="text-2xl font-bold text-purple-600">
-                        {vendor.priceRange}
-                      </span>
+                    <div className="flex items-center gap-1.5">
+                      <span>💰</span>
+                      <span className="text-lg font-bold text-[#8A1C2C] font-sans">{vendor.priceRange}</span>
                     </div>
                   </div>
                 </div>
@@ -390,72 +376,67 @@ Best regards`;
             </div>
 
             {/* About Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">About Us</h2>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                {vendor.description}
-              </p>
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm overflow-hidden">
+              <div className="px-5 py-3 bg-[#FFFDF8] border-b border-[#FAF6F0]">
+                <h2 className="text-sm font-bold text-[#2C1810]">About Us</h2>
+              </div>
+              <p className="p-5 text-xs text-[#1F1E1B]/70 italic leading-relaxed">{vendor.description}</p>
             </div>
 
             {/* Services Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Services</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm overflow-hidden">
+              <div className="px-5 py-3 bg-[#FFFDF8] border-b border-[#FAF6F0]">
+                <h2 className="text-sm font-bold text-[#2C1810]">Our Services</h2>
+              </div>
+              <div className="p-5 grid grid-cols-2 md:grid-cols-3 gap-3">
                 {vendor.services.map((service, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-purple-50 rounded-lg p-4 border-2 border-purple-100 hover:border-purple-300 transition-colors"
-                  >
-                    <div className="text-3xl mb-2">✓</div>
-                    <div className="font-semibold text-gray-900">{service}</div>
+                  <div key={idx} className="bg-[#FAF6F0] border border-[#DDD0BB] rounded p-3 hover:border-[#8A1C2C]/30 transition-colors">
+                    <div className="text-[#C5A880] font-bold text-sm mb-1">✦</div>
+                    <div className="text-xs font-semibold text-[#1F1E1B]">{service}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Portfolio/Work Samples */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Portfolio</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm overflow-hidden">
+              <div className="px-5 py-3 bg-[#FFFDF8] border-b border-[#FAF6F0]">
+                <h2 className="text-sm font-bold text-[#2C1810]">Portfolio</h2>
+              </div>
+              <div className="p-5 grid grid-cols-3 gap-3">
                 {portfolioImages.map((emoji, idx) => (
-                  <div
-                    key={idx}
-                    className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center text-6xl hover:scale-105 transition-transform cursor-pointer"
-                  >
+                  <div key={idx} className="aspect-square bg-[#EDE0CC] border border-[#DDD0BB] rounded flex items-center justify-center text-4xl hover:scale-105 transition-transform cursor-pointer">
                     {emoji}
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-gray-500 mt-4 text-center">
-                Sample portfolio images - Real vendor portfolios will be added in production
+              <p className="text-[10px] text-[#1F1E1B]/40 italic text-center pb-4 font-sans">
+                Sample portfolio — Real vendor portfolios will be available in production
               </p>
             </div>
 
             {/* Reviews Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
-              <div className="space-y-6">
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm overflow-hidden">
+              <div className="px-5 py-3 bg-[#FFFDF8] border-b border-[#FAF6F0]">
+                <h2 className="text-sm font-bold text-[#2C1810]">Customer Reviews</h2>
+              </div>
+              <div className="divide-y divide-[#FAF6F0] p-5 space-y-4">
                 {sampleReviews.map((review) => (
-                  <div key={review.id} className="border-b border-gray-200 pb-6 last:border-0">
-                    <div className="flex items-start justify-between mb-3">
+                  <div key={review.id} className="pt-4 first:pt-0">
+                    <div className="flex items-center justify-between mb-2">
                       <div>
-                        <div className="font-semibold text-gray-900 text-lg">{review.name}</div>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="font-semibold text-sm text-[#1F1E1B]">{review.name}</div>
+                        <div className="flex items-center gap-2 mt-0.5">
                           <div className="flex">
                             {[...Array(5)].map((_, i) => (
-                              <span
-                                key={i}
-                                className={i < review.rating ? 'text-yellow-400' : 'text-gray-300'}
-                              >
-                                ⭐
-                              </span>
+                              <span key={i} className={i < review.rating ? 'text-yellow-500 text-xs' : 'text-[#DDD0BB] text-xs'}>⭐</span>
                             ))}
                           </div>
-                          <span className="text-sm text-gray-500">{review.date}</span>
+                          <span className="text-[10px] text-[#1F1E1B]/40 font-sans">{review.date}</span>
                         </div>
                       </div>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                    <p className="text-xs text-[#1F1E1B]/60 italic leading-relaxed">{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -463,72 +444,62 @@ Best regards`;
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Contact Card */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Get in Touch</h3>
-              
-              <button 
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-sm p-5 sticky top-6 space-y-3">
+              <h3 className="text-sm font-bold text-[#2C1810] pb-3 border-b border-[#FAF6F0]">Get in Touch</h3>
+
+              <button
                 onClick={() => setShowHireModal(true)}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl mb-3 text-lg"
+                className="w-full py-2.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold rounded hover:shadow-lg transition font-sans"
               >
                 🤝 Hire This Vendor
               </button>
-              
-              <button 
+
+              <button
                 onClick={handleContactVendor}
-                className="w-full py-4 bg-white border-2 border-purple-600 text-purple-600 font-bold rounded-lg hover:bg-purple-50 transition-all mb-3 text-lg"
+                className="w-full py-2.5 border border-[#DDD0BB] text-[#7A6652] text-xs font-semibold rounded hover:bg-[#FAF6F0] transition font-sans"
               >
                 📞 Call: +91 98765 43210
               </button>
-              
 
-              
-              <button 
+              <button
                 onClick={handleSaveVendor}
                 disabled={isSaving}
-                className={`w-full py-4 ${
-                  isSaved 
-                    ? 'bg-green-500 border-green-500 text-white hover:bg-green-600' 
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                } border-2 font-bold rounded-lg transition-all text-lg disabled:opacity-60 disabled:cursor-not-allowed`}
+                className={`w-full py-2.5 text-xs font-bold rounded transition font-sans disabled:opacity-60 border ${
+                  isSaved
+                    ? 'bg-green-500/10 border-green-500/20 text-green-800 hover:bg-green-500/20'
+                    : 'border-[#DDD0BB] text-[#7A6652] hover:bg-[#FAF6F0]'
+                }`}
               >
-                {isSaving ? '⏳ Saving...' : isSaved ? '✓ Saved' : '🔖 Save Vendor'}
+                {isSaving ? '⏳ Saving...' : isSaved ? '✓ Saved to List' : '🔖 Save Vendor'}
               </button>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="space-y-3 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <span>⚡</span>
-                    <span>Typically responds within 24 hours</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>✓</span>
-                    <span>Verified business</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>📋</span>
-                    <span>{vendor.reviews}+ completed bookings</span>
-                  </div>
-                </div>
+              <div className="pt-3 border-t border-[#FAF6F0] space-y-1.5 text-[10px] text-[#1F1E1B]/50 italic font-sans">
+                <div className="flex items-center gap-1.5"><span>⚡</span> Responds within 24 hours</div>
+                <div className="flex items-center gap-1.5"><span>✓</span> Verified business</div>
+                <div className="flex items-center gap-1.5"><span>📋</span> {vendor.reviews}+ completed bookings</div>
               </div>
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg p-6 text-white">
-              <h3 className="text-xl font-bold mb-4">Why Choose Us?</h3>
-              <div className="space-y-4">
+            <div
+              className="rounded border border-[#C5A880]/20 shadow-sm p-5 text-center space-y-4"
+              style={{ background: 'linear-gradient(135deg, #1F1E1B 0%, #131211 100%)' }}
+            >
+              <h3 className="text-xs font-bold text-[#C5A880] uppercase tracking-widest font-sans">Why Choose Us?</h3>
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <div className="text-3xl font-bold">{vendor.reviews}+</div>
-                  <div className="text-sm opacity-90">Happy Clients</div>
+                  <div className="text-xl font-bold text-white font-sans">{vendor.reviews}+</div>
+                  <div className="text-[9px] text-white/50 uppercase font-sans">Happy Clients</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">{vendor.rating}★</div>
-                  <div className="text-sm opacity-90">Average Rating</div>
+                  <div className="text-xl font-bold text-white font-sans">{vendor.rating}★</div>
+                  <div className="text-[9px] text-white/50 uppercase font-sans">Avg Rating</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">{vendor.verified ? '100%' : '95%'}</div>
-                  <div className="text-sm opacity-90">Satisfaction Rate</div>
+                  <div className="text-xl font-bold text-white font-sans">{vendor.verified ? '100%' : '95%'}</div>
+                  <div className="text-[9px] text-white/50 uppercase font-sans">Satisfaction</div>
                 </div>
               </div>
             </div>
@@ -539,19 +510,19 @@ Best regards`;
 
         {/* Hire Vendor Modal */}
         {showHireModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white rounded-2xl max-w-4xl w-full my-8">
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white border border-[#DDD0BB] rounded shadow-xl max-w-4xl w-full my-8 font-serif">
               {/* Header */}
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+              <div className="bg-[#FFFDF8] border-b border-[#DDD0BB] px-6 py-4 rounded-t flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold">🤝 Hire {vendor.name}</h2>
-                  <p className="text-sm opacity-90">Send your requirements and get a personalized quote</p>
+                  <h2 className="text-base font-bold text-[#2C1810]">🤝 Hire {vendor.name}</h2>
+                  <p className="text-[10px] text-[#1F1E1B]/50 italic font-sans mt-0.5">Send your requirements and receive a personalised quote</p>
                 </div>
                 <button
                   onClick={() => setShowHireModal(false)}
-                  className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                  className="text-[#1F1E1B]/40 hover:text-[#8A1C2C] transition p-1"
                 >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -559,60 +530,53 @@ Best regards`;
 
               {leadCreated ? (
                 <div className="p-12 text-center">
-                  <div className="text-6xl mb-4">✅</div>
-                  <h3 className="text-3xl font-bold text-green-600 mb-2">Success!</h3>
-                  <p className="text-xl text-gray-700 mb-4">
-                    We've sent your inquiry to {vendor.name}
+                  <div className="text-4xl mb-3">✅</div>
+                  <h3 className="text-lg font-bold text-green-700 mb-2">Inquiry Sent Successfully!</h3>
+                  <p className="text-xs text-[#1F1E1B]/60 italic font-sans mb-2">
+                    We&apos;ve forwarded your inquiry to {vendor.name}.
                   </p>
-                  <p className="text-gray-600">
-                    The vendor will review your requirements and respond within 24-48 hours. 
-                    You can track the status in your dashboard.
+                  <p className="text-[10px] text-[#1F1E1B]/40 font-sans">
+                    The vendor will respond within 24–48 hours. Track status in your dashboard.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={(e) => { e.preventDefault(); handleHireVendor(); }} className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto px-2">
+                <form onSubmit={(e) => { e.preventDefault(); handleHireVendor(); }} className="p-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-1">
                     {/* Customer Information */}
-                    <div className="md:col-span-2 bg-purple-50 p-4 rounded-lg">
-                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <span className="text-xl">👤</span> Your Information
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2 bg-[#FAF6F0] border border-[#DDD0BB] p-4 rounded">
+                      <h3 className="text-xs font-bold text-[#2C1810] uppercase tracking-wider font-sans mb-3">👤 Your Information</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Your Name <span className="text-red-500">*</span>
+                          <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">
+                            Name <span className="text-red-500">*</span>
                           </label>
                           <input
-                            type="text"
-                            required
+                            type="text" required
                             value={hireForm.customerName}
                             onChange={(e) => setHireForm({...hireForm, customerName: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-1.5 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans"
                             placeholder="John Doe"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">
                             Email <span className="text-red-500">*</span>
                           </label>
                           <input
-                            type="email"
-                            required
+                            type="email" required
                             value={hireForm.customerEmail}
                             onChange={(e) => setHireForm({...hireForm, customerEmail: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-1.5 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans"
                             placeholder="john@example.com"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Phone
-                          </label>
+                          <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">Phone</label>
                           <input
                             type="tel"
                             value={hireForm.customerPhone}
                             onChange={(e) => setHireForm({...hireForm, customerPhone: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-1.5 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans"
                             placeholder="+91 98765 43210"
                           />
                         </div>
@@ -620,155 +584,77 @@ Best regards`;
                     </div>
 
                     {/* Event Information */}
-                    <div className="md:col-span-2 bg-pink-50 p-4 rounded-lg">
-                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <span className="text-xl">🎉</span> Event Details
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Event Name
-                          </label>
-                          <input
-                            type="text"
-                            value={hireForm.eventName}
-                            onChange={(e) => setHireForm({...hireForm, eventName: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="e.g., Birthday Party, Wedding"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Event Date
-                          </label>
-                          <input
-                            type="date"
-                            value={hireForm.eventDate}
-                            onChange={(e) => setHireForm({...hireForm, eventDate: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Location
-                          </label>
-                          <input
-                            type="text"
-                            value={hireForm.eventLocation}
-                            onChange={(e) => setHireForm({...hireForm, eventLocation: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="City, State"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Venue
-                          </label>
-                          <input
-                            type="text"
-                            value={hireForm.eventVenue}
-                            onChange={(e) => setHireForm({...hireForm, eventVenue: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Venue name"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Number of Guests
-                          </label>
-                          <input
-                            type="number"
-                            value={hireForm.guestCount}
-                            onChange={(e) => setHireForm({...hireForm, guestCount: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="100"
-                          />
-                        </div>
+                    <div className="md:col-span-2 bg-[#FAF6F0] border border-[#DDD0BB] p-4 rounded">
+                      <h3 className="text-xs font-bold text-[#2C1810] uppercase tracking-wider font-sans mb-3">🎉 Event Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {[{label:'Event Name',key:'eventName',type:'text',ph:'e.g., Birthday Party, Wedding'},
+                          {label:'Event Date',key:'eventDate',type:'date',ph:''},
+                          {label:'Location',key:'eventLocation',type:'text',ph:'City, State'},
+                          {label:'Venue',key:'eventVenue',type:'text',ph:'Venue name'},
+                          {label:'No. of Guests',key:'guestCount',type:'number',ph:'100'}].map(({label,key,type,ph}) => (
+                          <div key={key}>
+                            <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">{label}</label>
+                            <input
+                              type={type}
+                              value={(hireForm as any)[key]}
+                              onChange={(e) => setHireForm({...hireForm, [key]: e.target.value})}
+                              className="w-full px-3 py-1.5 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans"
+                              placeholder={ph}
+                            />
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Budget */}
+                    {/* Budget Range */}
                     <div className="md:col-span-2">
-                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <span className="text-xl">💰</span> Budget Range
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <h3 className="text-xs font-bold text-[#2C1810] uppercase tracking-wider font-sans mb-3">💰 Budget Range (₹)</h3>
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Minimum Budget (₹)
-                          </label>
-                          <input
-                            type="number"
-                            value={hireForm.budgetMin}
-                            onChange={(e) => setHireForm({...hireForm, budgetMin: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="25000"
-                          />
+                          <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">Minimum</label>
+                          <input type="number" value={hireForm.budgetMin} onChange={(e) => setHireForm({...hireForm, budgetMin: e.target.value})}
+                            className="w-full px-3 py-1.5 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans" placeholder="25000" />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Maximum Budget (₹)
-                          </label>
-                          <input
-                            type="number"
-                            value={hireForm.budgetMax}
-                            onChange={(e) => setHireForm({...hireForm, budgetMax: e.target.value})}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="50000"
-                          />
+                          <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">Maximum</label>
+                          <input type="number" value={hireForm.budgetMax} onChange={(e) => setHireForm({...hireForm, budgetMax: e.target.value})}
+                            className="w-full px-3 py-1.5 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans" placeholder="50000" />
                         </div>
                       </div>
                     </div>
 
                     {/* Service Details */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Service Details
-                      </label>
-                      <textarea
-                        value={hireForm.serviceDetails}
-                        onChange={(e) => setHireForm({...hireForm, serviceDetails: e.target.value})}
-                        rows={3}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="What specific services do you need?"
-                      />
+                      <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">Service Details</label>
+                      <textarea value={hireForm.serviceDetails} onChange={(e) => setHireForm({...hireForm, serviceDetails: e.target.value})}
+                        rows={3} className="w-full px-3 py-2 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans"
+                        placeholder="What specific services do you need?" />
                     </div>
 
                     {/* Specific Requirements */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Specific Requirements
-                      </label>
-                      <textarea
-                        value={hireForm.specificRequirements}
-                        onChange={(e) => setHireForm({...hireForm, specificRequirements: e.target.value})}
-                        rows={4}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Any special requirements, preferences, or constraints?"
-                      />
+                      <label className="block text-[10px] font-semibold text-[#1F1E1B]/60 uppercase tracking-wider font-sans mb-1">Specific Requirements</label>
+                      <textarea value={hireForm.specificRequirements} onChange={(e) => setHireForm({...hireForm, specificRequirements: e.target.value})}
+                        rows={3} className="w-full px-3 py-2 text-xs border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-white font-sans"
+                        placeholder="Any special requirements, preferences, or constraints?" />
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-4 mt-6 pt-6 border-t">
-                    <button
-                      type="submit"
-                      disabled={isCreatingLead}
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-lg font-bold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                  <div className="flex gap-3 mt-5 pt-4 border-t border-[#FAF6F0]">
+                    <button type="submit" disabled={isCreatingLead}
+                      className="flex-1 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] py-2.5 rounded text-xs font-bold hover:shadow transition disabled:opacity-50 font-sans"
                     >
                       {isCreatingLead ? '📤 Sending...' : '📤 Send Inquiry'}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowHireModal(false)}
-                      className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all text-lg"
+                    <button type="button" onClick={() => setShowHireModal(false)}
+                      className="px-5 py-2.5 border border-[#DDD0BB] text-[#7A6652] text-xs font-semibold rounded hover:bg-[#FAF6F0] transition font-sans"
                     >
                       Cancel
                     </button>
                   </div>
-
-                  <p className="text-xs text-gray-500 text-center mt-4">
-                    * The vendor will receive your inquiry via email and respond within 24-48 hours
+                  <p className="text-[9px] text-[#1F1E1B]/40 italic text-center mt-3 font-sans">
+                    The vendor will receive your inquiry and respond within 24–48 hours
                   </p>
                 </form>
               )}

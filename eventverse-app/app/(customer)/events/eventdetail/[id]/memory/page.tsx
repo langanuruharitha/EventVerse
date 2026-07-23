@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Camera, Upload, Grid, List, Map, Users, Sparkles, Download, Share2, Plus } from 'lucide-react';
+import { Camera, Upload, Grid, List, Sparkles, Download, Share2, Plus } from 'lucide-react';
 
 interface Album {
   id: string;
@@ -20,27 +20,22 @@ export default function MemoryVaultPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params?.id as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [organizing, setOrganizing] = useState(false);
   const [albums, setAlbums] = useState<Album[]>([]);
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'timeline'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showCreateAlbum, setShowCreateAlbum] = useState(false);
   const [newAlbumName, setNewAlbumName] = useState('');
 
-  useEffect(() => {
-    fetchAlbums();
-  }, [eventId]);
+  useEffect(() => { fetchAlbums(); }, [eventId]);
 
   const fetchAlbums = async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/memory/albums?eventId=${eventId}`);
       const data = await response.json();
-      
-      if (response.ok) {
-        setAlbums(data.albums || []);
-      }
+      if (response.ok) setAlbums(data.albums || []);
     } catch (error) {
       console.error('Error fetching albums:', error);
     } finally {
@@ -56,9 +51,7 @@ export default function MemoryVaultPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ eventId })
       });
-      
       const data = await response.json();
-      
       if (response.ok) {
         alert(`✨ Created ${data.albumsCreated} smart albums with ${data.totalPhotos} photos!`);
         fetchAlbums();
@@ -66,7 +59,6 @@ export default function MemoryVaultPage() {
         alert(data.error || 'Failed to organize photos');
       }
     } catch (error) {
-      console.error('Error organizing photos:', error);
       alert('Failed to organize photos');
     } finally {
       setOrganizing(false);
@@ -74,28 +66,18 @@ export default function MemoryVaultPage() {
   };
 
   const handleCreateAlbum = async () => {
-    if (!newAlbumName.trim()) {
-      alert('Please enter an album name');
-      return;
-    }
-
+    if (!newAlbumName.trim()) { alert('Please enter an album name'); return; }
     try {
       const response = await fetch('/api/memory/albums', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventId,
-          albumName: newAlbumName,
-          description: '',
-          privacySetting: 'private',
-          allowGuestUpload: false,
-          allowDownload: true,
-          allowComments: true
+          eventId, albumName: newAlbumName, description: '',
+          privacySetting: 'private', allowGuestUpload: false,
+          allowDownload: true, allowComments: true
         })
       });
-      
       const data = await response.json();
-      
       if (response.ok) {
         setAlbums([data.album, ...albums]);
         setNewAlbumName('');
@@ -104,218 +86,189 @@ export default function MemoryVaultPage() {
         alert(data.error || 'Failed to create album');
       }
     } catch (error) {
-      console.error('Error creating album:', error);
       alert('Failed to create album');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF6F0] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Memory Vault...</p>
+          <div className="text-4xl mb-3">📷</div>
+          <p className="text-xs text-[#1F1E1B]/50 italic font-sans">Loading Memory Vault...</p>
         </div>
       </div>
     );
   }
 
+  const totalPhotos = albums.reduce((sum, a) => sum + a.photo_count, 0);
+  const totalVideos = albums.reduce((sum, a) => sum + a.video_count, 0);
+  const smartAlbums = albums.filter(a => a.is_smart_album).length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="bg-white border-b border-[#DDD0BB] shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => router.back()}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-xs font-semibold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans"
               >
                 ← Back
               </button>
-              <Camera className="w-6 h-6 text-purple-600" />
+              <div className="w-px h-5 bg-[#DDD0BB]" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Memory Vault</h1>
-                <p className="text-sm text-gray-500">
-                  AI-powered photo organization & sharing
-                </p>
+                <h1 className="text-lg font-bold text-[#2C1810] flex items-center gap-2">
+                  <Camera className="w-5 h-5 text-[#8A1C2C]" /> Memory Vault
+                </h1>
+                <p className="text-[10px] text-[#1F1E1B]/40 italic font-sans">AI-powered photo organization & sharing</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-3">
-              {/* View Mode Toggle */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* View mode */}
+              <div className="flex bg-[#FAF6F0] border border-[#DDD0BB] rounded p-0.5">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow' : ''}`}
+                  className={`p-1.5 rounded transition ${viewMode === 'grid' ? 'bg-white shadow border border-[#DDD0BB]' : ''}`}
                 >
-                  <Grid className="w-5 h-5" />
+                  <Grid className="w-4 h-4 text-[#1F1E1B]/60" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow' : ''}`}
+                  className={`p-1.5 rounded transition ${viewMode === 'list' ? 'bg-white shadow border border-[#DDD0BB]' : ''}`}
                 >
-                  <List className="w-5 h-5" />
+                  <List className="w-4 h-4 text-[#1F1E1B]/60" />
                 </button>
               </div>
-              
-              {/* Action Buttons */}
-              <label className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
-                <Upload className="w-5 h-5" />
-                <span>Upload Photos</span>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*,video/*"
-                  className="hidden"
+
+              <label className="flex items-center gap-1.5 px-3 py-1.5 border border-[#DDD0BB] text-xs font-semibold text-[#1F1E1B]/70 rounded hover:bg-[#FAF6F0] cursor-pointer font-sans transition">
+                <Upload className="w-3.5 h-3.5" /> Upload
+                <input type="file" multiple accept="image/*,video/*" className="hidden"
                   onChange={(e) => {
                     const files = e.target.files;
                     if (files && files.length > 0) {
-                      alert(`Selected ${files.length} file(s). Photo upload feature requires Supabase Storage setup. See MEMORY-VAULT-SETUP-REQUIRED.md for instructions.`);
+                      alert(`Selected ${files.length} file(s). Photo upload requires Supabase Storage setup.`);
                     }
-                  }}
-                />
+                  }} />
               </label>
-              
+
               <button
                 onClick={handleOrganizePhotos}
                 disabled={organizing}
-                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-[#DDD0BB] text-xs font-semibold text-[#1F1E1B]/70 rounded hover:bg-[#FAF6F0] disabled:opacity-50 font-sans transition"
               >
-                <Sparkles className="w-5 h-5" />
-                <span>{organizing ? 'Organizing...' : 'AI Organize'}</span>
+                <Sparkles className="w-3.5 h-3.5" /> {organizing ? 'Organising...' : 'AI Organise'}
               </button>
-              
+
               <button
                 onClick={() => setShowCreateAlbum(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-semibold rounded hover:shadow transition font-sans"
               >
-                <Plus className="w-5 h-5" />
-                <span>New Album</span>
+                <Plus className="w-3.5 h-3.5" /> New Album
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Bar */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="text-sm text-gray-500 mb-1">Total Albums</div>
-            <div className="text-2xl font-bold text-gray-900">{albums.length}</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="text-sm text-gray-500 mb-1">Total Photos</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {albums.reduce((sum, a) => sum + a.photo_count, 0)}
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Albums', value: albums.length },
+            { label: 'Photos', value: totalPhotos },
+            { label: 'Videos', value: totalVideos },
+            { label: 'Smart Albums', value: smartAlbums },
+          ].map((stat, i) => (
+            <div key={i} className="bg-white border border-[#DDD0BB] rounded p-4 text-center shadow-sm">
+              <div className="text-[10px] text-[#1F1E1B]/50 uppercase tracking-wider font-sans mb-1">{stat.label}</div>
+              <div className="text-2xl font-bold text-[#8A1C2C] font-sans">{stat.value}</div>
             </div>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="text-sm text-gray-500 mb-1">Total Videos</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {albums.reduce((sum, a) => sum + a.video_count, 0)}
-            </div>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="text-sm text-gray-500 mb-1">Smart Albums</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {albums.filter(a => a.is_smart_album).length}
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Albums Grid */}
+        {/* Empty State */}
         {albums.length === 0 ? (
-          <div className="bg-white rounded-xl p-12 text-center border border-dashed border-gray-300">
-            <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Albums Yet
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Create your first album or upload photos to get started
-            </p>
-            <div className="flex justify-center space-x-4">
+          <div className="bg-white border border-dashed border-[#DDD0BB] rounded p-12 text-center shadow-sm">
+            <Camera className="w-12 h-12 text-[#DDD0BB] mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-[#2C1810] mb-2">No Albums Yet</h3>
+            <p className="text-xs text-[#1F1E1B]/50 italic mb-6">Create your first album or upload photos to begin</p>
+            <div className="flex justify-center gap-3">
               <button
                 onClick={() => setShowCreateAlbum(true)}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                className="px-5 py-2 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-semibold rounded hover:shadow font-sans transition"
               >
                 Create Album
               </button>
-              <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="px-5 py-2 border border-[#DDD0BB] text-[#7A6652] text-xs font-semibold rounded hover:bg-[#FAF6F0] font-sans transition">
                 Upload Photos
               </button>
             </div>
           </div>
         ) : (
-          <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-6' : 'space-y-4'}>
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-3 gap-5' : 'space-y-4'}>
             {albums.map((album) => (
               <div
                 key={album.id}
-                className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
+                className="bg-white border border-[#DDD0BB] rounded shadow-sm overflow-hidden hover:shadow-md transition-shadow"
               >
-                {/* Album Cover */}
-                <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 relative">
+                {/* Cover */}
+                <div className="aspect-video bg-[#EDE0CC] relative">
                   {album.cover_image_url ? (
-                    <img
-                      src={album.cover_image_url}
-                      alt={album.album_name}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={album.cover_image_url} alt={album.album_name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <Camera className="w-12 h-12 text-gray-400" />
+                      <Camera className="w-10 h-10 text-[#DDD0BB]" />
                     </div>
                   )}
                   {album.is_smart_album && (
-                    <div className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-lg text-xs flex items-center space-x-1">
-                      <Sparkles className="w-3 h-3" />
-                      <span>Smart</span>
+                    <div className="absolute top-2 right-2 bg-[#8A1C2C] text-[#FAF0E0] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 font-sans">
+                      <Sparkles className="w-2.5 h-2.5" /> Smart
                     </div>
                   )}
                 </div>
-                
-                {/* Album Info */}
+
+                {/* Info */}
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    {album.album_name}
-                  </h3>
+                  <h3 className="font-bold text-sm text-[#2C1810] mb-0.5">{album.album_name}</h3>
                   {album.description && (
-                    <p className="text-sm text-gray-500 mb-2 line-clamp-2">
-                      {album.description}
-                    </p>
+                    <p className="text-[11px] text-[#1F1E1B]/50 italic mb-2 line-clamp-2">{album.description}</p>
                   )}
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center justify-between text-[10px] text-[#1F1E1B]/40 font-sans mb-3">
                     <span>{album.photo_count} photos</span>
-                    <span>{new Date(album.created_at).toLocaleDateString()}</span>
+                    <span>{new Date(album.created_at).toLocaleDateString('en-IN')}</span>
                   </div>
-                  
+
                   {/* Actions */}
-                  <div className="flex items-center space-x-2 mt-3 pt-3 border-t border-gray-100">
-                    <button 
-                      onClick={() => alert(`View feature: Album "${album.album_name}" will show all photos. Create album detail page to enable this.`)}
-                      className="flex-1 text-sm px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  <div className="flex items-center gap-1.5 border-t border-[#FAF6F0] pt-3">
+                    <button
+                      onClick={() => alert(`View feature: Album "${album.album_name}". Create album detail page to enable.`)}
+                      className="flex-1 text-[11px] font-semibold py-1.5 border border-[#DDD0BB] rounded text-[#7A6652] hover:bg-[#FAF6F0] transition font-sans"
                     >
                       View
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const shareUrl = `${window.location.origin}/memory/shared/${album.id}`;
                         navigator.clipboard.writeText(shareUrl);
-                        alert(`Share link copied to clipboard!\n\n${shareUrl}\n\nNote: Sharing feature requires share page implementation.`);
+                        alert(`Share link copied!\n${shareUrl}`);
                       }}
-                      className="p-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+                      className="p-1.5 border border-[#DDD0BB] rounded hover:bg-[#FAF6F0] transition"
                       title="Share album"
                     >
-                      <Share2 className="w-4 h-4" />
+                      <Share2 className="w-3.5 h-3.5 text-[#7A6652]" />
                     </button>
-                    <button 
-                      onClick={() => alert(`Download feature: Would download all ${album.photo_count} photos from "${album.album_name}". Requires download API implementation.`)}
-                      className="p-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    <button
+                      onClick={() => alert(`Download: ${album.photo_count} photos from "${album.album_name}". Requires download API.`)}
+                      className="p-1.5 border border-[#DDD0BB] rounded hover:bg-[#FAF6F0] transition"
                       title="Download album"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download className="w-3.5 h-3.5 text-[#7A6652]" />
                     </button>
                   </div>
                 </div>
@@ -327,36 +280,32 @@ export default function MemoryVaultPage() {
 
       {/* Create Album Modal */}
       {showCreateAlbum && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Create New Album</h2>
-            
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-[#DDD0BB] rounded shadow-xl p-6 max-w-sm w-full">
+            <h2 className="text-base font-bold text-[#2C1810] mb-4">Create New Album</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-[#1F1E1B]/70 uppercase tracking-wider font-sans mb-2">
                 Album Name
               </label>
               <input
                 type="text"
                 value={newAlbumName}
                 onChange={(e) => setNewAlbumName(e.target.value)}
-                placeholder="e.g., Wedding Ceremony, Reception, Pre-Wedding"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="e.g., Wedding Ceremony, Reception..."
+                className="w-full px-3 py-2 text-sm border border-[#DDD0BB] rounded focus:outline-none focus:border-[#8A1C2C] bg-[#FAF6F0] font-sans"
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateAlbum()}
               />
             </div>
-            
-            <div className="flex space-x-3">
+            <div className="flex gap-2">
               <button
-                onClick={() => {
-                  setShowCreateAlbum(false);
-                  setNewAlbumName('');
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                onClick={() => { setShowCreateAlbum(false); setNewAlbumName(''); }}
+                className="flex-1 px-4 py-2 border border-[#DDD0BB] text-[#7A6652] text-xs font-semibold rounded hover:bg-[#FAF6F0] font-sans transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateAlbum}
-                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-semibold rounded hover:shadow font-sans transition"
               >
                 Create Album
               </button>

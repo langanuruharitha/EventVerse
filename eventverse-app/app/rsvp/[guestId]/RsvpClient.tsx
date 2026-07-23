@@ -22,7 +22,6 @@ export default function RsvpClient({ guestId, currentStatus }: RsvpClientProps) 
       });
 
       if (!res.ok) throw new Error('Failed to update RSVP');
-      
       setStatus(newStatus);
     } catch (error) {
       console.error('RSVP Error:', error);
@@ -34,46 +33,55 @@ export default function RsvpClient({ guestId, currentStatus }: RsvpClientProps) 
 
   if (status === 'confirmed') {
     return (
-      <div className="text-center py-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-          <Check className="w-8 h-8" />
+      <div className="text-center py-6 space-y-3">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-500/10 border-2 border-green-500/20 text-green-600">
+          <Check className="w-7 h-7" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">You're confirmed!</h3>
-        <p className="text-gray-600">We're looking forward to seeing you.</p>
+        <h3 className="text-lg font-bold text-[#1F1E1B]">Attendance Confirmed!</h3>
+        <p className="text-xs text-[#1F1E1B]/50 italic font-sans">
+          We look forward to celebrating with you.
+        </p>
       </div>
     );
   }
 
   if (status === 'declined') {
     return (
-      <div className="text-center py-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-600 mb-4">
-          <X className="w-8 h-8" />
+      <div className="text-center py-6 space-y-3">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-500/10 border-2 border-red-500/20 text-red-500">
+          <X className="w-7 h-7" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">You've declined.</h3>
-        <p className="text-gray-600">We're sorry you can't make it!</p>
+        <h3 className="text-lg font-bold text-[#1F1E1B]">Regrets Noted</h3>
+        <p className="text-xs text-[#1F1E1B]/50 italic font-sans">
+          We&apos;re sorry you can&apos;t make it. You will be missed.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 font-sans">
       <button
         onClick={() => handleRsvp('confirmed')}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:opacity-90 transition-all disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-50 hover:shadow-lg"
+        style={{
+          background: 'linear-gradient(135deg, #8A1C2C 0%, #6B1522 100%)',
+          color: '#FAF0E0',
+          boxShadow: '0 4px 14px rgba(138,28,44,0.25)',
+        }}
       >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-        Yes, I'll be there!
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+        Yes, I&apos;ll be there!
       </button>
 
       <button
         onClick={() => handleRsvp('declined')}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gray-100 text-gray-700 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-[#DDD0BB] bg-[#FAF6F0] text-[#7A6652] rounded text-sm font-semibold uppercase tracking-wider hover:bg-[#EDE0CC] transition-all disabled:opacity-50"
       >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
-        No, I can't make it
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+        Sorry, I can&apos;t make it
       </button>
     </div>
   );

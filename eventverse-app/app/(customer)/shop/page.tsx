@@ -32,94 +32,107 @@ export default async function ShopPage() {
     .limit(8);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-20 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">🛒 EventVerse Shop</h1>
-          <p className="text-2xl mb-8 text-purple-100">
-            Everything you need for your perfect event!
-          </p>
-          
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for decorations, gifts, party supplies..."
-                className="w-full px-6 py-4 rounded-full text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-purple-300"
-              />
-              <button className="absolute right-2 top-2 px-8 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:from-purple-700 hover:to-pink-700 transition-all">
-                Search
-              </button>
+    <div className="min-h-screen bg-[#FAF6F0] text-[#1F1E1B] font-serif p-8">
+      <div className="max-w-7xl mx-auto space-y-12">
+        
+        {/* Hero Section Ornate Frame */}
+        <div className="relative bg-white rounded-lg border-2 border-double border-[#C5A880] p-8 sm:p-10 shadow-md">
+          <div className="absolute top-2 left-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute top-2 right-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute bottom-2 left-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute bottom-2 right-2 text-sm text-[#C5A880]">❦</div>
+
+          <div className="text-center relative space-y-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded border border-[#C5A880]/30 bg-[#FAF6F0] text-[#C5A880] text-xs font-semibold uppercase tracking-wider font-sans">
+              ⚜ Heritage Store
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#2C1810]">
+              EventVerse Shop
+            </h1>
+            <p className="text-sm sm:text-base text-[#1F1E1B]/70 italic max-w-xl mx-auto">
+              "Curated event collections, luxury gifts, traditional decors, and party accessories."
+            </p>
+
+            {/* Ornamental divider */}
+            <div className="flex items-center justify-center gap-3">
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#C5A880]" />
+              <span className="text-xs text-[#C5A880]">❦</span>
+              <div className="h-px w-16 bg-gradient-to-r from-[#C5A880] to-transparent" />
+            </div>
+
+            {/* Search Bar */}
+            <div className="max-w-2xl mx-auto mt-6">
+              <div className="flex border border-[#DDD0BB] rounded bg-[#FFFDF8] overflow-hidden">
+                <input
+                  type="text"
+                  placeholder="Search decorations, party supplies, and premium gifts..."
+                  className="w-full px-5 py-3 text-sm focus:outline-none text-[#2C1810] placeholder-[#9B8B7A]"
+                  style={{ background: 'transparent' }}
+                />
+                <button
+                  className="px-6 text-xs font-semibold uppercase tracking-widest text-[#FAF0E0] transition-colors"
+                  style={{ background: 'linear-gradient(135deg, #8A1C2C 0%, #6B1522 100%)' }}
+                >
+                  Search
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto p-6">
         {/* Category Grid */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Shop by Category</h2>
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold text-[#1F1E1B] flex items-center gap-3">
+            <span className="text-[#C5A880]">❦</span> Shop by Category
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {categories?.map((category) => (
               <Link
                 key={category.id}
                 href={`/shop/${category.slug}`}
-                className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-center"
+                className="bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] p-6 hover:shadow-md transition-all text-center group"
               >
-                <div className="text-5xl mb-3">
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
                   {category.icon_name || '🎉'}
                 </div>
-                <h3 className="font-bold text-gray-900">{category.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">{category.description}</p>
+                <h3 className="font-bold text-[#1F1E1B] text-sm group-hover:text-[#8A1C2C] transition-colors">{category.name}</h3>
+                <p className="text-[11px] text-[#1F1E1B]/60 italic mt-1.5 leading-relaxed">{category.description}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* Quick Links */}
-        <section className="mb-12">
+        {/* Event Quick Links */}
+        <section className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link
-              href="/shop/event/birthday"
-              className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-xl p-6 text-center hover:shadow-lg transition-all"
-            >
-              <div className="text-4xl mb-2">🎂</div>
-              <div className="font-semibold text-gray-800">Birthday</div>
-            </Link>
-            <Link
-              href="/shop/event/wedding"
-              className="bg-gradient-to-br from-pink-100 to-red-100 rounded-xl p-6 text-center hover:shadow-lg transition-all"
-            >
-              <div className="text-4xl mb-2">💍</div>
-              <div className="font-semibold text-gray-800">Wedding</div>
-            </Link>
-            <Link
-              href="/shop/event/anniversary"
-              className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl p-6 text-center hover:shadow-lg transition-all"
-            >
-              <div className="text-4xl mb-2">💐</div>
-              <div className="font-semibold text-gray-800">Anniversary</div>
-            </Link>
-            <Link
-              href="/shop/event/corporate"
-              className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl p-6 text-center hover:shadow-lg transition-all"
-            >
-              <div className="text-4xl mb-2">🏢</div>
-              <div className="font-semibold text-gray-800">Corporate</div>
-            </Link>
+            {[
+              { slug: 'birthday', name: 'Birthday Store', icon: '🎂', bg: 'bg-[#FFFDF8] border-[#DDD0BB]' },
+              { slug: 'wedding', name: 'Wedding Store', icon: '💍', bg: 'bg-[#FFFDF8] border-[#DDD0BB]' },
+              { slug: 'anniversary', name: 'Anniversary Store', icon: '💐', bg: 'bg-[#FFFDF8] border-[#DDD0BB]' },
+              { slug: 'corporate', name: 'Corporate Store', icon: '🏢', bg: 'bg-[#FFFDF8] border-[#DDD0BB]' }
+            ].map((link, i) => (
+              <Link
+                key={i}
+                href={`/shop/event/${link.slug}`}
+                className={`rounded border p-6 text-center hover:shadow-md transition-all hover:border-[#8A1C2C] ${link.bg}`}
+              >
+                <div className="text-3xl mb-2">{link.icon}</div>
+                <div className="font-bold text-[#1F1E1B] text-sm">{link.name}</div>
+              </Link>
+            ))}
           </div>
         </section>
 
         {/* Featured Products */}
         {featuredProducts && featuredProducts.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-gray-900">Featured Products</h2>
+          <section className="space-y-6">
+            <div className="flex items-center justify-between border-b border-[#FAF6F0] pb-2">
+              <h2 className="text-2xl font-bold text-[#1F1E1B] flex items-center gap-3">
+                <span className="text-[#C5A880]">❦</span> Featured Products
+              </h2>
               <Link
                 href="/shop/featured"
-                className="text-purple-600 hover:text-purple-700 font-semibold"
+                className="text-xs font-bold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans"
               >
                 View All →
               </Link>
@@ -129,41 +142,45 @@ export default async function ShopPage() {
                 <Link
                   key={product.id}
                   href={`/shop/product/${product.slug}`}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all group"
+                  className="bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
                 >
-                  <div className="relative overflow-hidden rounded-t-xl h-48">
-                    <ProductImage
-                      product={product}
-                      alt={product.name}
-                      className="group-hover:scale-110 transition-transform duration-300"
-                    />
-                    {product.discount_percentage > 0 && (
-                      <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        {product.discount_percentage}% OFF
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-purple-600">
-                        ₹{product.price.toLocaleString('en-IN')}
-                      </span>
-                      {product.original_price && product.original_price > product.price && (
-                        <span className="text-sm text-gray-400 line-through">
-                          ₹{product.original_price.toLocaleString('en-IN')}
-                        </span>
+                  <div>
+                    <div className="relative overflow-hidden h-48 bg-[#FAF6F0]">
+                      <ProductImage
+                        product={product}
+                        alt={product.name}
+                        className="group-hover:scale-105 transition-transform duration-500 w-full h-full object-cover"
+                      />
+                      {product.discount_percentage > 0 && (
+                        <div className="absolute top-2 right-2 bg-[#8A1C2C] text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                          {product.discount_percentage}% OFF
+                        </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      <span className="text-yellow-500">⭐</span>
-                      <span className="text-sm text-gray-600">
+                    <div className="p-4 space-y-2">
+                      <h3 className="font-bold text-[#1F1E1B] text-sm line-clamp-2 leading-relaxed">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold text-[#8A1C2C]">
+                          ₹{product.price.toLocaleString('en-IN')}
+                        </span>
+                        {product.original_price && product.original_price > product.price && (
+                          <span className="text-xs text-[#1F1E1B]/40 line-through">
+                            ₹{product.original_price.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 pt-0 space-y-2">
+                    <div className="flex items-center gap-1.5 text-xs text-[#C5A880] font-sans">
+                      <span>⭐</span>
+                      <span className="font-bold text-[#1F1E1B]/70">
                         {product.rating_average.toFixed(1)} ({product.review_count})
                       </span>
                     </div>
-                    <div className="text-xs text-green-600 font-medium mt-2">📅 Delivery in 4–7 days</div>
+                    <div className="text-[10px] text-emerald-700 italic border-t border-[#FAF6F0] pt-2">📅 Delivery in 4–7 days</div>
                   </div>
                 </Link>
               ))}
@@ -173,12 +190,14 @@ export default async function ShopPage() {
 
         {/* Bestsellers */}
         {bestsellers && bestsellers.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-gray-900">🔥 Bestsellers</h2>
+          <section className="space-y-6">
+            <div className="flex items-center justify-between border-b border-[#FAF6F0] pb-2">
+              <h2 className="text-2xl font-bold text-[#1F1E1B] flex items-center gap-3">
+                <span className="text-[#C5A880]">❦</span> Bestsellers
+              </h2>
               <Link
                 href="/shop/bestsellers"
-                className="text-purple-600 hover:text-purple-700 font-semibold"
+                className="text-xs font-bold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans"
               >
                 View All →
               </Link>
@@ -188,37 +207,36 @@ export default async function ShopPage() {
                 <Link
                   key={product.id}
                   href={`/shop/product/${product.slug}`}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all group"
+                  className="bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
                 >
-                  <div className="relative overflow-hidden rounded-t-xl h-48">
-                    <ProductImage
-                      product={product}
-                      alt={product.name}
-                      className="group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                      🔥 Bestseller
+                  <div>
+                    <div className="relative overflow-hidden h-48 bg-[#FAF6F0]">
+                      <ProductImage
+                        product={product}
+                        alt={product.name}
+                        className="group-hover:scale-105 transition-transform duration-500 w-full h-full object-cover"
+                      />
+                      <div className="absolute top-2 left-2 bg-[#9B7A4A] text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                        🔥 Bestseller
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <h3 className="font-bold text-[#1F1E1B] text-sm line-clamp-2 leading-relaxed">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold text-[#8A1C2C]">
+                          ₹{product.price.toLocaleString('en-IN')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-purple-600">
-                        ₹{product.price.toLocaleString('en-IN')}
-                      </span>
+                  <div className="p-4 pt-0 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-[#1F1E1B]/50 font-sans">
+                      <span className="text-[#C5A880]">⭐ {product.rating_average.toFixed(1)}</span>
+                      <span>{product.sales_count} sold</span>
                     </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      <span className="text-yellow-500">⭐</span>
-                      <span className="text-sm text-gray-600">
-                        {product.rating_average.toFixed(1)}
-                      </span>
-                      <span className="text-xs text-gray-400 ml-auto">
-                        {product.sales_count} sold
-                      </span>
-                    </div>
-                    <div className="text-xs text-green-600 font-medium mt-2">📅 Delivery in 4–7 days</div>
+                    <div className="text-[10px] text-emerald-700 italic border-t border-[#FAF6F0] pt-2">📅 Delivery in 4–7 days</div>
                   </div>
                 </Link>
               ))}
@@ -227,28 +245,20 @@ export default async function ShopPage() {
         )}
 
         {/* Benefits Section */}
-        <section className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 text-center">
-              <div className="text-4xl mb-3">🚚</div>
-              <h3 className="font-bold text-gray-900 mb-2">Free Shipping</h3>
-              <p className="text-sm text-gray-600">On orders above ₹999</p>
-            </div>
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 text-center">
-              <div className="text-4xl mb-3">💯</div>
-              <h3 className="font-bold text-gray-900 mb-2">Quality Assured</h3>
-              <p className="text-sm text-gray-600">100% authentic products</p>
-            </div>
-            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 text-center">
-              <div className="text-4xl mb-3">↩️</div>
-              <h3 className="font-bold text-gray-900 mb-2">Easy Returns</h3>
-              <p className="text-sm text-gray-600">7 days return policy</p>
-            </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 text-center">
-              <div className="text-4xl mb-3">🎁</div>
-              <h3 className="font-bold text-gray-900 mb-2">Gift Wrapping</h3>
-              <p className="text-sm text-gray-600">Free on request</p>
-            </div>
+        <section className="pt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { label: 'Free Shipping', desc: 'On orders above ₹999', icon: '🚚' },
+              { label: 'Quality Assured', desc: '100% authentic items', icon: '💯' },
+              { label: 'Easy Returns', desc: '7 days return register', icon: '↩️' },
+              { label: 'Gift Wrapping', desc: 'Available on request', icon: '🎁' }
+            ].map((ben, i) => (
+              <div key={i} className="bg-white rounded border border-[#DDD0BB] p-6 text-center shadow-sm">
+                <div className="text-3xl mb-3">{ben.icon}</div>
+                <h3 className="font-bold text-[#1F1E1B] text-sm mb-1">{ben.label}</h3>
+                <p className="text-xs text-[#1F1E1B]/60 italic">{ben.desc}</p>
+              </div>
+            ))}
           </div>
         </section>
       </div>

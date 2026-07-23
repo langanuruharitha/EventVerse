@@ -152,18 +152,16 @@ export default function EventTypePage({ params }: { params: Promise<{ eventType:
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
-          <div className="container mx-auto px-4">
-            <Button
-              variant="ghost"
+        <div className="bg-[#2C1810] text-[#FAF0E0] py-10 border-b border-[#C5A880]/30 relative">
+          <div className="max-w-7xl mx-auto px-4">
+            <button
               onClick={() => router.push('/shop')}
-              className="gap-2 mb-4 text-white hover:bg-white/20"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C5A880] hover:text-[#FAF0E0] uppercase tracking-wider font-sans mb-4 transition"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Shop
-            </Button>
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Shop
+            </button>
             <div className="text-center">
               <div className="text-6xl mb-4">{eventInfo.icon}</div>
               <h1 className="text-4xl font-bold mb-2">{eventInfo.title}</h1>
@@ -235,7 +233,7 @@ export default function EventTypePage({ params }: { params: Promise<{ eventType:
 
                     {/* Price */}
                     <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-2xl font-bold text-purple-600">
+                      <span className="text-2xl font-bold text-[#8A1C2C] font-sans">
                         ₹{product.price.toFixed(2)}
                       </span>
                       {product.original_price && product.original_price > product.price && (

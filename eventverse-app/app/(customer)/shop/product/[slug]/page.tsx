@@ -178,22 +178,20 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const allImages = resolveProductGallery(product);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <Button
-            variant="ghost"
+      <div className="bg-white border-b border-[#DDD0BB] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <button
             onClick={() => router.back()}
-            className="gap-2"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans transition"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
+            <ArrowLeft className="w-3.5 h-3.5" /> Back
+          </button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Images */}
           <div className="space-y-4">
@@ -215,7 +213,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                     key={idx}
                     onClick={() => setSelectedImage(img)}
                     className={`aspect-square rounded-lg overflow-hidden border-2 transition ${
-                      selectedImage === img ? 'border-purple-500' : 'border-gray-200'
+                      selectedImage === img ? 'border-[#8A1C2C]' : 'border-[#DDD0BB]'
                     }`}
                   >
                     <ProductImage
@@ -257,18 +255,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
             {/* Price */}
             <div className="space-y-2">
-              <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-bold text-purple-600">
+              <div className="flex items-baseline gap-3 font-sans">
+                <span className="text-4xl font-bold text-[#8A1C2C]">
                   ₹{product.price.toFixed(2)}
                 </span>
                 {product.original_price && product.original_price > product.price && (
                   <>
-                    <span className="text-xl text-gray-400 line-through">
+                    <span className="text-xl text-[#1F1E1B]/40 line-through">
                       ₹{product.original_price.toFixed(2)}
                     </span>
-                    <Badge className="bg-green-100 text-green-800">
+                    <span className="px-2 py-0.5 bg-[#8A1C2C] text-[#FAF0E0] text-[10px] font-bold rounded uppercase tracking-wider">
                       {discount}% OFF
-                    </Badge>
+                    </span>
                   </>
                 )}
               </div>
@@ -352,31 +350,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 pt-4">
-              <Button
-                variant="primary"
-                size="lg"
-                className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            <div className="space-y-3 pt-4 font-sans">
+              <button
                 disabled={addingToCart || product.stock_quantity === 0}
                 onClick={async (e) => {
                   e.stopPropagation();
                   await handleAddToCart();
                   router.push('/shop/cart/checkout');
                 }}
+                className="w-full py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded hover:shadow-lg transition disabled:opacity-50"
               >
                 Buy Now
-              </Button>
+              </button>
               <div className="flex gap-3">
-                <Button
+                <button
                   onClick={handleAddToCart}
                   disabled={addingToCart || product.stock_quantity === 0}
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  size="lg"
+                  className="flex-1 py-3 border border-[#DDD0BB] bg-white text-[#7A6652] text-xs font-bold uppercase tracking-wider rounded hover:bg-[#FAF6F0] transition flex items-center justify-center gap-2"
                 >
-                  <ShoppingCart className="w-5 h-5" />
+                  <ShoppingCart className="w-4 h-4" />
                   {addingToCart ? 'Adding...' : 'Add to Cart'}
-                </Button>
+                </button>
                 <Button 
                   variant="outline" 
                   size="lg"

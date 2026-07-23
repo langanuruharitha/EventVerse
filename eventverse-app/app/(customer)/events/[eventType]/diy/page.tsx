@@ -127,34 +127,44 @@ export default function DIYPlanningPage({ params }: { params: Promise<{ eventTyp
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#FAF6F0] text-[#1F1E1B] font-serif p-8">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="text-6xl mb-4">{eventTypeInfo.icon}</div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Plan Your {eventTypeInfo.name}
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Tell us your requirements and let AI create a complete plan! 🤖
-          </p>
+        <div className="relative bg-white rounded-lg border-2 border-double border-[#C5A880] p-8 shadow-md">
+          {/* Decorative Corner Ornaments */}
+          <div className="absolute top-2 left-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute top-2 right-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute bottom-2 left-2 text-sm text-[#C5A880]">❦</div>
+          <div className="absolute bottom-2 right-2 text-sm text-[#C5A880]">❦</div>
+
+          <div className="text-center relative space-y-4">
+            <div className="text-5xl mb-2">{eventTypeInfo.icon}</div>
+            <h1 className="text-3xl font-bold tracking-tight text-[#2C1810]">
+              Plan Your {eventTypeInfo.name}
+            </h1>
+            <p className="text-sm text-[#1F1E1B]/70 italic">
+              "Input your preferences and let our AI system generate a personalized heritage blueprint checklist."
+            </p>
+          </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8">
+        <form onSubmit={handleSubmit} className="bg-white rounded border border-[#DDD0BB] shadow-sm p-8 space-y-6">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+            <div className="p-3 rounded text-sm text-center"
+              style={{ background: '#FFF0F0', border: '1px solid #F5BDBD', color: '#8A1C2C' }}>
               {error}
             </div>
           )}
 
           {loading && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="p-4 rounded border"
+              style={{ background: 'rgba(197,168,128,0.08)', borderColor: '#C5A880' }}>
               <div className="flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                <div className="text-blue-800">
-                  <div className="font-semibold">🤖 Generating AI Blueprint...</div>
-                  <div className="text-sm">This may take 10-15 seconds</div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderBottomColor: '#8A1C2C' }} />
+                <div>
+                  <div className="font-bold text-[#8A1C2C] text-sm">🤖 Generating AI Blueprint...</div>
+                  <div className="text-xs text-[#7A6652] italic font-sans mt-0.5">Please wait, this will take approximately 10-15 seconds</div>
                 </div>
               </div>
             </div>
@@ -540,21 +550,26 @@ export default function DIYPlanningPage({ params }: { params: Promise<{ eventTyp
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+              className="w-full py-3.5 text-sm font-semibold tracking-widest uppercase rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: 'linear-gradient(135deg, #8A1C2C 0%, #6B1522 100%)',
+                color: '#FAF0E0',
+                boxShadow: '0 4px 16px rgba(138,28,44,0.3)',
+              }}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Generating AI Plan...
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  Generating Plan...
                 </span>
               ) : (
                 '🤖 Generate AI Event Plan'
               )}
             </button>
 
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-700 text-center">
-                <strong>✨ What you'll get:</strong> Complete event blueprint with budget breakdown, timeline, task checklist, shopping list, vendor recommendations, decoration ideas, and food suggestions - all personalized for your requirements!
+            <div className="bg-[#FAF6F0] border border-[#DDD0BB] p-4 rounded text-xs italic">
+              <p className="text-[#1F1E1B]/70 text-center">
+                <strong>✨ What you&apos;ll get:</strong> Complete event blueprint with budget breakdown, timeline, task checklist, shopping list, vendor recommendations, decoration ideas, and food suggestions - all personalized for your requirements!
               </p>
             </div>
           </div>
@@ -564,9 +579,9 @@ export default function DIYPlanningPage({ params }: { params: Promise<{ eventTyp
         <div className="mt-8 text-center">
           <Link
             href={`/events/${eventTypeSlug}`}
-            className="inline-flex items-center text-gray-600 hover:text-purple-600 transition-colors"
+            className="inline-flex items-center text-xs font-bold text-[#1F1E1B]/70 hover:text-[#8A1C2C] uppercase tracking-wider font-sans transition-colors"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Planning Options

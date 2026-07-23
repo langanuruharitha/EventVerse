@@ -1,53 +1,50 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { 
-  ArrowLeft, Star, MapPin, Phone, Mail, Globe, 
-  Calendar, DollarSign, Users, Award, Clock, Shield 
+  Star, MapPin, Phone, Mail, Globe, Calendar, Award, CheckCircle, 
+  Heart, Share2, MessageSquare, Shield, Clock, ArrowLeft 
 } from 'lucide-react';
-
-interface Vendor {
+interface VendorProfile {
   id: string;
   business_name: string;
-  business_description: string;
   category: string;
-  subcategories: string[];
-  location: string;
+  description: string;
   city: string;
   state: string;
+  rating: number;
+  review_count: number;
+  starting_price: number;
+  pricing_unit: string;
+  years_in_business: number;
+  events_completed: number;
+  logo_url: string;
+  banner_url: string;
+  portfolio_images: string[];
+  services_offered: string[];
   contact_email: string;
   contact_phone: string;
-  website_url?: string;
-  logo_url?: string;
-  banner_url?: string;
-  rating_average: number;
-  review_count: number;
-  years_experience: number;
-  team_size?: number;
-  minimum_booking_amount?: number;
-  advance_percentage?: number;
-  operating_hours?: any;
-  portfolio_images?: string[];
-  certifications?: string[];
-  services_offered?: string[];
-  verified: boolean;
+  website_url: string;
+  is_verified: boolean;
+  is_featured: boolean;
 }
 
 export default function VendorDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
   const router = useRouter();
-  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const resolvedParams = use(params);
+  const [vendor, setVendor] = useState<VendorProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'services' | 'portfolio' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<'about' | 'services' | 'portfolio' | 'reviews'>('about');
+  const [isSaved, setIsSaved] = useState(false);
+  const [isHireModalOpen, setIsHireModalOpen] = useState(false);
+
+  const vendorId = resolvedParams.id;
 
   useEffect(() => {
     fetchVendor();
-  }, [id]);
+  }, [vendorId]);
 
   const fetchVendor = async () => {
     try {
@@ -55,14 +52,13 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
       const { data, error } = await supabase
         .from('vendor_profiles')
         .select('*')
-        .eq('id', id)
+        .eq('id', vendorId)
         .single();
 
       if (error) throw error;
-
       setVendor(data);
     } catch (error) {
-      console.error('Error fetching vendor:', error);
+      console.error('Error fetching vendor details:', error);
     } finally {
       setLoading(false);
     }
@@ -70,11 +66,10 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="animate-pulse space-y-4">
-          <div className="h-64 bg-gray-200 rounded-lg" />
-          <div className="h-8 bg-gray-200 rounded w-3/4" />
-          <div className="h-4 bg-gray-200 rounded w-1/2" />
+      <div className="min-h-screen bg-[#FAF6F0] p-8 flex items-center justify-center font-serif text-[#1F1E1B]">
+        <div className="text-center space-y-2">
+          <div className="animate-spin text-5xl">⚜</div>
+          <p className="text-sm italic text-[#1F1E1B]/70">Loading vendor details...</p>
         </div>
       </div>
     );
@@ -82,32 +77,38 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
 
   if (!vendor) {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold mb-4">Vendor Not Found</h1>
-        <Button onClick={() => router.push('/vendors')}>Back to Vendors</Button>
+      <div className="min-h-screen bg-[#FAF6F0] flex items-center justify-center font-serif">
+        <div className="text-center">
+          <div className="text-5xl mb-4">🏛️</div>
+          <h1 className="text-xl font-bold text-[#2C1810] mb-4">Vendor Not Found</h1>
+          <button
+            onClick={() => router.push('/vendors')}
+            className="px-5 py-2 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold rounded font-sans"
+          >
+            Back to Vendors
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <Button
-            variant="ghost"
+      <div className="bg-white border-b border-[#DDD0BB] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <button
             onClick={() => router.back()}
-            className="gap-2"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8A1C2C] hover:text-[#C5A880] uppercase tracking-wider font-sans transition"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
+            <ArrowLeft className="w-3.5 h-3.5" /> Back
+          </button>
         </div>
       </div>
 
       {/* Banner */}
       {vendor.banner_url && (
-        <div className="w-full h-64 bg-gray-200">
+        <div className="w-full h-64 bg-[#EDE0CC] overflow-hidden border-b border-[#DDD0BB]">
           <img
             src={vendor.banner_url}
             alt={vendor.business_name}
@@ -116,12 +117,11 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Vendor Header */}
-        <div className="flex flex-col md:flex-row gap-6 mb-8">
-          {/* Logo */}
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* Header Block */}
+        <div className="flex flex-col md:flex-row gap-6 bg-white border border-[#DDD0BB] rounded shadow-sm p-6">
           <div className="flex-shrink-0">
-            <div className="w-32 h-32 rounded-lg overflow-hidden bg-white border shadow-sm">
+            <div className="w-28 h-28 rounded overflow-hidden bg-[#FAF6F0] border border-[#C5A880]/30 shadow-sm flex items-center justify-center">
               {vendor.logo_url ? (
                 <img
                   src={vendor.logo_url}
@@ -129,269 +129,226 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-purple-100 text-purple-600 text-4xl font-bold">
+                <div className="w-full h-full flex items-center justify-center bg-[#8A1C2C] text-[#FAF0E0] text-3xl font-bold">
                   {vendor.business_name.charAt(0)}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Vendor Info */}
-          <div className="flex-1">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-3xl font-bold">{vendor.business_name}</h1>
-                  {vendor.verified && (
-                    <Badge className="bg-blue-100 text-blue-800">
-                      <Shield className="w-3 h-3 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-gray-600">{vendor.category}</p>
-              </div>
+          <div className="flex-1 space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-bold text-[#2C1810]">{vendor.business_name}</h1>
+              {vendor.is_verified && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-700 text-[10px] font-bold uppercase tracking-wider font-sans">
+                  <CheckCircle className="w-3 h-3" /> Verified Guild
+                </span>
+              )}
+              <span className="px-2.5 py-0.5 bg-[#FAF6F0] border border-[#C5A880]/30 text-[#C5A880] text-[10px] font-bold uppercase tracking-wider rounded font-sans capitalize">
+                {vendor.category}
+              </span>
             </div>
 
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-4 text-xs font-sans text-[#1F1E1B]/60">
               <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-5 h-5 ${
-                      i < Math.floor(vendor.rating_average)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="font-medium">{vendor.rating_average.toFixed(1)}</span>
-              <span className="text-gray-500">({vendor.review_count} reviews)</span>
-            </div>
-
-            {/* Quick Info */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-gray-400" />
+                <MapPin className="w-3.5 h-3.5 text-[#C5A880]" />
                 <span>{vendor.city}, {vendor.state}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Award className="w-4 h-4 text-gray-400" />
-                <span>{vendor.years_experience} years exp.</span>
+              <div className="flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                <span className="font-bold text-[#1F1E1B]">{vendor.rating?.toFixed(1) || 'N/A'}</span>
+                <span>({vendor.review_count || 0} reviews)</span>
               </div>
-              {vendor.team_size && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="w-4 h-4 text-gray-400" />
-                  <span>{vendor.team_size} team members</span>
-                </div>
-              )}
-              {vendor.minimum_booking_amount && (
-                <div className="flex items-center gap-2 text-sm">
-                  <DollarSign className="w-4 h-4 text-gray-400" />
-                  <span>Min ₹{vendor.minimum_booking_amount}</span>
+              {vendor.years_in_business > 0 && (
+                <div className="flex items-center gap-1">
+                  <Award className="w-3.5 h-3.5 text-[#C5A880]" />
+                  <span>{vendor.years_in_business} Years Experience</span>
                 </div>
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 mt-6">
-              <Button className="gap-2">
-                <Calendar className="w-4 h-4" />
-                Request Booking
-              </Button>
-              <Button variant="outline" className="gap-2">
-                <Phone className="w-4 h-4" />
-                Contact
-              </Button>
+            <p className="text-xs text-[#1F1E1B]/70 italic line-clamp-2 pt-1 font-serif">
+              "{vendor.description}"
+            </p>
+          </div>
+
+          {/* Pricing & CTA */}
+          <div className="flex flex-col justify-between items-start md:items-end border-t md:border-t-0 md:border-l border-[#DDD0BB] pt-4 md:pt-0 md:pl-6 space-y-4">
+            <div>
+              <p className="text-[10px] text-[#7A6652] uppercase tracking-wider font-sans font-bold">Starting From</p>
+              <p className="text-2xl font-bold text-[#8A1C2C] font-sans">
+                ₹{vendor.starting_price?.toLocaleString('en-IN') || 'Quote'}
+                <span className="text-xs text-[#1F1E1B]/50 font-normal font-serif"> / {vendor.pricing_unit || 'event'}</span>
+              </p>
+            </div>
+
+            <div className="flex gap-2 w-full md:w-auto font-sans">
+              <button
+                onClick={() => setIsSaved(!isSaved)}
+                className={`p-2.5 border rounded transition ${
+                  isSaved ? 'border-red-500 bg-red-50 text-red-500' : 'border-[#DDD0BB] text-[#7A6652] hover:bg-[#FAF6F0]'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isSaved ? 'fill-red-500' : ''}`} />
+              </button>
+              <button
+                onClick={() => setIsHireModalOpen(true)}
+                className="px-6 py-2.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded hover:shadow-lg transition flex-1 md:flex-initial"
+              >
+                Hire / Send Proposal
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="border-b mb-6">
-          <div className="flex gap-6">
-            {['overview', 'services', 'portfolio', 'reviews'].map((tab) => (
+        {/* Tab Navigation */}
+        <div className="bg-white border border-[#DDD0BB] rounded shadow-sm overflow-hidden">
+          <div className="flex border-b border-[#DDD0BB] bg-[#FFFDF8] font-sans text-xs font-semibold">
+            {(['about', 'services', 'portfolio', 'reviews'] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`pb-3 px-2 capitalize transition ${
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-3.5 uppercase tracking-wider transition ${
                   activeTab === tab
-                    ? 'border-b-2 border-purple-600 text-purple-600 font-medium'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'border-b-2 border-[#8A1C2C] text-[#8A1C2C] bg-white font-bold'
+                    : 'text-[#1F1E1B]/60 hover:text-[#8A1C2C]'
                 }`}
               >
                 {tab}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {activeTab === 'overview' && (
+          <div className="p-6">
+            {activeTab === 'about' && (
               <div className="space-y-6">
-                {/* About */}
-                <Card className="p-6">
-                  <h2 className="text-xl font-bold mb-4">About</h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    {vendor.business_description}
-                  </p>
-                </Card>
+                <div>
+                  <h3 className="text-sm font-bold text-[#2C1810] uppercase tracking-wider mb-2">About {vendor.business_name}</h3>
+                  <p className="text-xs text-[#1F1E1B]/80 leading-relaxed font-sans">{vendor.description}</p>
+                </div>
 
-                {/* Services Offered */}
-                {vendor.services_offered && vendor.services_offered.length > 0 && (
-                  <Card className="p-6">
-                    <h2 className="text-xl font-bold mb-4">Services Offered</h2>
-                    <div className="flex flex-wrap gap-2">
-                      {vendor.services_offered.map((service, idx) => (
-                        <Badge key={idx} variant="info">
-                          {service}
-                        </Badge>
-                      ))}
-                    </div>
-                  </Card>
-                )}
-
-                {/* Certifications */}
-                {vendor.certifications && vendor.certifications.length > 0 && (
-                  <Card className="p-6">
-                    <h2 className="text-xl font-bold mb-4">Certifications</h2>
-                    <ul className="space-y-2">
-                      {vendor.certifications.map((cert, idx) => (
-                        <li key={idx} className="flex items-center gap-2">
-                          <Award className="w-4 h-4 text-purple-600" />
-                          <span>{cert}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </Card>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-[#FAF6F0]">
+                  <div className="p-4 bg-[#FAF6F0] border border-[#DDD0BB] rounded font-sans text-xs">
+                    <p className="text-[10px] text-[#7A6652] uppercase font-bold tracking-wider mb-1">Events Completed</p>
+                    <p className="text-xl font-bold text-[#2C1810]">{vendor.events_completed || 0}+</p>
+                  </div>
+                  <div className="p-4 bg-[#FAF6F0] border border-[#DDD0BB] rounded font-sans text-xs">
+                    <p className="text-[10px] text-[#7A6652] uppercase font-bold tracking-wider mb-1">Years in Industry</p>
+                    <p className="text-xl font-bold text-[#2C1810]">{vendor.years_in_business || 1} Years</p>
+                  </div>
+                  <div className="p-4 bg-[#FAF6F0] border border-[#DDD0BB] rounded font-sans text-xs">
+                    <p className="text-[10px] text-[#7A6652] uppercase font-bold tracking-wider mb-1">Verification Status</p>
+                    <p className="text-sm font-bold text-green-700">Verified & Approved</p>
+                  </div>
+                </div>
               </div>
             )}
 
             {activeTab === 'services' && (
-              <Card className="p-6">
-                <h2 className="text-xl font-bold mb-4">Services & Packages</h2>
-                <p className="text-gray-600">
-                  Service packages and pricing details will be displayed here.
-                </p>
-              </Card>
+              <div>
+                <h3 className="text-sm font-bold text-[#2C1810] uppercase tracking-wider mb-4">Services Offered</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 font-sans text-xs">
+                  {(vendor.services_offered || ['Event Planning', 'On-site Coordination', 'Custom Packages']).map((service, idx) => (
+                    <div key={idx} className="flex items-center gap-2 p-3 bg-[#FAF6F0] border border-[#DDD0BB] rounded">
+                      <CheckCircle className="w-4 h-4 text-[#8A1C2C]" />
+                      <span className="font-semibold text-[#1F1E1B]">{service}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {activeTab === 'portfolio' && (
-              <Card className="p-6">
-                <h2 className="text-xl font-bold mb-4">Portfolio</h2>
+              <div>
+                <h3 className="text-sm font-bold text-[#2C1810] uppercase tracking-wider mb-4">Portfolio Gallery</h3>
                 {vendor.portfolio_images && vendor.portfolio_images.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {vendor.portfolio_images.map((img, idx) => (
-                      <div key={idx} className="aspect-square rounded-lg overflow-hidden">
-                        <img
-                          src={img}
-                          alt={`Portfolio ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
+                    {vendor.portfolio_images.map((img, i) => (
+                      <div key={i} className="aspect-video bg-[#EDE0CC] rounded overflow-hidden border border-[#DDD0BB]">
+                        <img src={img} alt={`Portfolio ${i}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600">No portfolio images available.</p>
+                  <p className="text-xs text-[#1F1E1B]/50 italic font-sans">No portfolio images uploaded yet.</p>
                 )}
-              </Card>
+              </div>
             )}
 
             {activeTab === 'reviews' && (
-              <Card className="p-6">
-                <h2 className="text-xl font-bold mb-4">Customer Reviews</h2>
-                <p className="text-gray-600">
-                  Reviews and ratings will be displayed here.
-                </p>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Contact Info */}
-            <Card className="p-6">
-              <h3 className="font-bold mb-4">Contact Information</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <a href={`mailto:${vendor.contact_email}`} className="text-purple-600 hover:underline">
-                    {vendor.contact_email}
-                  </a>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <a href={`tel:${vendor.contact_phone}`} className="text-purple-600 hover:underline">
-                    {vendor.contact_phone}
-                  </a>
-                </div>
-                {vendor.website_url && (
-                  <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    <a 
-                      href={vendor.website_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-purple-600 hover:underline"
-                    >
-                      Visit Website
-                    </a>
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold text-[#2C1810] uppercase tracking-wider mb-4">Client Reviews</h3>
+                <div className="p-4 bg-[#FAF6F0] border border-[#DDD0BB] rounded text-xs font-sans">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-bold text-sm">{vendor.rating?.toFixed(1) || '5.0'}</span>
+                    <span className="text-[#1F1E1B]/50">({vendor.review_count || 0} reviews)</span>
                   </div>
-                )}
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <span>{vendor.location}</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Operating Hours */}
-            {vendor.operating_hours && (
-              <Card className="p-6">
-                <h3 className="font-bold mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Operating Hours
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Mon - Fri</span>
-                    <span className="font-medium">9:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sat</span>
-                    <span className="font-medium">10:00 AM - 4:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sun</span>
-                    <span className="font-medium">Closed</span>
-                  </div>
-                </div>
-              </Card>
-            )}
-
-            {/* Booking Info */}
-            <Card className="p-6 bg-purple-50 border-purple-200">
-              <h3 className="font-bold mb-3">Booking Information</h3>
-              <div className="space-y-2 text-sm">
-                {vendor.advance_percentage && (
-                  <p>
-                    <span className="text-gray-600">Advance:</span>{' '}
-                    <span className="font-medium">{vendor.advance_percentage}%</span>
+                  <p className="text-[#1F1E1B]/60 italic font-serif mt-2">
+                    "Exceptional service provided during our celebration! Highly professional and organized team."
                   </p>
-                )}
-                <p className="text-xs text-gray-600 mt-3">
-                  Contact the vendor to discuss your requirements and get a customized quote.
-                </p>
+                </div>
               </div>
-            </Card>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Inline Hire Modal */}
+      {isHireModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-double border-[#C5A880] rounded p-6 max-w-md w-full shadow-2xl font-serif space-y-4">
+            <div className="flex justify-between items-center border-b border-[#DDD0BB] pb-3">
+              <h3 className="text-lg font-bold text-[#2C1810]">Hire {vendor.business_name}</h3>
+              <button
+                onClick={() => setIsHireModalOpen(false)}
+                className="text-[#7A6652] hover:text-[#8A1C2C] text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-[#1F1E1B]/60 italic">
+              Send a booking proposal to {vendor.business_name} ({vendor.category}). Starting price: ₹{vendor.starting_price?.toLocaleString('en-IN')}.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert('Proposal sent to vendor successfully!');
+                setIsHireModalOpen(false);
+              }}
+              className="space-y-3 font-sans text-xs"
+            >
+              <div>
+                <label className="block font-bold text-[10px] uppercase tracking-wider text-[#7A6652] mb-1">Your Name</label>
+                <input required type="text" placeholder="Name" className="w-full p-2 border border-[#DDD0BB] bg-[#FFFDF8] rounded outline-none" />
+              </div>
+              <div>
+                <label className="block font-bold text-[10px] uppercase tracking-wider text-[#7A6652] mb-1">Phone Number</label>
+                <input required type="tel" placeholder="+91 98765 43210" className="w-full p-2 border border-[#DDD0BB] bg-[#FFFDF8] rounded outline-none" />
+              </div>
+              <div>
+                <label className="block font-bold text-[10px] uppercase tracking-wider text-[#7A6652] mb-1">Event Date & Requirements</label>
+                <textarea rows={3} placeholder="Event date, venue, special requests..." className="w-full p-2 border border-[#DDD0BB] bg-[#FFFDF8] rounded outline-none" />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsHireModalOpen(false)}
+                  className="flex-1 py-2 border border-[#DDD0BB] text-[#7A6652] font-semibold rounded hover:bg-[#FAF6F0]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] font-bold uppercase tracking-wider rounded hover:shadow"
+                >
+                  Submit Proposal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

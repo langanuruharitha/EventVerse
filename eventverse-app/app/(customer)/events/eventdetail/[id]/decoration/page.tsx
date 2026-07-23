@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { Sparkles, Palette, CheckSquare, TrendingUp, ArrowLeft } from 'lucide-react';
+import { Sparkles, Palette, CheckSquare, ArrowLeft } from 'lucide-react';
 import ThemeGallery from '@/components/decoration/ThemeGallery';
 import DecorationGeneratorForm from '@/components/decoration/DecorationGeneratorForm';
 import DecorationPlanDisplay from '@/components/decoration/DecorationPlanDisplay';
@@ -26,24 +26,14 @@ export default function DecorationPlanningPage() {
   const fetchEventAndPlan = async () => {
     try {
       const supabase = createBrowserClient();
-
-      // Fetch event details
       const { data: eventData, error: eventError } = await supabase
-        .from('events')
-        .select('*')
-        .eq('id', eventId)
-        .single();
-
+        .from('events').select('*').eq('id', eventId).single();
       if (eventError) throw eventError;
       setEvent(eventData);
 
-      // Check if decoration plan exists
-      const { data: planData, error: planError } = await supabase
+      const { data: planData } = await supabase
         .from('decoration_plans')
-        .select(`
-          *,
-          decoration_items (*)
-        `)
+        .select(`*, decoration_items (*)`)
         .eq('event_id', eventId)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -62,83 +52,59 @@ export default function DecorationPlanningPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF6F0] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading decoration planner...</p>
+          <div className="text-4xl mb-3">🎨</div>
+          <p className="text-xs text-[#1F1E1B]/50 italic font-sans">Loading decoration planner...</p>
         </div>
       </div>
     );
   }
 
+  const tabs = [
+    { key: 'browse' as const, label: 'Browse Themes', icon: <Palette className="w-3.5 h-3.5" /> },
+    { key: 'generate' as const, label: 'AI Generate', icon: <Sparkles className="w-3.5 h-3.5" /> },
+    ...(existingPlan ? [{ key: 'myplan' as const, label: 'My Plan', icon: <CheckSquare className="w-3.5 h-3.5" /> }] : []),
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.back()}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                  <Palette className="w-8 h-8 text-purple-600 mr-3" />
-                  Decoration Planner
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  {event?.event_name || 'Your Event'} - AI-powered decoration planning
-                </p>
-              </div>
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
+      {/* Header Bar */}
+      <div className="bg-white border-b border-[#DDD0BB] shadow-sm sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-1.5 hover:bg-[#FAF6F0] rounded border border-transparent hover:border-[#DDD0BB] transition"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#8A1C2C]" />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-[#2C1810] flex items-center gap-2">
+                <span>🎨</span> Decoration Planner
+              </h1>
+              <p className="text-[10px] text-[#1F1E1B]/40 italic font-sans mt-0.5">
+                {event?.event_name || 'Your Event'} — Curated decoration planning
+              </p>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="mt-6 flex space-x-4 border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab('browse')}
-              className={`pb-3 px-4 font-medium transition-all ${
-                activeTab === 'browse'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <span className="flex items-center">
-                <Palette className="w-4 h-4 mr-2" />
-                Browse Themes
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('generate')}
-              className={`pb-3 px-4 font-medium transition-all ${
-                activeTab === 'generate'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <span className="flex items-center">
-                <Sparkles className="w-4 h-4 mr-2" />
-                AI Generate
-              </span>
-            </button>
-            {existingPlan && (
+          <div className="mt-4 flex gap-1 border-b border-[#EDE0CC]">
+            {tabs.map((tab) => (
               <button
-                onClick={() => setActiveTab('myplan')}
-                className={`pb-3 px-4 font-medium transition-all ${
-                  activeTab === 'myplan'
-                    ? 'text-purple-600 border-b-2 border-purple-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center gap-1.5 px-4 pb-2.5 text-xs font-semibold uppercase tracking-wider font-sans border-b-2 transition-all ${
+                  activeTab === tab.key
+                    ? 'text-[#8A1C2C] border-[#8A1C2C]'
+                    : 'text-[#1F1E1B]/50 border-transparent hover:text-[#1F1E1B]'
                 }`}
               >
-                <span className="flex items-center">
-                  <CheckSquare className="w-4 h-4 mr-2" />
-                  My Plan
-                </span>
+                {tab.icon}
+                {tab.label}
               </button>
-            )}
+            ))}
           </div>
         </div>
       </div>
@@ -146,7 +112,7 @@ export default function DecorationPlanningPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'browse' && <ThemeGallery />}
-        
+
         {activeTab === 'generate' && (
           <DecorationGeneratorForm
             eventId={eventId}
@@ -158,7 +124,7 @@ export default function DecorationPlanningPage() {
             }}
           />
         )}
-        
+
         {activeTab === 'myplan' && existingPlan && (
           <DecorationPlanDisplay
             plan={existingPlan}
