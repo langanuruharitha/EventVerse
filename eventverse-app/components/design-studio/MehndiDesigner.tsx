@@ -3,9 +3,12 @@
 
 import { useState } from 'react';
 import { Sparkles, Loader2, Download, Image as ImageIcon, Hand } from 'lucide-react';
+import { Toast, useToast } from '@/components/ui/Toast';
 
 export default function MehndiDesigner() {
+  const { toasts, addToast, removeToast } = useToast();
   const [generating, setGenerating] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     occasion: 'wedding',
@@ -32,16 +35,18 @@ export default function MehndiDesigner() {
       
       const result = await response.json();
       setGeneratedImage(result.imageUrl);
+      addToast('🤏 Mehndi design generated successfully!', 'success');
     } catch (error) {
       console.error('Error generating mehndi design:', error);
-      alert('Failed to generate mehndi design. Please try again.');
+      addToast('Failed to generate mehndi design. Please try again.', 'error');
     } finally {
       setGenerating(false);
     }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Form Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -242,16 +247,31 @@ export default function MehndiDesigner() {
                 onLoad={() => console.log('Mehndi image loaded successfully!')}
               />
               <button
-                onClick={() => {
-                  const link = document.createElement('a');
-                  link.href = generatedImage;
-                  link.download = 'mehndi-design.png';
-                  link.click();
+                onClick={async () => {
+                  if (!generatedImage) return;
+                  setDownloading(true);
+                  try {
+                    const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(generatedImage)}`;
+                    const res = await fetch(proxyUrl);
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'mehndi-design.png';
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    addToast('🤏 Mehndi design downloaded!', 'success');
+                  } catch {
+                    addToast('Download failed. Please try right-clicking the image to save.', 'error');
+                  } finally {
+                    setDownloading(false);
+                  }
                 }}
-                className="absolute bottom-4 right-4 bg-white text-orange-600 px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-gray-50 transition-colors flex items-center"
+                disabled={downloading}
+                className="absolute bottom-4 right-4 bg-white text-[#8A1C2C] px-4 py-2 rounded font-semibold shadow-lg hover:bg-[#FAF6F0] transition-colors flex items-center gap-2 border border-[#C5A880] font-sans text-xs uppercase tracking-wider disabled:opacity-60"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Download
+                {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {downloading ? 'Downloading...' : 'Download Image'}
               </button>
             </div>
           ) : (
@@ -281,5 +301,7 @@ export default function MehndiDesigner() {
         )}
       </div>
     </div>
+    <Toast toasts={toasts} removeToast={removeToast} />
+    </>
   );
 }

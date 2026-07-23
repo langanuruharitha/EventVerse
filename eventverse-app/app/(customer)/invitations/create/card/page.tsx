@@ -1,16 +1,20 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Download, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Sparkles, Download, Image as ImageIcon, FileImage, Loader2 } from 'lucide-react';
+import { Toast, useToast } from '@/components/ui/Toast';
 
 function CreateCardInvitationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState(1); // 1: Form, 2: Preview/Generated
+  const { toasts, addToast, removeToast } = useToast();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [step, setStep] = useState(1);
   const [generating, setGenerating] = useState(false);
-  const [generatedCard, setGeneratedCard] = useState<string | null>(null); // raw HTML string
+  const [downloadingPng, setDownloadingPng] = useState(false);
+  const [generatedCard, setGeneratedCard] = useState<string | null>(null);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -29,7 +33,7 @@ function CreateCardInvitationContent() {
 
   const handleGenerate = async () => {
     if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
-      alert('Please fill all required fields');
+      addToast('Please fill all required fields before generating.', 'error');
       return;
     }
 
@@ -49,14 +53,58 @@ function CreateCardInvitationContent() {
       if (response.ok && data.htmlContent) {
         setGeneratedCard(data.htmlContent);
         setStep(2);
+        addToast('🎉 Invitation card generated successfully!', 'success');
       } else {
-        alert('Error: ' + (data.error || 'Failed to generate invitation card'));
+        addToast('Error: ' + (data.error || 'Failed to generate invitation card'), 'error');
       }
     } catch (error) {
       console.error('Error generating card:', error);
-      alert('Failed to generate invitation card. Please try again.');
+      addToast('Failed to generate invitation card. Please try again.', 'error');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Download invitation as PNG image using html2canvas
+  const downloadAsImage = async () => {
+    if (!generatedCard) return;
+    setDownloadingPng(true);
+    addToast('Preparing your PNG download...', 'info');
+    try {
+      // Load html2canvas dynamically
+      const html2canvas = (await import('html2canvas')).default;
+      // Create a hidden iframe to render the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:800px;height:1100px;overflow:hidden;z-index:-1;';
+      tempDiv.innerHTML = generatedCard;
+      document.body.appendChild(tempDiv);
+      await new Promise(r => setTimeout(r, 600)); // wait for render
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#fff',
+        width: 800,
+        height: 1100,
+      });
+      document.body.removeChild(tempDiv);
+      const url = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `invitation-${formData.eventName || 'card'}.png`;
+      link.click();
+      addToast('📥 Invitation card downloaded as PNG!', 'success');
+    } catch (err) {
+      console.error('PNG download failed:', err);
+      addToast('PNG download failed. Downloading as HTML instead.', 'error');
+      // Fallback to HTML download
+      const blob = new Blob([generatedCard], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'invitation-card.html'; a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloadingPng(false);
     }
   };
 
@@ -337,12 +385,20 @@ function CreateCardInvitationContent() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 font-sans text-xs">
+            <div className="flex flex-wrap gap-3 font-sans text-xs">
               <button
                 onClick={() => setStep(1)}
                 className="flex-1 py-3 border border-[#DDD0BB] text-[#7A6652] font-semibold rounded hover:bg-[#FAF6F0] transition"
               >
                 Edit Details
+              </button>
+              <button
+                onClick={downloadAsImage}
+                disabled={downloadingPng}
+                className="flex-1 py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:shadow transition disabled:opacity-60"
+              >
+                {downloadingPng ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileImage className="w-4 h-4" />}
+                {downloadingPng ? 'Creating PNG...' : 'Download as PNG'}
               </button>
               <button
                 onClick={() => {
@@ -354,11 +410,12 @@ function CreateCardInvitationContent() {
                   a.download = 'invitation-card.html';
                   a.click();
                   URL.revokeObjectURL(url);
+                  addToast('📄 Invitation downloaded as HTML!', 'success');
                 }}
-                className="flex-1 py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:shadow transition"
+                className="flex-1 py-3 border border-[#8A1C2C] text-[#8A1C2C] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:bg-[#FAF6F0] transition"
               >
                 <Download className="w-4 h-4" />
-                Download Card
+                Download HTML
               </button>
               <button
                 onClick={() => router.push('/invitations')}
@@ -370,6 +427,7 @@ function CreateCardInvitationContent() {
           </div>
         )}
       </div>
+      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }
