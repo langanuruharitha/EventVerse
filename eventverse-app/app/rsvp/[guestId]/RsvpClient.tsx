@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check, X, Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 interface RsvpClientProps {
   guestId: string;
@@ -9,6 +10,7 @@ interface RsvpClientProps {
 }
 
 export default function RsvpClient({ guestId, currentStatus }: RsvpClientProps) {
+  const toast = useToast();
   const [status, setStatus] = useState(currentStatus);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +27,7 @@ export default function RsvpClient({ guestId, currentStatus }: RsvpClientProps) 
       setStatus(newStatus);
     } catch (error) {
       console.error('RSVP Error:', error);
-      alert('Something went wrong. Please try again.');
+      toast('Something went wrong. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

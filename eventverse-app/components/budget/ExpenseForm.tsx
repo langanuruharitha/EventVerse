@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
@@ -22,6 +23,7 @@ export default function ExpenseForm({
   onSubmit, 
   onCancel 
 }: ExpenseFormProps) {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     expense_name: '',
@@ -69,7 +71,7 @@ export default function ExpenseForm({
       });
     } catch (error) {
       console.error('Error adding expense:', error);
-      alert(`Failed to add expense: ${error instanceof Error ? error.message : 'Please try again.'}`);
+      toast(`Failed to add expense: ${error instanceof Error ? error.message : 'Please try again.'}`, 'error');
     } finally {
       setLoading(false);
     }

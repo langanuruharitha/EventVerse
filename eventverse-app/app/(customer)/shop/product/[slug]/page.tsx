@@ -10,6 +10,7 @@ import { Star, ShoppingCart, Heart, Share2, Truck, Shield, ArrowLeft } from 'luc
 import ProductImage from '@/components/shop/ProductImage';
 import { resolveProductGallery } from '@/lib/commerce/product-images';
 import ProductReviews from '@/components/shop/ProductReviews';
+import { useToast } from '@/components/ui/Toast';
 
 interface Product {
   id: string;
@@ -34,6 +35,7 @@ interface Product {
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter();
+  const toast = useToast();
   const resolvedParams = use(params);
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
@@ -79,7 +81,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           method: 'DELETE'
         });
         setIsInWishlist(false);
-        alert('Removed from wishlist');
+        toast('Removed from wishlist', 'info');
       } else {
         // Add to wishlist
         await fetch('/api/wishlist', {
@@ -88,11 +90,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           body: JSON.stringify({ productId: product.id })
         });
         setIsInWishlist(true);
-        alert('Added to wishlist! ❤️');
+        toast('Added to wishlist! ❤️', 'success');
       }
     } catch (error) {
       console.error('Wishlist error:', error);
-      alert('Please sign in to use wishlist');
+      toast('Please sign in to use wishlist', 'warning');
     } finally {
       setWishlistLoading(false);
     }
@@ -136,15 +138,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       if (response.ok && result.success) {
         window.dispatchEvent(new Event('cart-updated'));
         router.refresh();
-        alert('Product added to cart!');
+        toast('Product added to cart!', 'success');
       } else if (response.status === 401 || result.error === 'Not authenticated') {
         router.push('/auth/signin');
       } else {
-        alert(result.error || 'Failed to add to cart');
+        toast(result.error || 'Failed to add to cart', 'error');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Failed to add to cart');
+      toast('Failed to add to cart', 'error');
     } finally {
       setAddingToCart(false);
     }

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { Star, User, MessageSquare } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/Toast';
 
 interface Review {
   id: string;
@@ -19,6 +20,7 @@ interface Review {
 }
 
 export default function ProductReviews({ productId }: { productId: string }) {
+  const toast = useToast();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -74,18 +76,18 @@ export default function ProductReviews({ productId }: { productId: string }) {
       });
       
       if (res.ok) {
-        alert('Review submitted successfully!');
+        toast('Review submitted successfully!', 'success');
         setNewTitle('');
         setNewReviewText('');
         setNewRating(5);
         setShowForm(false);
-        fetchReviews(); // refresh
+        fetchReviews();
       } else {
-        alert('Failed to submit review.');
+        toast('Failed to submit review.', 'error');
       }
     } catch (error) {
       console.error('Error submitting review:', error);
-      alert('An error occurred.');
+      toast('An error occurred.', 'error');
     } finally {
       setSubmitting(false);
     }

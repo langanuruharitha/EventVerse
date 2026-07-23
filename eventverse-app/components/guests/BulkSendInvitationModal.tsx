@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
@@ -23,6 +24,7 @@ export default function BulkSendInvitationModal({
   onClose,
   onSent
 }: BulkSendInvitationModalProps) {
+  const toast = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -38,7 +40,7 @@ export default function BulkSendInvitationModal({
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 4.0 * 1024 * 1024) {
-        alert('The file is too large to attach to the emails (max 4.0MB). Please choose a smaller file.');
+        toast('The file is too large to attach to the emails (max 4.0MB). Please choose a smaller file.', 'warning');
         return;
       }
       setSelectedFile(file);
@@ -53,7 +55,7 @@ export default function BulkSendInvitationModal({
 
   const handleSendAll = async () => {
     if (targetGuests.length === 0) {
-      alert("No pending guests with email addresses found.");
+      toast("No pending guests with email addresses found.", 'info');
       return;
     }
 
@@ -88,7 +90,7 @@ export default function BulkSendInvitationModal({
         
         if (result.simulated) {
            // If simulated, just break early, no need to simulate 50 times
-           alert('Server says: "SIMULATED". This means your SMTP API keys are not loaded in Vercel yet! Make sure you added them to the Production environment in Vercel and redeployed.');
+           toast('Server says: "SIMULATED". This means your SMTP API keys are not loaded in Vercel yet! Make sure you added them to the Production environment in Vercel and redeployed.', 'info');
            setSending(false);
            return;
         }
@@ -107,7 +109,7 @@ export default function BulkSendInvitationModal({
     setSent(true);
 
     if (errorList.length > 0) {
-      alert(`Sent ${targetGuests.length - errorList.length} successfully. Errors:\n` + errorList.join('\n'));
+      toast(`Sent ${targetGuests.length - errorList.length} successfully. Errors: ${errorList.join(', ')}`, 'error');
     }
 
     // Auto close after showing success

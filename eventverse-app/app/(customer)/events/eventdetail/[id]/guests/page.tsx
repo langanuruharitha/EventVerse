@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -37,6 +38,7 @@ interface Event {
 }
 
 export default function GuestListPage() {
+  const toast = useToast();
   const [guests, setGuests] = useState<Guest[]>([]);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,11 +100,11 @@ export default function GuestListPage() {
         });
         const { error } = await supabase.from('guests').insert(newGuests);
         if (error) throw error;
-        alert(`Successfully imported ${newGuests.length} guests!`);
+        toast('Successfully imported ${newGuests.length} guests!', 'success');
         await fetchEventAndGuests();
       } catch (err) {
         console.error('Error importing guests:', err);
-        alert('Failed to import guests. Please check the CSV format.');
+        toast('Failed to import guests. Please check the CSV format.', 'error');
         setLoading(false);
       } finally {
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -145,7 +147,7 @@ export default function GuestListPage() {
       if (error) throw error;
       setGuests(guests.filter(g => g.id !== guestId));
     } catch (err) {
-      alert('Failed to delete guest. Please try again.');
+      toast('Failed to delete guest. Please try again.', 'error');
     }
   };
 

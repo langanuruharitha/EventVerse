@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { X } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 interface GuestFormProps {
   eventId: string;
@@ -15,6 +16,7 @@ export default function GuestForm({
   onSubmit, 
   onCancel 
 }: GuestFormProps) {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     guest_name: '',
@@ -72,7 +74,7 @@ export default function GuestForm({
       });
     } catch (error: any) {
       console.error('Error adding guest:', error);
-      alert(`Failed to add guest: ${error.message}`);
+      toast(`Failed to add guest: ${error.message}`, 'error');
     } finally {
       setLoading(false);
     }

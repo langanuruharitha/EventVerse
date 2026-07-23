@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useToast } from '@/components/ui/Toast';
 
 export default function ResetPasswordPage() {
+  const toast = useToast();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -56,7 +58,7 @@ export default function ResetPasswordPage() {
       setLoading(false);
     } else {
       await supabase.auth.signOut();
-      alert('Password updated successfully! Please sign in with your new password.');
+      toast('Password updated successfully! Please sign in with your new password.', 'success');
       router.push('/auth/signin');
     }
   };

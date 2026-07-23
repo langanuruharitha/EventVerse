@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,6 +18,7 @@ interface Address {
 }
 
 export default function AddressPage() {
+  const toast = useToast();
   const router = useRouter();
   const [address, setAddress] = useState<Address>({
     fullName: '',
@@ -36,7 +38,7 @@ export default function AddressPage() {
 
   const handleContinue = () => {
     if (!address.fullName || !address.phone || !address.addressLine1 || !address.city || !address.state || !address.pincode) {
-      alert('Please fill in all required fields');
+      toast('Please fill in all required fields', 'warning');
       return;
     }
 

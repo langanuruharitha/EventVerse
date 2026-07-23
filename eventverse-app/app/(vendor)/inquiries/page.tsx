@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
@@ -20,6 +21,7 @@ interface Inquiry {
 }
 
 export default function VendorInquiriesPage() {
+  const toast = useToast();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
@@ -37,7 +39,7 @@ export default function VendorInquiriesPage() {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('Please log in');
+        toast('Please log in', 'warning');
         return;
       }
 
@@ -49,7 +51,7 @@ export default function VendorInquiriesPage() {
         .single();
 
       if (!vendor) {
-        alert('Vendor profile not found');
+        toast('Vendor profile not found', 'info');
         return;
       }
 
@@ -62,7 +64,7 @@ export default function VendorInquiriesPage() {
 
       if (error) {
         console.error('Error loading inquiries:', error);
-        alert('Failed to load inquiries');
+        toast('Failed to load inquiries', 'error');
       } else {
         setInquiries(data || []);
       }
@@ -85,7 +87,7 @@ export default function VendorInquiriesPage() {
 
   const handleRespond = async () => {
     if (!selectedInquiry || !response) {
-      alert('Please enter a response');
+      toast('Please enter a response', 'warning');
       return;
     }
 
@@ -102,13 +104,13 @@ export default function VendorInquiriesPage() {
         })
         .eq('id', selectedInquiry.id);
 
-      alert('Response sent successfully!');
+      toast('Response sent successfully!', 'success');
       setResponse('');
       setSelectedInquiry(null);
       loadInquiries();
     } catch (error) {
       console.error('Error sending response:', error);
-      alert('Failed to send response');
+      toast('Failed to send response', 'error');
     } finally {
       setIsSending(false);
     }

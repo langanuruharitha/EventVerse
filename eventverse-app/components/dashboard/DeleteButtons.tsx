@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Trash2 } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 export function DeleteSavedVendorButton({ savedId }: { savedId: string }) {
   const router = useRouter();
+  const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -29,7 +31,7 @@ export function DeleteSavedVendorButton({ savedId }: { savedId: string }) {
       router.refresh();
     } catch (error) {
       console.error('Error deleting saved vendor:', error);
-      alert('Failed to remove saved vendor. Please try again.');
+      toast('Failed to remove saved vendor. Please try again.', 'error');
     } finally {
       setIsDeleting(false);
     }
@@ -49,6 +51,7 @@ export function DeleteSavedVendorButton({ savedId }: { savedId: string }) {
 
 export function DeleteEnquiryButton({ enquiryId }: { enquiryId: string }) {
   const router = useRouter();
+  const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -71,7 +74,7 @@ export function DeleteEnquiryButton({ enquiryId }: { enquiryId: string }) {
       router.refresh();
     } catch (error) {
       console.error('Error deleting inquiry:', error);
-      alert('Failed to delete inquiry. Please try again.');
+      toast('Failed to delete inquiry. Please try again.', 'error');
     } finally {
       setIsDeleting(false);
     }

@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 import { Upload, Sparkles, Loader2, Download, Image as ImageIcon } from 'lucide-react';
-import { Toast, useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/Toast';
 
 export default function DecorationDesigner() {
-  const { toasts, addToast, removeToast } = useToast();
+  const toast = useToast();
   const [generating, setGenerating] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -55,18 +55,17 @@ export default function DecorationDesigner() {
       
       const result = await response.json();
       setGeneratedImage(result.imageUrl);
-      addToast('✨ Decoration design generated successfully!', 'success');
+      toast('✨ Decoration design generated successfully!', 'success');
     } catch (error) {
       console.error('Error generating design:', error);
-      addToast('Failed to generate design. Please try again.', 'error');
+      toast('Failed to generate design. Please try again.', 'error');
     } finally {
       setGenerating(false);
     }
   };
 
   return (
-    <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Form Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -294,9 +293,9 @@ export default function DecorationDesigner() {
                     link.download = 'decoration-design.png';
                     link.click();
                     URL.revokeObjectURL(url);
-                    addToast('🎨 Decoration design downloaded!', 'success');
+                    toast('🎨 Decoration design downloaded!', 'success');
                   } catch {
-                    addToast('Download failed. Please try right-clicking the image to save.', 'error');
+                    toast('Download failed. Please try right-clicking the image to save.', 'error');
                   } finally {
                     setDownloading(false);
                   }
@@ -335,7 +334,5 @@ export default function DecorationDesigner() {
         )}
       </div>
     </div>
-    <Toast toasts={toasts} removeToast={removeToast} />
-    </>
   );
 }

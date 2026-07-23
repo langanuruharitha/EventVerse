@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { ArrowLeft, MapPin, CreditCard, CheckCircle } from 'lucide-react';
 import ProductImage from '@/components/shop/ProductImage';
+import { useToast } from '@/components/ui/Toast';
 
 interface CheckoutStep {
   id: number;
@@ -20,6 +21,7 @@ interface CheckoutStep {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const toast = useToast();
   const [cart, setCart] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
@@ -68,7 +70,7 @@ export default function CheckoutPage() {
 
   const handleContinue = () => {
     if (currentStep === 1 && (!email || !phone)) {
-      alert('Please fill in all contact details');
+      toast('Please fill in all contact details', 'warning');
       return;
     }
 

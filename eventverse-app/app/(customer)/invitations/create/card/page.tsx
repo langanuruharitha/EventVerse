@@ -4,12 +4,12 @@ import { useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, Download, Image as ImageIcon, FileImage, Loader2 } from 'lucide-react';
-import { Toast, useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/Toast';
 
 function CreateCardInvitationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toasts, addToast, removeToast } = useToast();
+  const toast = useToast();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [step, setStep] = useState(1);
   const [generating, setGenerating] = useState(false);
@@ -33,7 +33,7 @@ function CreateCardInvitationContent() {
 
   const handleGenerate = async () => {
     if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
-      addToast('Please fill all required fields before generating.', 'error');
+      toast('Please fill all required fields before generating.', 'error');
       return;
     }
 
@@ -53,13 +53,13 @@ function CreateCardInvitationContent() {
       if (response.ok && data.htmlContent) {
         setGeneratedCard(data.htmlContent);
         setStep(2);
-        addToast('🎉 Invitation card generated successfully!', 'success');
+        toast('🎉 Invitation card generated successfully!', 'success');
       } else {
-        addToast('Error: ' + (data.error || 'Failed to generate invitation card'), 'error');
+        toast('Error: ' + (data.error || 'Failed to generate invitation card'), 'error');
       }
     } catch (error) {
       console.error('Error generating card:', error);
-      addToast('Failed to generate invitation card. Please try again.', 'error');
+      toast('Failed to generate invitation card. Please try again.', 'error');
     } finally {
       setGenerating(false);
     }
@@ -69,7 +69,7 @@ function CreateCardInvitationContent() {
   const downloadAsImage = async () => {
     if (!generatedCard) return;
     setDownloadingPng(true);
-    addToast('Preparing your PNG download...', 'info');
+    toast('Preparing your PNG download...', 'info');
     try {
       // Load html2canvas dynamically
       const html2canvas = (await import('html2canvas')).default;
@@ -93,10 +93,10 @@ function CreateCardInvitationContent() {
       link.href = url;
       link.download = `invitation-${formData.eventName || 'card'}.png`;
       link.click();
-      addToast('📥 Invitation card downloaded as PNG!', 'success');
+      toast('📥 Invitation card downloaded as PNG!', 'success');
     } catch (err) {
       console.error('PNG download failed:', err);
-      addToast('PNG download failed. Downloading as HTML instead.', 'error');
+      toast('PNG download failed. Downloading as HTML instead.', 'error');
       // Fallback to HTML download
       const blob = new Blob([generatedCard], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -410,7 +410,7 @@ function CreateCardInvitationContent() {
                   a.download = 'invitation-card.html';
                   a.click();
                   URL.revokeObjectURL(url);
-                  addToast('📄 Invitation downloaded as HTML!', 'success');
+                  toast('📄 Invitation downloaded as HTML!', 'success');
                 }}
                 className="flex-1 py-3 border border-[#8A1C2C] text-[#8A1C2C] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:bg-[#FAF6F0] transition"
               >
@@ -427,7 +427,6 @@ function CreateCardInvitationContent() {
           </div>
         )}
       </div>
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

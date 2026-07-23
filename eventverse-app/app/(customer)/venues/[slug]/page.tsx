@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -9,6 +10,7 @@ import {
 } from 'lucide-react';
 
 export default function VenueDetailPage() {
+  const toast = useToast();
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
@@ -89,7 +91,7 @@ export default function VenueDetailPage() {
       setInquiryForm({ name: '', email: '', phone: '', eventDate: '', guestCount: '', message: '' });
     } catch (err) {
       console.error('Error submitting inquiry:', err);
-      alert('An unexpected error occurred. Please try again.');
+      toast('An unexpected error occurred. Please try again.', 'error');
     } finally {
       setInquirySubmitting(false);
     }

@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -43,6 +44,7 @@ interface Expense {
 }
 
 export default function BudgetPage() {
+  const toast = useToast();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
@@ -256,7 +258,7 @@ export default function BudgetPage() {
 
   const handleViewAllExpenses = async () => {
     if (!selectedBudget) {
-      alert('Please select a budget first');
+      toast('Please select a budget first', 'warning');
       return;
     }
 
@@ -274,17 +276,17 @@ export default function BudgetPage() {
         `${exp.expense_name}: ${formatCurrency(exp.amount)} (${new Date(exp.expense_date).toLocaleDateString()})`
       ).join('\n');
 
-      alert(`All Expenses:\n\n${expensesList || 'No expenses found'}`);
+      toast(`All Expenses:\n\n${expensesList || 'No expenses found'}`, 'info');
       
     } catch (error) {
       console.error('Error fetching all expenses:', error);
-      alert('Failed to fetch expenses');
+      toast('Failed to fetch expenses', 'error');
     }
   };
 
   const handleGenerateReport = async () => {
     if (!selectedBudget) {
-      alert('Please select a budget first');
+      toast('Please select a budget first', 'warning');
       return;
     }
 
@@ -325,10 +327,10 @@ export default function BudgetPage() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      alert('Report downloaded successfully!');
+      toast('Report downloaded successfully!', 'success');
     } catch (error) {
       console.error('Error generating report:', error);
-      alert('Failed to generate report');
+      toast('Failed to generate report', 'error');
     }
   };
 
@@ -354,7 +356,7 @@ export default function BudgetPage() {
         .single();
 
       if (!eventsData) {
-        alert('Please create an event first!');
+        toast('Please create an event first!', 'warning');
         router.push('/events/new');
         return;
       }
@@ -400,10 +402,10 @@ export default function BudgetPage() {
 
       // Refresh
       fetchBudgets();
-      alert('Budget created successfully! 🎉');
+      toast('Budget created successfully! 🎉', 'success');
     } catch (error) {
       console.error('Error creating budget:', error);
-      alert('Failed to create budget. Please try again.');
+      toast('Failed to create budget. Please try again.', 'error');
     }
   };
 

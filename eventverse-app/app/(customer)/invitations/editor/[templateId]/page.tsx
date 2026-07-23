@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -8,6 +9,7 @@ import Link from 'next/link';
 import { editableTemplatesList } from '@/lib/templates/editable-templates';
 
 export default function TemplateEditorPage() {
+  const toast = useToast();
   const params = useParams();
   const router = useRouter();
   const templateRef = useRef<HTMLDivElement>(null);
@@ -111,7 +113,7 @@ export default function TemplateEditorPage() {
       setGeneratedImage(imageUrl);
     } catch (error) {
       console.error('Error generating image:', error);
-      alert('Failed to generate image. Please try again.');
+      toast('Failed to generate image. Please try again.', 'error');
     } finally {
       setIsGenerating(false);
     }

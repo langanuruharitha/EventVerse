@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { X, Upload, Mail, MessageCircle, CheckCircle } from 'lucide-react';
+import { X, Send, Mail, MessageSquare, Paperclip, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 interface SendInvitationModalProps {
   guest: {
     id: string;
     guest_name: string;
-    email: string | null;
-    phone: string | null;
+    email?: string | null;
+    phone?: string | null;
   };
   eventName: string;
   onClose: () => void;
@@ -22,19 +22,22 @@ export default function SendInvitationModal({
   onClose,
   onSent
 }: SendInvitationModalProps) {
+  const toast = useToast();
+  const [sendVia, setSendVia] = useState<'email' | 'whatsapp'>(guest.email ? 'email' : 'whatsapp');
+  const [senderName, setSenderName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [sendVia, setSendVia] = useState<'email' | 'whatsapp'>(guest.email ? 'email' : 'whatsapp');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const [senderName, setSenderName] = useState('');
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 4.0 * 1024 * 1024) {
+        toast('The file is too large to attach to the email (max 4.0MB). Please choose a smaller file.', 'warning');
+        return;
+      }
       setSelectedFile(file);
-      
-      // Create preview for image/video
       const reader = new FileReader();
       reader.onload = (event) => {
         setFilePreview(event.target?.result as string);
@@ -51,20 +54,18 @@ export default function SendInvitationModal({
       const rsvpLink = `${hostUrl}/rsvp/${guest.id}`;
       const messageBody = `Hi ${guest.guest_name},\n\nYou are invited to *${eventName}*!\n\nFrom,\n${senderName || 'Your Host'}\n\nPlease click here to confirm your RSVP:\n${rsvpLink}`;
 
-      // 1. Send WhatsApp via Click-to-Chat if selected
       if (sendVia === 'whatsapp' && guest.phone) {
         let formattedPhone = guest.phone.replace(/\D/g, '');
         if (!formattedPhone.startsWith('+') && formattedPhone.length === 10) {
-          formattedPhone = '91' + formattedPhone; // default to India for this example if 10 digits
+          formattedPhone = '91' + formattedPhone;
         }
         const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(messageBody)}`;
         window.open(whatsappUrl, '_blank');
       }
 
-      // 2. Send Email via our Server API (Nodemailer) if selected
       if (sendVia === 'email') {
         if (selectedFile && selectedFile.size > 4.0 * 1024 * 1024) {
-          alert('The file is too large to attach to the email (max 4.0MB). Please choose a smaller file.');
+          toast('The file is too large to attach to the email (max 4.0MB). Please choose a smaller file.', 'warning');
           setSending(false);
           return;
         }
@@ -90,29 +91,27 @@ export default function SendInvitationModal({
         const result = await response.json();
         
         if (result.simulated) {
-          alert('Server says: "SIMULATED". This means your SMTP API keys are not loaded in Vercel yet! Make sure you added them to the Production environment in Vercel and redeployed.');
+          toast('Server says: "SIMULATED". SMTP API keys not loaded yet.', 'info');
           setSending(false);
           return;
         }
         
         if (!result.success && result.errors && result.errors.length > 0) {
-          alert('Failed to send email:\n' + result.errors.join('\n'));
+          toast(`Failed to send email: ${result.errors.join(', ')}`, 'error');
           setSending(false);
           return;
         }
       }
 
       setSent(true);
-      
-      // Auto close after showing success
+
       setTimeout(() => {
         onSent();
         onClose();
       }, 1500);
-
     } catch (error: any) {
       console.error('Error sending invitation:', error);
-      alert(`Error: ${error.message}`);
+      toast(`Error: ${error.message}`, 'error');
     } finally {
       setSending(false);
     }
@@ -146,156 +145,122 @@ export default function SendInvitationModal({
               {sendVia === 'email' && 'Invitation sent via Email'}
               {sendVia === 'whatsapp' && 'Invitation sent via WhatsApp'}
             </p>
-            <p className="text-sm text-green-600 mt-4">✓ Marked as sent in guest list</p>
           </div>
         ) : (
           /* Form State */
-          <div className="p-6 space-y-6 overflow-y-auto flex-1">
-            {/* Event Info */}
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <p className="text-sm text-purple-900">
-                <span className="font-semibold">Event:</span> {eventName}
-              </p>
-              <p className="text-sm text-purple-900 mt-1">
-                <span className="font-semibold">Guest:</span> {guest.guest_name}
-              </p>
-            </div>
-
-            {/* Sender Info */}
+          <div className="p-6 overflow-y-auto space-y-6 flex-1">
+            {/* Delivery Method */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sender Name (From)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. John Doe, The Smith Family"
-                value={senderName}
-                onChange={(e) => setSenderName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Upload Invitation */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Upload Invitation Card/Video *
-              </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-500 transition-colors">
-                {filePreview ? (
-                  <div className="space-y-4">
-                    {selectedFile?.type.startsWith('image/') ? (
-                      <img src={filePreview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
-                    ) : (
-                      <video src={filePreview} className="max-h-48 mx-auto rounded-lg" controls />
-                    )}
-                    <p className="text-sm text-gray-600">{selectedFile?.name}</p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedFile(null);
-                        setFilePreview(null);
-                      }}
-                    >
-                      Change File
-                    </Button>
-                  </div>
-                ) : (
-                  <label className="cursor-pointer">
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-2">Click to upload or drag and drop</p>
-                    <p className="text-sm text-gray-500">PNG, JPG, MP4, or PDF (Max 10MB)</p>
-                    <input
-                      type="file"
-                      accept="image/*,video/*,.pdf"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-            </div>
-
-            {/* Send Via Options */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
                 Send Via
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setSendVia('email')}
                   disabled={!guest.email}
-                  className={`p-4 border-2 rounded-lg text-left transition-all ${
+                  className={`p-4 border-2 rounded-xl flex items-center gap-3 transition-all ${
                     sendVia === 'email'
-                      ? 'border-purple-600 bg-purple-50'
-                      : 'border-gray-300 hover:border-purple-300'
+                      ? 'border-purple-600 bg-purple-50 text-purple-900'
+                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
                   } ${!guest.email ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <Mail className="w-5 h-5 text-purple-600 mb-2" />
-                  <p className="font-semibold text-gray-900">Email Only</p>
-                  <p className="text-xs text-gray-600">
-                    {guest.email || 'No email'}
-                  </p>
+                  <Mail className="w-6 h-6 text-purple-600" />
+                  <div className="text-left">
+                    <div className="font-semibold">Email</div>
+                    <div className="text-xs text-gray-500">{guest.email || 'No email provided'}</div>
+                  </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setSendVia('whatsapp')}
                   disabled={!guest.phone}
-                  className={`p-4 border-2 rounded-lg text-left transition-all ${
+                  className={`p-4 border-2 rounded-xl flex items-center gap-3 transition-all ${
                     sendVia === 'whatsapp'
-                      ? 'border-purple-600 bg-purple-50'
-                      : 'border-gray-300 hover:border-purple-300'
+                      ? 'border-green-600 bg-green-50 text-green-900'
+                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
                   } ${!guest.phone ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <MessageCircle className="w-5 h-5 text-green-600 mb-2" />
-                  <p className="font-semibold text-gray-900">WhatsApp</p>
-                  <p className="text-xs text-gray-600">
-                    {guest.phone || 'No phone'}
-                  </p>
+                  <MessageSquare className="w-6 h-6 text-green-600" />
+                  <div className="text-left">
+                    <div className="font-semibold">WhatsApp</div>
+                    <div className="text-xs text-gray-500">{guest.phone || 'No phone provided'}</div>
+                  </div>
                 </button>
               </div>
             </div>
 
-            {/* Info Note */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-900">
-                <span className="font-semibold">ℹ️ Note:</span> Clicking send will email/message the guest an invitation link automatically. They can confirm or decline, and their RSVP status will update automatically.
-              </p>
+            {/* Sender Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Your Name (Host)
+              </label>
+              <input
+                type="text"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+                placeholder="e.g. Rahul & Priya"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              />
             </div>
-          </div>
-        )}
 
-        {/* Footer Buttons */}
-        {!sent && (
-          <div className="border-t px-6 py-4 flex gap-4 flex-shrink-0">
-            <Button
-              onClick={handleSend}
-              disabled={!selectedFile || sending}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3"
-            >
-              {sending ? (
-                <>
-                  <div className="animate-spin mr-2">⏳</div>
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Mail className="w-5 h-5 mr-2" />
-                  Send Invitation
-                </>
-              )}
-            </Button>
-            <Button
-              type="button"
-              onClick={onClose}
-              variant="outline"
-              className="px-8"
-              disabled={sending}
-            >
-              Cancel
-            </Button>
+            {/* File Attachment (Optional) */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Attach Design / Video Card (Optional)
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-purple-500 transition-colors">
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="invitation-file"
+                />
+                <label htmlFor="invitation-file" className="cursor-pointer">
+                  <Paperclip className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <span className="text-sm font-medium text-purple-600 hover:text-purple-700">
+                    Upload an Image or Video
+                  </span>
+                  <span className="block text-xs text-gray-500 mt-1">PNG, JPG, MP4 (max 4.0MB)</span>
+                </label>
+                {selectedFile && (
+                  <p className="mt-2 text-xs text-green-600 font-semibold">
+                    Attached: {selectedFile.name}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={sending}
+                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 flex items-center gap-2 font-semibold disabled:opacity-50"
+              >
+                {sending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Send Invitation
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         )}
       </div>

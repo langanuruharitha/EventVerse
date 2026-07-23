@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 interface Props {
   eventId: string;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function DecorationGeneratorForm({ eventId, event, onPlanGenerated }: Props) {
+  const toast = useToast();
   const [generating, setGenerating] = useState(false);
   const [formData, setFormData] = useState({
     theme: '',
@@ -57,7 +59,7 @@ export default function DecorationGeneratorForm({ eventId, event, onPlanGenerate
       onPlanGenerated(result);
     } catch (error) {
       console.error('Error generating plan:', error);
-      alert('Failed to generate decoration plan. Please try again.');
+      toast('Failed to generate decoration plan. Please try again.', 'error');
     } finally {
       setGenerating(false);
     }

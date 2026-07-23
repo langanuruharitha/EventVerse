@@ -5,9 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { ArrowLeft, Video, Download, Upload, Sparkles } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 function CreateVideoInvitationContent() {
   const router = useRouter();
+  const toast = useToast();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(2); // Start directly at customize step
   const [loading, setLoading] = useState(false);
@@ -49,7 +51,7 @@ function CreateVideoInvitationContent() {
 
   const generateVideo = async () => {
     if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
-      alert('Please fill all required fields: Event Name, Host Name, Date, Time and Venue');
+      toast('Please fill all required fields: Event Name, Host Name, Date, Time and Venue', 'warning');
       return;
     }
 
@@ -76,7 +78,7 @@ function CreateVideoInvitationContent() {
       }
     } catch (error) {
       console.error('Error generating video:', error);
-      alert('Failed to generate video invitation. Falling back to default preview.');
+      toast('Failed to generate video invitation. Falling back to default preview.', 'warning');
       await generateVideoViaAPI();
     } finally {
       setGenerating(false);

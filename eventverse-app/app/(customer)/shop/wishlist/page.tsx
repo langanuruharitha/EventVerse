@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { ArrowLeft, Heart, ShoppingCart, Trash2 } from 'lucide-react';
 import ProductImage from '@/components/shop/ProductImage';
+import { useToast } from '@/components/ui/Toast';
 
 interface WishlistItem {
   id: string;
@@ -14,6 +15,7 @@ interface WishlistItem {
 
 export default function WishlistPage() {
   const router = useRouter();
+  const toast = useToast();
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,9 +53,9 @@ export default function WishlistPage() {
       if (response.ok && result.success) {
         window.dispatchEvent(new Event('cart-updated'));
         await removeFromWishlist(item.products.id);
-        alert('Added to cart!');
+        toast('Added to cart!', 'success');
       } else {
-        alert(result.error || 'Failed to add to cart');
+        toast(result.error || 'Failed to add to cart', 'error');
       }
     } catch (error) {
       console.error('Error moving to cart:', error);

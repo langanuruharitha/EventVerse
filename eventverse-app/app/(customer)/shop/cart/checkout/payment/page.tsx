@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,6 +8,7 @@ import { createOrder, processOrderPayment } from '@/lib/commerce/order-service';
 import { ArrowLeft, CreditCard, Wallet, Building, Shield, CheckCircle } from 'lucide-react';
 
 export default function PaymentPage() {
+  const toast = useToast();
   const router = useRouter();
   const [cart, setCart] = useState<any>(null);
   const [address, setAddress] = useState<any>(null);
@@ -83,7 +85,7 @@ export default function PaymentPage() {
       }
     } catch (error: any) {
       console.error('Payment error:', error);
-      alert(error.message || 'Payment processing failed. Please try again.');
+      toast(error.message || 'Payment processing failed. Please try again.', 'error');
     } finally {
       setProcessing(false);
     }

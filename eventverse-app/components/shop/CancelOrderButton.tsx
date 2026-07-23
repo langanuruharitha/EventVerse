@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/Toast';
 
 export default function CancelOrderButton({ orderId }: { orderId: string }) {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -15,13 +17,13 @@ export default function CancelOrderButton({ orderId }: { orderId: string }) {
       const res = await fetch(`/api/orders/${orderId}/cancel`, { method: 'POST' });
       const result = await res.json();
       if (result.success) {
-        alert('✅ Order cancelled successfully!');
+        toast('Order cancelled successfully!', 'success');
         router.refresh();
       } else {
-        alert('❌ ' + (result.error || 'Failed to cancel order'));
+        toast(result.error || 'Failed to cancel order', 'error');
       }
     } catch (error: any) {
-      alert('An error occurred while cancelling the order.');
+      toast('An error occurred while cancelling the order.', 'error');
     } finally {
       setLoading(false);
     }

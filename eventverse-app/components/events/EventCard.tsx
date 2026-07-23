@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { EventWithStats } from '@/types/events';
 import { calculateHealthScore, getHealthStatusMessage } from '@/lib/events/health-score';
+import { useToast } from '@/components/ui/Toast';
 
 interface EventCardProps {
   event: EventWithStats;
@@ -12,6 +13,7 @@ interface EventCardProps {
 
 export default function EventCard({ event }: EventCardProps) {
   const router = useRouter();
+  const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
@@ -54,15 +56,15 @@ export default function EventCard({ event }: EventCardProps) {
       const data = await response.json();
 
       if (response.ok) {
-        alert('✅ Event deleted successfully!');
+        toast('Event deleted successfully!', 'success');
         router.refresh();
       } else {
-        alert(data.error || 'Failed to delete event');
+        toast(data.error || 'Failed to delete event', 'error');
         setShowDeleteConfirm(false);
       }
     } catch (error) {
       console.error('Error deleting event:', error);
-      alert('Failed to delete event. Please try again.');
+      toast('Failed to delete event. Please try again.', 'error');
       setShowDeleteConfirm(false);
     } finally {
       setIsDeleting(false);

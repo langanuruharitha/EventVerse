@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/Toast';
 
 // Admin Profile Management Page
 export default function AdminProfilePage() {
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -75,7 +77,7 @@ export default function AdminProfilePage() {
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile');
+      toast('Failed to update profile', 'error');
     } finally {
       setSaving(false);
     }

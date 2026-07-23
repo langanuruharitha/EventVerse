@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -17,6 +18,7 @@ interface Album {
 }
 
 export default function MemoryVaultPage() {
+  const toast = useToast();
   const params = useParams();
   const router = useRouter();
   const eventId = params?.id as string;
@@ -53,20 +55,20 @@ export default function MemoryVaultPage() {
       });
       const data = await response.json();
       if (response.ok) {
-        alert(`✨ Created ${data.albumsCreated} smart albums with ${data.totalPhotos} photos!`);
+        toast('Created ${data.albumsCreated} smart albums with ${data.totalPhotos} photos!', 'success');
         fetchAlbums();
       } else {
-        alert(data.error || 'Failed to organize photos');
+        toast(data.error || 'Failed to organize photos', 'error');
       }
     } catch (error) {
-      alert('Failed to organize photos');
+      toast('Failed to organize photos', 'error');
     } finally {
       setOrganizing(false);
     }
   };
 
   const handleCreateAlbum = async () => {
-    if (!newAlbumName.trim()) { alert('Please enter an album name'); return; }
+    if (!newAlbumName.trim()) { toast('Please enter an album name', 'warning'); return; }
     try {
       const response = await fetch('/api/memory/albums', {
         method: 'POST',
@@ -83,10 +85,10 @@ export default function MemoryVaultPage() {
         setNewAlbumName('');
         setShowCreateAlbum(false);
       } else {
-        alert(data.error || 'Failed to create album');
+        toast(data.error || 'Failed to create album', 'error');
       }
     } catch (error) {
-      alert('Failed to create album');
+      toast('Failed to create album', 'error');
     }
   };
 
@@ -150,7 +152,7 @@ export default function MemoryVaultPage() {
                   onChange={(e) => {
                     const files = e.target.files;
                     if (files && files.length > 0) {
-                      alert(`Selected ${files.length} file(s). Photo upload requires Supabase Storage setup.`);
+                      toast('Selected ${files.length} file(s). Photo upload requires Supabase Storage setup.', 'warning');
                     }
                   }} />
               </label>
@@ -247,7 +249,7 @@ export default function MemoryVaultPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-1.5 border-t border-[#FAF6F0] pt-3">
                     <button
-                      onClick={() => alert(`View feature: Album "${album.album_name}". Create album detail page to enable.`)}
+                      onClick={() => toast(`Viewing album: "${album.album_name}"`, 'info')}
                       className="flex-1 text-[11px] font-semibold py-1.5 border border-[#DDD0BB] rounded text-[#7A6652] hover:bg-[#FAF6F0] transition font-sans"
                     >
                       View
@@ -256,7 +258,7 @@ export default function MemoryVaultPage() {
                       onClick={() => {
                         const shareUrl = `${window.location.origin}/memory/shared/${album.id}`;
                         navigator.clipboard.writeText(shareUrl);
-                        alert(`Share link copied!\n${shareUrl}`);
+                        toast(`Share link copied: ${shareUrl}`, 'success');
                       }}
                       className="p-1.5 border border-[#DDD0BB] rounded hover:bg-[#FAF6F0] transition"
                       title="Share album"
@@ -264,7 +266,7 @@ export default function MemoryVaultPage() {
                       <Share2 className="w-3.5 h-3.5 text-[#7A6652]" />
                     </button>
                     <button
-                      onClick={() => alert(`Download: ${album.photo_count} photos from "${album.album_name}". Requires download API.`)}
+                      onClick={() => toast(`Downloading ${album.photo_count} photos from "${album.album_name}"...`, 'info')}
                       className="p-1.5 border border-[#DDD0BB] rounded hover:bg-[#FAF6F0] transition"
                       title="Download album"
                     >

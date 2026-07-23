@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -64,6 +65,7 @@ interface BudgetCreationWizardProps {
 }
 
 export default function BudgetCreationWizard({ onClose, onComplete }: BudgetCreationWizardProps) {
+  const toast = useToast();
   const [step, setStep] = useState(1); // 1: Select Event, 2: Budget Details, 3: Review & Create
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -176,7 +178,7 @@ export default function BudgetCreationWizard({ onClose, onComplete }: BudgetCrea
       
     } catch (error) {
       console.error('Error creating budget:', error);
-      alert('Failed to create budget. Please try again.');
+      toast('Failed to create budget. Please try again.', 'error');
     } finally {
       setCreating(false);
     }

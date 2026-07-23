@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/components/ui/Toast';
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,6 +33,7 @@ interface VendorProfile {
 }
 
 export default function VendorDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const toast = useToast();
   const router = useRouter();
   const resolvedParams = use(params);
   const [vendor, setVendor] = useState<VendorProfile | null>(null);
@@ -313,7 +315,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                alert('Proposal sent to vendor successfully!');
+                toast('Proposal sent to vendor successfully!', 'success');
                 setIsHireModalOpen(false);
               }}
               className="space-y-3 font-sans text-xs"

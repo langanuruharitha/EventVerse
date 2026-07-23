@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useToast } from '@/components/ui/Toast';
 
 const DEMO_VENDORS_KEY = 'eventverse_demo_vendors';
 
@@ -64,6 +65,7 @@ const getInitialDemoVendors = () => [
 ];
 
 export default function AdminVendorsPage() {
+  const toast = useToast();
   const [vendors, setVendors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -147,10 +149,10 @@ export default function AdminVendorsPage() {
         localStorage.setItem(DEMO_VENDORS_KEY, JSON.stringify(updatedVendors));
       }
 
-      alert(`Vendor status updated to ${newStatus}${isDemoVendor ? ' (Demo - changes saved in browser)' : ''}`);
+      toast(`Vendor status updated to ${newStatus}${isDemoVendor ? ' (Demo)' : ''}`, 'success');
     } catch (err) {
       console.error('Error updating vendor status:', err);
-      alert('Failed to update vendor status. Please try again.');
+      toast('Failed to update vendor status. Please try again.', 'error');
     }
   };
 
