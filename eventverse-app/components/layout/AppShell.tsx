@@ -8,7 +8,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-[#070913] text-slate-100 font-sans relative overflow-x-hidden">
+      {/* Background ambient orbs */}
+      <div className="absolute top-0 left-0 w-[400px] h-[400px] rounded-full bg-purple-500/5 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
+
       <Sidebar />
       <MobileSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

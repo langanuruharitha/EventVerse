@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { signOut } from '@/lib/auth/actions';
 import { Avatar } from '@/components/ui/Avatar';
+import { Sparkles } from 'lucide-react';
 
 const customerNav = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
@@ -33,19 +34,23 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 bg-white/80 backdrop-blur-xl border-r border-gray-200">
-      <div className="p-6">
-        <Link href="/dashboard">
-          <img 
-            src="/eventverse-logo.png" 
-            alt="EventVerse" 
-            className="h-24 w-auto mb-3"
-          />
+    <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 bg-[#0d1026]/75 backdrop-blur-xl border-r border-white/5">
+      <div className="p-6 border-b border-white/5 mb-4">
+        <Link href="/dashboard" className="flex items-center gap-3 group mb-2">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity" />
+            <div className="relative bg-[#0d1026] border border-white/10 rounded-lg p-1.5">
+              <Sparkles className="w-4 h-4 text-purple-400 group-hover:text-pink-400 transition-colors" />
+            </div>
+          </div>
+          <span className="text-xl font-bold bg-gradient-to-r from-white via-slate-100 to-purple-400 bg-clip-text text-transparent tracking-tight">
+            EventVerse
+          </span>
         </Link>
-        <p className="text-lg font-semibold text-gray-700">Customer Portal</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Customer Workspace</p>
       </div>
 
-      <nav className="px-4 space-y-2 flex-1">
+      <nav className="px-4 space-y-1.5 flex-1 overflow-y-auto">
         {customerNav.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -56,37 +61,37 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+                flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                 ${isActive
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white shadow-lg shadow-purple-900/30 font-semibold'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
                 }
               `}
             >
               <span className="text-xl">{item.icon}</span>
-              <span className="font-medium">{item.name}</span>
+              <span className="text-sm font-medium">{item.name}</span>
             </Link>
           );
         })}
       </nav>
 
       {user && (
-        <div className="p-4 border-t border-gray-200 bg-white/80">
+        <div className="p-4 border-t border-white/5 bg-[#0a0c1f]/80">
           <div className="flex items-center gap-3 mb-3">
             <Avatar
               fallback={user.email}
               size="md"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-semibold text-white truncate">
                 {user.user_metadata?.full_name || 'User'}
               </p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              <p className="text-xs text-slate-500 truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={handleSignOut}
-            className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="w-full px-4 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium border border-red-500/20"
           >
             Sign Out
           </button>
@@ -120,56 +125,69 @@ export function MobileSidebar({
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
         onClick={onClose}
       />
-      <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-white/95 backdrop-blur-xl border-r border-gray-200 lg:hidden">
-        <div className="p-6 flex items-center justify-between">
-          <Link href="/dashboard" onClick={onClose}>
-            <img 
-              src="/eventverse-logo.png" 
-              alt="EventVerse" 
-              className="h-20 w-auto"
-            />
-          </Link>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+      <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-[#0d1026]/95 backdrop-blur-xl border-r border-white/5 lg:hidden flex flex-col justify-between">
+        <div>
+          <div className="p-6 flex items-center justify-between border-b border-white/5">
+            <Link href="/dashboard" onClick={onClose} className="flex items-center gap-3 group">
+              <div className="relative bg-[#0d1026] border border-white/10 rounded-lg p-1.5">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+              </div>
+              <span className="text-lg font-bold text-white tracking-tight">EventVerse</span>
+            </Link>
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <nav className="px-4 py-6 space-y-1.5 overflow-y-auto">
+            {customerNav.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ||
+                (item.href === '/dashboard' && pathname === '/dashboard');
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={`
+                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                    ${isActive
+                      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white shadow-lg'
+                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                    }
+                  `}
+                >
+                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-sm font-medium">{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        <nav className="px-4 space-y-2">
-          {customerNav.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ||
-              (item.href === '/dashboard' && pathname === '/dashboard');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={`
-                  flex items-center gap-3 px-4 py-3 rounded-lg transition-all
-                  ${isActive
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                    : 'text-gray-700 hover:bg-gray-100'
-                  }
-                `}
-              >
-                <span className="text-xl">{item.icon}</span>
-                <span className="font-medium">{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
         {user && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white/95">
+          <div className="p-4 border-t border-white/5 bg-[#0a0c1f]/95">
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar
+                fallback={user.email}
+                size="md"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white truncate">
+                  {user.user_metadata?.full_name || 'User'}
+                </p>
+                <p className="text-xs text-slate-500 truncate">{user.email}</p>
+              </div>
+            </div>
             <button
               onClick={handleSignOut}
-              className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="w-full px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium border border-red-500/20"
             >
               Sign Out
             </button>
