@@ -56,7 +56,7 @@ export default function Navigation({ onMenuClick }: { onMenuClick?: () => void }
   };
 
   return (
-    <nav className="bg-[#070913]/60 border-b border-white/5 sticky top-0 z-40 backdrop-blur-md shadow-2xl">
+    <nav className="bg-[#FAF6F0]/80 border-b border-[#C5A880]/20 sticky top-0 z-40 backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-3">
@@ -64,7 +64,7 @@ export default function Navigation({ onMenuClick }: { onMenuClick?: () => void }
               <button
                 type="button"
                 onClick={onMenuClick}
-                className="lg:hidden p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-colors"
+                className="lg:hidden p-2 rounded-xl hover:bg-black/5 text-[#1F1E1B]/70 hover:text-[#1F1E1B] transition-colors"
                 aria-label="Open menu"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,12 +79,12 @@ export default function Navigation({ onMenuClick }: { onMenuClick?: () => void }
             {/* Wishlist Icon */}
             <Link
               href="/shop/wishlist"
-              className="relative p-2 text-slate-400 hover:text-pink-400 transition-colors"
+              className="relative p-2 text-[#1F1E1B]/70 hover:text-[#8A1C2C] transition-colors"
               title="Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-pink-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#8A1C2C] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {wishlistCount > 9 ? '9+' : wishlistCount}
                 </span>
               )}
@@ -93,7 +93,7 @@ export default function Navigation({ onMenuClick }: { onMenuClick?: () => void }
             {/* Orders Icon */}
             <Link
               href="/shop/orders"
-              className="relative p-2 text-slate-400 hover:text-blue-400 transition-colors"
+              className="relative p-2 text-[#1F1E1B]/70 hover:text-[#C5A880] transition-colors"
               title="My Orders"
             >
               <Package className="w-5 h-5" />
@@ -102,12 +102,12 @@ export default function Navigation({ onMenuClick }: { onMenuClick?: () => void }
             {/* Cart Icon */}
             <Link
               href="/shop/cart"
-              className="relative p-2 text-slate-400 hover:text-purple-400 transition-colors"
+              className="relative p-2 text-[#1F1E1B]/70 hover:text-[#C5A880] transition-colors"
               title="Shopping Cart"
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-purple-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#1F1E1B] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
@@ -116,11 +116,11 @@ export default function Navigation({ onMenuClick }: { onMenuClick?: () => void }
             {/* Profile/Customer Icon */}
             <Link
               href={user ? "/dashboard/profile" : "/auth/signin"}
-              className="relative p-2 text-slate-400 hover:text-purple-400 transition-colors border-l border-white/10 pl-4 ml-2"
+              className="relative p-2 text-[#1F1E1B]/70 hover:text-[#C5A880] transition-colors border-l border-black/10 pl-4 ml-2"
               title={user ? "My Profile" : "Sign In"}
             >
               {user ? (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold text-xs shadow-md">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#C5A880] to-[#8A1C2C] flex items-center justify-center text-white font-semibold text-xs shadow-md">
                   {user.email?.charAt(0).toUpperCase()}
                 </div>
               ) : (

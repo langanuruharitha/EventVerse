@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { signOut } from '@/lib/auth/actions';
 import { Avatar } from '@/components/ui/Avatar';
-import { Sparkles } from 'lucide-react';
 
 const customerNav = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
@@ -34,23 +33,20 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 bg-[#0d1026]/75 backdrop-blur-xl border-r border-white/5">
-      <div className="p-6 border-b border-white/5 mb-4">
-        <Link href="/dashboard" className="flex items-center gap-3 group mb-2">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity" />
-            <div className="relative bg-[#0d1026] border border-white/10 rounded-lg p-1.5">
-              <Sparkles className="w-4 h-4 text-purple-400 group-hover:text-pink-400 transition-colors" />
-            </div>
+    <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 bg-[#1F1E1B] border-r border-[#C5A880]/30 shadow-xl">
+      <div className="p-6 border-b border-[#C5A880]/20 mb-4">
+        <Link href="/dashboard" className="flex items-center gap-3 group mb-2 text-decoration-none">
+          <div className="relative bg-[#131211] border border-[#C5A880]/40 rounded-lg p-2 flex items-center justify-center">
+            <span style={{ fontSize: 16, color: '#C5A880' }}>❦</span>
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-white via-slate-100 to-purple-400 bg-clip-text text-transparent tracking-tight">
+          <span className="text-xl font-bold font-serif text-[#FAF6F0] tracking-tight">
             EventVerse
           </span>
         </Link>
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Customer Workspace</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880]/70 font-sans">Customer Workspace</p>
       </div>
 
-      <nav className="px-4 space-y-1.5 flex-1 overflow-y-auto">
+      <nav className="px-3 space-y-1 flex-1 overflow-y-auto font-sans">
         {customerNav.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -61,14 +57,14 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-decoration-none
                 ${isActive
-                  ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white shadow-lg shadow-purple-900/30 font-semibold'
-                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                  ? 'bg-[#C5A880] text-[#1F1E1B] font-bold border-l-4 border-[#8A1C2C] shadow-md'
+                  : 'text-[#FAF6F0]/70 hover:bg-[#C5A880]/15 hover:text-white'
                 }
               `}
             >
-              <span className="text-xl">{item.icon}</span>
+              <span className="text-lg">{item.icon}</span>
               <span className="text-sm font-medium">{item.name}</span>
             </Link>
           );
@@ -76,22 +72,22 @@ export default function Sidebar() {
       </nav>
 
       {user && (
-        <div className="p-4 border-t border-white/5 bg-[#0a0c1f]/80">
+        <div className="p-4 border-t border-[#C5A880]/20 bg-[#131211]">
           <div className="flex items-center gap-3 mb-3">
             <Avatar
               fallback={user.email}
               size="md"
             />
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 font-sans">
               <p className="text-sm font-semibold text-white truncate">
                 {user.user_metadata?.full_name || 'User'}
               </p>
-              <p className="text-xs text-slate-500 truncate">{user.email}</p>
+              <p className="text-xs text-[#FAF6F0]/50 truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={handleSignOut}
-            className="w-full px-4 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium border border-red-500/20"
+            className="w-full px-4 py-2.5 text-xs text-[#FAF6F0] hover:bg-[#8A1C2C] bg-[#8A1C2C]/80 rounded-lg transition-all font-semibold border border-[#8A1C2C]"
           >
             Sign Out
           </button>
@@ -128,23 +124,23 @@ export function MobileSidebar({
         className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
         onClick={onClose}
       />
-      <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-[#0d1026]/95 backdrop-blur-xl border-r border-white/5 lg:hidden flex flex-col justify-between">
+      <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-[#1F1E1B] border-r border-[#C5A880]/30 lg:hidden flex flex-col justify-between shadow-2xl">
         <div>
-          <div className="p-6 flex items-center justify-between border-b border-white/5">
-            <Link href="/dashboard" onClick={onClose} className="flex items-center gap-3 group">
-              <div className="relative bg-[#0d1026] border border-white/10 rounded-lg p-1.5">
-                <Sparkles className="w-4 h-4 text-purple-400" />
+          <div className="p-6 flex items-center justify-between border-b border-[#C5A880]/20">
+            <Link href="/dashboard" onClick={onClose} className="flex items-center gap-3 group text-decoration-none">
+              <div className="relative bg-[#131211] border border-[#C5A880]/40 rounded-lg p-2">
+                <span style={{ fontSize: 16, color: '#C5A880' }}>❦</span>
               </div>
-              <span className="text-lg font-bold text-white tracking-tight">EventVerse</span>
+              <span className="text-lg font-bold font-serif text-white tracking-tight">EventVerse</span>
             </Link>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white">
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#C5A880]/15 text-[#FAF6F0]/70 hover:text-white">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <nav className="px-4 py-6 space-y-1.5 overflow-y-auto">
+          <nav className="px-3 py-6 space-y-1 overflow-y-auto font-sans">
             {customerNav.map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -156,14 +152,14 @@ export function MobileSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                    flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-decoration-none
                     ${isActive
-                      ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white shadow-lg'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      ? 'bg-[#C5A880] text-[#1F1E1B] font-bold border-l-4 border-[#8A1C2C]'
+                      : 'text-[#FAF6F0]/70 hover:bg-[#C5A880]/15 hover:text-white'
                     }
                   `}
                 >
-                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-lg">{item.icon}</span>
                   <span className="text-sm font-medium">{item.name}</span>
                 </Link>
               );
@@ -172,22 +168,22 @@ export function MobileSidebar({
         </div>
 
         {user && (
-          <div className="p-4 border-t border-white/5 bg-[#0a0c1f]/95">
+          <div className="p-4 border-t border-[#C5A880]/20 bg-[#131211]">
             <div className="flex items-center gap-3 mb-3">
               <Avatar
                 fallback={user.email}
                 size="md"
               />
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 font-sans">
                 <p className="text-sm font-semibold text-white truncate">
                   {user.user_metadata?.full_name || 'User'}
                 </p>
-                <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                <p className="text-xs text-[#FAF6F0]/50 truncate">{user.email}</p>
               </div>
             </div>
             <button
               onClick={handleSignOut}
-              className="w-full px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium border border-red-500/20"
+              className="w-full px-4 py-2.5 text-xs text-[#FAF6F0] hover:bg-[#8A1C2C] bg-[#8A1C2C]/80 rounded-lg transition-all font-semibold border border-[#8A1C2C]"
             >
               Sign Out
             </button>
