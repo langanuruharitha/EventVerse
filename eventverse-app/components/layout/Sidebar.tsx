@@ -34,14 +34,9 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 bg-[#1F1E1B] border-r border-[#C5A880]/30 shadow-xl">
-      <div className="p-6 border-b border-[#C5A880]/20 mb-4">
-        <Link href="/dashboard" className="flex items-center gap-3 group mb-2 text-decoration-none">
-          <div className="relative bg-[#131211] border border-[#C5A880]/40 rounded-lg p-2 flex items-center justify-center">
-            <span style={{ fontSize: 16, color: '#C5A880' }}>❦</span>
-          </div>
-          <span className="text-xl font-bold font-serif text-[#FAF6F0] tracking-tight">
-            EventVerse
-          </span>
+      <div className="p-4 border-b border-[#C5A880]/20 mb-4">
+        <Link href="/dashboard" className="block mb-1.5">
+          <img src="/eventverse-logo.png" alt="EventVerse" className="h-16 w-auto object-contain" />
         </Link>
         <p className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880]/70 font-sans">Customer Workspace</p>
       </div>
@@ -126,12 +121,9 @@ export function MobileSidebar({
       />
       <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-[#1F1E1B] border-r border-[#C5A880]/30 lg:hidden flex flex-col justify-between shadow-2xl">
         <div>
-          <div className="p-6 flex items-center justify-between border-b border-[#C5A880]/20">
-            <Link href="/dashboard" onClick={onClose} className="flex items-center gap-3 group text-decoration-none">
-              <div className="relative bg-[#131211] border border-[#C5A880]/40 rounded-lg p-2">
-                <span style={{ fontSize: 16, color: '#C5A880' }}>❦</span>
-              </div>
-              <span className="text-lg font-bold font-serif text-white tracking-tight">EventVerse</span>
+          <div className="px-4 py-3 flex items-center justify-between border-b border-[#C5A880]/20">
+            <Link href="/dashboard" onClick={onClose}>
+              <img src="/eventverse-logo.png" alt="EventVerse" className="h-12 w-auto object-contain" />
             </Link>
             <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#C5A880]/15 text-[#FAF6F0]/70 hover:text-white">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
