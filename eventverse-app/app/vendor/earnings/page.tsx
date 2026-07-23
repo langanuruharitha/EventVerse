@@ -93,7 +93,7 @@ export default function VendorEarningsPage() {
         </div>
         <button
           onClick={() => setShowRequestModal(true)}
-          className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-5 py-2.5 rounded-xl font-semibold hover:from-orange-600 hover:to-amber-600 transition-all shadow-lg shadow-orange-200"
+          className="bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] px-5 py-2.5 rounded font-semibold uppercase tracking-wider text-xs font-sans hover:shadow transition"
         >
           💸 Request Payout
         </button>
@@ -108,8 +108,8 @@ export default function VendorEarningsPage() {
         </div>
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <p className="text-sm font-semibold text-gray-400 uppercase">Withdrawable Balance</p>
-          <p className="text-3xl font-bold text-orange-600 mt-2">₹{pendingPayout.toLocaleString('en-IN')}</p>
-          <span className="text-xs font-semibold text-orange-500 block mt-1">Funds currently pending payout</span>
+          <p className="text-3xl font-bold text-[#8A1C2C] mt-2 font-sans">₹{pendingPayout.toLocaleString('en-IN')}</p>
+          <span className="text-xs font-semibold text-[#8A1C2C]/70 block mt-1 font-sans">Funds currently pending payout</span>
         </div>
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <p className="text-sm font-semibold text-gray-400 uppercase">Paid Out</p>
@@ -214,7 +214,7 @@ export default function VendorEarningsPage() {
               </button>
               <button
                 onClick={handleRequestPayout}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold hover:from-orange-600 hover:to-amber-600 transition-all"
+                className="px-5 py-2.5 rounded bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider font-sans hover:shadow transition"
               >
                 Request Transfer
               </button>

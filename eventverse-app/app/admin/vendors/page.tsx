@@ -180,7 +180,7 @@ export default function AdminVendorsPage() {
               onClick={() => setFilter(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-all ${
                 filter === tab
-                  ? 'bg-rose-600 text-white shadow-lg'
+                  ? 'bg-[#8A1C2C] text-[#FAF0E0] shadow font-bold'
                   : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -249,7 +249,7 @@ export default function AdminVendorsPage() {
                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => setSelectedVendor(vendor)}
-                        className="text-rose-600 hover:text-rose-700 font-semibold"
+                        className="text-[#8A1C2C] hover:underline font-semibold"
                       >
                         Review
                       </button>
@@ -295,7 +295,7 @@ export default function AdminVendorsPage() {
                   <p className="text-xs text-gray-500 font-semibold mb-1.5">Submitted Identification Document</p>
                   <div className="flex items-center justify-between text-xs bg-white p-2.5 rounded-lg border border-gray-100">
                     <span className="font-semibold truncate text-gray-700">📄 {selectedVendor.documents}</span>
-                    <button className="text-rose-600 hover:underline font-bold flex-shrink-0 ml-2">Download File</button>
+                    <button className="text-[#8A1C2C] hover:underline font-bold flex-shrink-0 ml-2">Download File</button>
                   </div>
                 </div>
               )}

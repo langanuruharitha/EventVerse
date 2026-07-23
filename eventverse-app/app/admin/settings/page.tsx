@@ -88,7 +88,7 @@ export default function AdminSettingsPage() {
             <button
               onClick={() => setAllowRegistration(!allowRegistration)}
               className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 focus:outline-none ${
-                allowRegistration ? 'bg-rose-600' : 'bg-gray-200'
+                allowRegistration ? 'bg-[#8A1C2C]' : 'bg-gray-200'
               }`}
             >
               <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 transform ${
@@ -105,7 +105,7 @@ export default function AdminSettingsPage() {
             <button
               onClick={() => setAutoVerifyVendors(!autoVerifyVendors)}
               className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 focus:outline-none ${
-                autoVerifyVendors ? 'bg-rose-600' : 'bg-gray-200'
+                autoVerifyVendors ? 'bg-[#8A1C2C]' : 'bg-gray-200'
               }`}
             >
               <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 transform ${
@@ -133,7 +133,7 @@ export default function AdminSettingsPage() {
         <div className="pt-6 border-t border-gray-100 flex justify-end">
           <button
             onClick={handleSave}
-            className="bg-gradient-to-r from-rose-600 to-pink-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:from-rose-700 hover:to-pink-700 transition-all shadow-lg shadow-rose-200"
+            className="bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] px-6 py-2.5 rounded text-xs font-bold uppercase tracking-wider font-sans hover:shadow transition"
           >
             Save Settings Configuration
           </button>

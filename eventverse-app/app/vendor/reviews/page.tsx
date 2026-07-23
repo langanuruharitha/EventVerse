@@ -67,7 +67,7 @@ export default function VendorReviewsPage() {
         {mockReviews.map(review => (
           <div key={review.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-400 to-amber-400 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+              <div className="w-12 h-12 rounded-full bg-[#8A1C2C] text-[#FAF0E0] font-sans flex items-center justify-center font-bold text-lg flex-shrink-0">
                 {review.avatar}
               </div>
               <div className="flex-1">

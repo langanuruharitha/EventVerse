@@ -125,7 +125,7 @@ export default function AdminUsersPage() {
               onClick={() => setFilter(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize whitespace-nowrap transition-all ${
                 filter === tab
-                  ? 'bg-rose-600 text-white shadow-lg shadow-rose-200'
+                  ? 'bg-[#8A1C2C] text-[#FAF0E0] shadow font-bold'
                   : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -173,7 +173,7 @@ export default function AdminUsersPage() {
               <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+                    <div className="w-9 h-9 rounded-full bg-[#8A1C2C] text-[#FAF0E0] flex items-center justify-center font-bold text-xs font-sans">
                       {user.user_profiles?.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                     </div>
                     <span className="font-semibold text-gray-900">

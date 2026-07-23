@@ -134,7 +134,7 @@ export default function VendorBookingsPage() {
             onClick={() => setFilter(tab)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
               filter === tab
-                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg'
+                ? 'bg-[#8A1C2C] text-[#FAF0E0] shadow font-bold'
                 : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
             }`}
           >
@@ -162,7 +162,7 @@ export default function VendorBookingsPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-amber-400 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[#8A1C2C] text-[#FAF0E0] font-bold flex items-center justify-center flex-shrink-0 font-sans">
                     {booking.customer.charAt(0)}
                   </div>
                   <div>

@@ -27,7 +27,6 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
       try {
         const { createBrowserClient } = await import('@/lib/supabase/client');
         const supabase = createBrowserClient();
-
         const { data: { user } } = await supabase.auth.getUser();
 
         if (user) {
@@ -44,8 +43,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
 
           setAdmin({
             email: user.email,
-            full_name:
-              displayName.charAt(0).toUpperCase() + displayName.slice(1),
+            full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
             role: 'Admin',
           });
         } else {
@@ -72,18 +70,20 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="p-6 border-b border-rose-100">
+    <div className="flex flex-col h-full bg-[#1F1E1B] text-[#FAF0E0] font-serif border-r border-[#C5A880]/30">
+      {/* Logo */}
+      <div className="p-6 border-b border-[#C5A880]/20 bg-[#2C1810]">
         <Link href="/admin/dashboard">
-          <img src="/eventverse-logo.png" alt="EventVerse" className="h-20 w-auto mb-3" />
+          <img src="/eventverse-logo.png" alt="EventVerse" className="h-16 w-auto mb-2" />
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-xl">🛠️</span>
-          <p className="text-base font-bold text-rose-700">Admin Control Panel</p>
+          <span className="text-xs text-[#C5A880]">⚜</span>
+          <p className="text-xs font-bold text-[#C5A880] uppercase tracking-wider font-sans">Admin Control Panel</p>
         </div>
       </div>
 
-      <nav className="px-4 py-4 space-y-1 flex-1">
+      {/* Navigation */}
+      <nav className="px-3 py-4 space-y-1 flex-1 font-sans text-xs font-semibold">
         {adminNav.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -94,86 +94,99 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
               href={item.href}
               onClick={() => setSidebarOpen(false)}
               className={`
-                flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                flex items-center gap-3 px-4 py-3 rounded transition-all duration-200
                 ${isActive
-                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-lg shadow-rose-200'
-                  : 'text-gray-700 hover:bg-rose-50 hover:text-rose-700'
+                  ? 'bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] shadow-sm font-bold border border-[#C5A880]/30'
+                  : 'text-[#FAF0E0]/70 hover:bg-[#2C1810] hover:text-[#FAF0E0]'
                 }
               `}
             >
-              <span className="text-xl">{item.icon}</span>
-              <span className="font-medium">{item.name}</span>
+              <span className="text-base">{item.icon}</span>
+              <span className="tracking-wide">{item.name}</span>
             </Link>
           );
         })}
       </nav>
 
-      {admin && (
-        <div className="p-4 border-t border-rose-100 bg-rose-50/50">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 flex items-center justify-center text-white font-bold text-sm">
-              {admin.email?.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{admin.full_name}</p>
-              <p className="text-xs text-gray-500 truncate">{admin.email}</p>
-            </div>
+      {/* User Info / Signout */}
+      <div className="p-4 border-t border-[#C5A880]/20 bg-[#2C1810]/60">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-full bg-[#8A1C2C] text-[#FAF0E0] font-bold flex items-center justify-center text-xs font-sans border border-[#C5A880]/30">
+            {admin?.full_name?.charAt(0) || 'A'}
           </div>
-          <button
-            onClick={handleSignOut}
-            className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-          >
-            Sign Out
-          </button>
+          <div className="flex-1 min-w-0 font-sans">
+            <p className="text-xs font-bold text-[#FAF0E0] truncate">
+              {admin?.full_name || 'System Admin'}
+            </p>
+            <p className="text-[10px] text-[#C5A880] truncate">{admin?.email || 'admin@eventverse.com'}</p>
+          </div>
         </div>
-      )}
+        <button
+          onClick={handleSignOut}
+          className="w-full py-2 text-xs text-[#FAF0E0] bg-[#8A1C2C] hover:bg-[#6B1522] border border-[#C5A880]/30 rounded font-semibold font-sans transition"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+    <div className="min-h-screen bg-[#FAF6F0] font-serif text-[#1F1E1B]">
       {/* Desktop Sidebar */}
-      <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 bg-white/90 backdrop-blur-xl border-r border-rose-200 shadow-sm">
+      <aside className="fixed top-0 left-0 z-30 hidden lg:flex flex-col h-full w-64 shadow-xl">
         <SidebarContent />
       </aside>
 
       {/* Mobile Sidebar Backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/70 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Mobile Sidebar */}
-      {sidebarOpen && (
-        <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-white/95 backdrop-blur-xl border-r border-rose-200 lg:hidden">
-          <SidebarContent />
-        </aside>
-      )}
+      {/* Mobile Sidebar Drawer */}
+      <aside
+        className={`
+          fixed top-0 left-0 z-50 h-full w-64 transform transition-transform duration-300 ease-in-out lg:hidden
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <SidebarContent />
+      </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <div className="lg:pl-64 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-rose-100 shadow-sm">
-          <div className="px-4 sm:px-6 py-4 flex items-center justify-between">
+        {/* Top Navbar */}
+        <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-[#DDD0BB] px-4 py-3 sm:px-6 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-rose-50"
+              className="lg:hidden p-2 text-[#2C1810] hover:bg-[#FAF6F0] rounded"
             >
-              <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div className="flex items-center gap-2 ml-auto">
-              <span className="text-sm text-rose-600 font-medium bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
-                🛡️ System Administrator
-              </span>
-            </div>
+            <h1 className="text-lg font-bold text-[#2C1810]">
+              {adminNav.find((item) =>
+                pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href))
+              )?.name || 'Admin Panel'}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#2C1810] text-[#C5A880] border border-[#C5A880]/30 text-[10px] font-bold uppercase tracking-wider font-sans">
+              👑 Admin Command
+            </span>
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        {/* Page Body */}
+        <main className="flex-1 p-4 sm:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );

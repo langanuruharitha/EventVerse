@@ -42,7 +42,7 @@ export default function AdminBookingsPage() {
               onClick={() => setFilter(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize whitespace-nowrap transition-all ${
                 filter === tab
-                  ? 'bg-rose-600 text-white shadow-lg shadow-rose-200'
+                  ? 'bg-[#8A1C2C] text-[#FAF0E0] shadow font-bold'
                   : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
               }`}
             >

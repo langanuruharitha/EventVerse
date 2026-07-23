@@ -26,104 +26,86 @@ export default function AdminLoginPage() {
       });
 
       const data = await response.json();
-      
-      console.log('Login response:', { status: response.status, data });
 
       if (response.ok) {
-        // Redirect to admin dashboard
         router.push('/admin/dashboard');
       } else {
-        // Show detailed error message
         const errorMsg = data.error || 'Login failed';
-        console.error('Login failed:', errorMsg);
         setError(errorMsg);
-        
-        // Keep error visible for longer
-        setTimeout(() => {
-          // Error will stay visible
-        }, 5000);
       }
     } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'An error occurred. Please check console.');
+      setError(err.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#1F1E1B] p-4 font-serif text-[#FAF0E0]">
+      <div className="w-full max-w-md bg-[#2C1810] border-2 border-double border-[#C5A880] rounded shadow-2xl p-8 relative">
+        <div className="absolute top-2 left-2 text-xs text-[#C5A880]">❦</div>
+        <div className="absolute top-2 right-2 text-xs text-[#C5A880]">❦</div>
+        <div className="absolute bottom-2 left-2 text-xs text-[#C5A880]">❦</div>
+        <div className="absolute bottom-2 right-2 text-xs text-[#C5A880]">❦</div>
+
+        <div className="text-center mb-6 space-y-2">
+          <div className="flex justify-center mb-3">
             <img 
               src="/eventverse-logo.png" 
               alt="EventVerse Logo" 
-              className="h-20 object-contain"
+              className="h-16 object-contain"
             />
           </div>
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full mb-4">
-            <svg
-              className="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Portal</h1>
-          <p className="text-gray-600">Sign in to access the admin dashboard</p>
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded border border-[#C5A880]/30 bg-[#C5A880]/10 text-[#C5A880] text-[10px] font-bold uppercase tracking-widest font-sans">
+            👑 Secret Admin Access
+          </span>
+          <h1 className="text-2xl font-bold text-[#FAF0E0] tracking-tight">Admin Command Portal</h1>
+          <p className="text-xs text-[#C5A880] italic font-sans">Enter authorized system credentials to proceed</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+          <div className="mb-4 p-3 bg-red-900/30 border border-red-500/40 rounded text-red-200 text-xs font-sans text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Admin Email
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#C5A880] mb-1">
+              Admin Email *
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 bg-[#1F1E1B] border border-[#C5A880]/40 rounded text-[#FAF0E0] outline-none focus:border-[#C5A880]"
               placeholder="admin@eventverse.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#C5A880] mb-1">
+              Password *
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 bg-[#1F1E1B] border border-[#C5A880]/40 rounded text-[#FAF0E0] outline-none focus:border-[#C5A880]"
               placeholder="••••••••"
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2 w-4 h-4 text-purple-600 focus:ring-purple-500 rounded" />
-              <span className="text-sm text-gray-600">Remember me</span>
+          <div className="flex items-center justify-between text-[11px] pt-1">
+            <label className="flex items-center gap-1.5 cursor-pointer text-[#FAF0E0]/70">
+              <input type="checkbox" className="accent-[#8A1C2C] rounded" />
+              <span>Remember session</span>
             </label>
             <Link 
               href="/admin/forgot-password" 
-              className="text-sm text-purple-600 hover:text-purple-700"
+              className="text-[#C5A880] hover:underline"
             >
               Forgot password?
             </Link>
@@ -132,40 +114,24 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+            className="w-full py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] border border-[#C5A880]/30 text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded hover:shadow-lg disabled:opacity-50 transition"
           >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Signing In...
-              </span>
-            ) : (
-              'Sign In to Admin Portal'
-            )}
+            {loading ? 'Authenticating Admin...' : 'Sign In to Admin Command'}
           </button>
         </form>
 
-        <div className="mt-6 text-center space-y-2">
+        <div className="mt-6 text-center space-y-2 font-sans text-xs">
           <Link 
             href="/" 
-            className="block text-gray-600 hover:text-purple-600 text-sm font-medium"
+            className="text-[#C5A880] hover:underline block text-[11px]"
           >
-            ← Back to EventVerse Home
-          </Link>
-          <Link 
-            href="/admin/debug" 
-            className="block text-blue-600 hover:text-blue-700 text-sm font-medium"
-          >
-            🔍 Having login issues? Use Debug Tool
+            ← Return to EventVerse Main Site
           </Link>
         </div>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-500 text-center">
-            🔒 This is a secure admin area. Unauthorized access attempts are logged and monitored.
+        <div className="mt-5 p-3 bg-[#1F1E1B]/60 border border-[#C5A880]/20 rounded font-sans">
+          <p className="text-[10px] text-[#C5A880]/80 text-center italic">
+            🔒 Restricted Area: Direct access required. Unauthorized attempts are logged.
           </p>
         </div>
       </div>

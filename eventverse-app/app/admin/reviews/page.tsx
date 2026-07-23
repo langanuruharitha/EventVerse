@@ -53,7 +53,7 @@ export default function AdminReviewsPage() {
             onClick={() => setFilter(tab)}
             className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-all ${
               filter === tab
-                ? 'bg-rose-600 text-white shadow-lg shadow-rose-200'
+                ? 'bg-[#8A1C2C] text-[#FAF0E0] shadow font-bold'
                 : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
             }`}
           >
@@ -73,7 +73,7 @@ export default function AdminReviewsPage() {
           <div key={review.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#8A1C2C] text-[#FAF0E0] font-bold flex items-center justify-center font-sans flex-shrink-0">
                   {review.customer.charAt(0)}
                 </div>
                 <div>

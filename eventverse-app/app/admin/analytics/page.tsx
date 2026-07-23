@@ -29,7 +29,7 @@ export default function AdminAnalyticsPage() {
         </div>
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <p className="text-xs font-semibold text-gray-400 uppercase">Net Admin Commission (10%)</p>
-          <p className="text-3xl font-bold text-rose-600 mt-2">₹428,050</p>
+          <p className="text-3xl font-bold text-[#8A1C2C] mt-2 font-sans">₹428,050</p>
           <span className="text-xs text-green-600 font-semibold block mt-1">▲ 18% from last month</span>
         </div>
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
@@ -55,7 +55,7 @@ export default function AdminAnalyticsPage() {
                 {/* Bar Container */}
                 <div className="w-full flex-1 flex items-end relative">
                   <div
-                    className="w-full bg-gradient-to-t from-rose-500 to-pink-500 rounded-t-xl transition-all duration-500 hover:opacity-90 cursor-pointer shadow-sm shadow-rose-200"
+                    className="w-full bg-gradient-to-t from-[#8A1C2C] to-[#6B1522] rounded-t transition-all duration-500 hover:opacity-90 cursor-pointer shadow-sm"
                     style={{ height: `${heightPct * 0.8}%` }}
                   />
                 </div>
@@ -86,7 +86,7 @@ export default function AdminAnalyticsPage() {
               <tr key={report.month} className="hover:bg-gray-50/50 transition-colors">
                 <td className="px-6 py-4 font-bold">{report.month} 2026</td>
                 <td className="px-6 py-4">₹{report.volume.toLocaleString('en-IN')}</td>
-                <td className="px-6 py-4 text-rose-600">₹{report.commission.toLocaleString('en-IN')}</td>
+                <td className="px-6 py-4 text-[#8A1C2C] font-bold font-sans">₹{report.commission.toLocaleString('en-IN')}</td>
                 <td className="px-6 py-4 text-gray-600">₹{(report.volume - report.commission).toLocaleString('en-IN')}</td>
                 <td className="px-6 py-4 text-right">
                   <span className="bg-green-50 border border-green-200 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">SETTLED</span>

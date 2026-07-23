@@ -105,7 +105,7 @@ export default function VendorServicesPage() {
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-5 py-2.5 rounded-xl font-semibold hover:from-orange-600 hover:to-amber-600 transition-all shadow-lg shadow-orange-200 hover:shadow-xl"
+          className="flex items-center gap-2 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] px-5 py-2.5 rounded font-semibold uppercase tracking-wider text-xs font-sans hover:shadow transition"
         >
           <span className="text-lg">➕</span>
           Add Service
@@ -124,7 +124,7 @@ export default function VendorServicesPage() {
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <p className="text-sm text-gray-500">Total Bookings</p>
-          <p className="text-3xl font-bold text-orange-600 mt-1">{services.reduce((a, s) => a + s.bookings, 0)}</p>
+          <p className="text-3xl font-bold text-[#8A1C2C] mt-1 font-sans">{services.reduce((a, s) => a + s.bookings, 0)}</p>
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export default function VendorServicesPage() {
                 </div>
                 <p className="text-sm text-gray-500 mb-3">{svc.description}</p>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-1 text-orange-600 font-medium">
+                  <span className="flex items-center gap-1 text-[#8A1C2C] font-semibold font-sans">
                     🏷️ {svc.category}
                   </span>
                   <span className="flex items-center gap-1 text-green-600 font-bold">
@@ -267,7 +267,7 @@ export default function VendorServicesPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold hover:from-orange-600 hover:to-amber-600 transition-all"
+                className="px-5 py-2.5 rounded bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider font-sans hover:shadow transition"
               >
                 {editService ? 'Save Changes' : 'Add Service'}
               </button>

@@ -109,7 +109,7 @@ export default function AdminProfilePage() {
       {/* Profile Card */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
         <div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-100">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 flex items-center justify-center text-white text-3xl font-bold">
+          <div className="w-20 h-20 rounded-full bg-[#8A1C2C] text-[#FAF0E0] font-sans flex items-center justify-center font-bold text-2xl border-2 border-[#C5A880]">
             {user?.email?.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -181,7 +181,7 @@ export default function AdminProfilePage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 bg-gradient-to-r from-rose-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:from-rose-700 hover:to-pink-700 transition-all shadow-lg shadow-rose-200 disabled:opacity-50"
+              className="flex-1 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider py-3 rounded font-sans hover:shadow transition disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

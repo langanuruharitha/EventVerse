@@ -141,7 +141,7 @@ export default function VendorProfilePage() {
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md ${
             isEditing
               ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600'
+              : 'bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] hover:shadow'
           }`}
         >
           <span>{isEditing ? '💾 Save Changes' : '✏️ Edit Profile'}</span>
@@ -152,7 +152,7 @@ export default function VendorProfilePage() {
         {/* Left Card: Business Overview */}
         <div className="md:col-span-1 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
           <div className="text-center">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white text-3xl font-bold mx-auto shadow-md">
+            <div className="w-24 h-24 rounded-full bg-[#8A1C2C] text-[#FAF0E0] flex items-center justify-center text-3xl font-bold mx-auto shadow-md font-sans">
               {profile.businessName.charAt(0)}
             </div>
             <h2 className="text-lg font-bold text-gray-900 mt-4">{profile.businessName}</h2>
