@@ -10,6 +10,8 @@ import { Avatar } from '@/components/ui/Avatar';
 const customerNav = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
   { name: 'My Events', href: '/events/my-events', icon: '🎉' },
+  { name: 'Shared Workspaces', href: '/events/1/workspace', icon: '🤝' },
+  { name: 'Escrow Payments', href: '/events/1/payments', icon: '🛡️' },
   { name: 'Create Invitation', href: '/invitations', icon: '💌' },
   { name: 'AI Design Studio', href: '/design-studio', icon: '🎨' },
   { name: 'Venues', href: '/venues', icon: '🏛️' },

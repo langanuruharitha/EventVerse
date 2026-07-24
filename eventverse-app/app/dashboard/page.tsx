@@ -127,11 +127,52 @@ export default async function DashboardPage() {
           ))}
         </div>
 
+        {/* New Innovative Dual-Portal Features Highlight */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link
+            href="/events/1/workspace"
+            className="group bg-gradient-to-r from-[#2C1810] to-[#1F0A05] text-[#FAF0E0] border-2 border-double border-[#C5A880] p-6 rounded-xl shadow-md hover:shadow-xl transition-all flex items-center justify-between"
+          >
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded bg-[#C5A880]/20 text-[#C5A880] text-[10px] font-bold uppercase tracking-widest font-sans">
+                🤝 New Feature
+              </span>
+              <h3 className="text-lg font-bold font-serif text-[#FFD700] group-hover:text-white transition">
+                Shared Collaborative Workspaces
+              </h3>
+              <p className="text-xs text-[#FAF0E0]/80 italic">
+                Minute-by-minute live run-sheet timeline, vendor item approvals & digital contracts.
+              </p>
+            </div>
+            <span className="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+          </Link>
+
+          <Link
+            href="/events/1/payments"
+            className="group bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] border-2 border-double border-[#FFD700]/50 p-6 rounded-xl shadow-md hover:shadow-xl transition-all flex items-center justify-between"
+          >
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded bg-[#FFD700]/20 text-[#FFD700] text-[10px] font-bold uppercase tracking-widest font-sans">
+                🛡️ Payment Vault
+              </span>
+              <h3 className="text-lg font-bold font-serif text-white group-hover:text-[#FFD700] transition">
+                Milestone Escrow Payments
+              </h3>
+              <p className="text-xs text-[#FAF0E0]/80 italic">
+                3-Stage protected milestone releases, 100% buyer security & PDF receipts.
+              </p>
+            </div>
+            <span className="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+          </Link>
+        </div>
+
         {/* Orchestration Center */}
         <div className="vintage-card p-6 sm:p-8">
           <h2 className="text-xl font-bold text-[#1F1E1B] border-b border-[#C5A880]/20 pb-4 mb-6">Orchestration Center</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
             {[
+              { href: '/events/1/workspace', icon: '🤝', label: 'Shared Workspaces' },
+              { href: '/events/1/payments', icon: '🛡️', label: 'Escrow Payments' },
               { href: '/events/birthday/diy', icon: '🎂', label: 'Plan Birthday' },
               { href: '/events/wedding/diy', icon: '💍', label: 'Plan Wedding' },
               { href: '/venues', icon: '🏛️', label: 'Find Venues' },
