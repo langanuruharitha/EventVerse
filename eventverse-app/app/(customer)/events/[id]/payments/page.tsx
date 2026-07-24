@@ -64,27 +64,124 @@ export default function EscrowPaymentTrackerPage({
   };
 
   const handleDownloadInvoice = async () => {
-    toast('📥 Capturing high-definition PNG Tax Receipt Image...', 'info');
+    toast('📥 Generating high-definition PNG Tax Receipt Image...', 'info');
     try {
-      const receiptEl = document.getElementById('payment-tax-receipt-card');
-      if (!receiptEl) {
-        throw new Error('Receipt card element not found');
-      }
-      const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(receiptEl, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#FFFDF8'
+      // Create a 1200x1600 HD Canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 1200;
+      canvas.height = 1600;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas 2D context creation failed');
+
+      // 1. Background
+      ctx.fillStyle = '#FFFDF8';
+      ctx.fillRect(0, 0, 1200, 1600);
+
+      // 2. Gold Filigree Double Border Frame
+      ctx.strokeStyle = '#C5A880';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(30, 30, 1140, 1540);
+      ctx.lineWidth = 2;
+      ctx.strokeRect(44, 44, 1112, 1512);
+
+      // 3. Header Banner
+      ctx.fillStyle = '#2C1810';
+      ctx.fillRect(55, 55, 1090, 220);
+
+      ctx.fillStyle = '#FFD700';
+      ctx.font = 'bold 22px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚜ OFFICIAL EVENTVERSE PAYMENT RECEIPT ⚜', 600, 110);
+
+      ctx.fillStyle = '#FAF0E0';
+      ctx.font = 'bold 40px serif';
+      ctx.fillText('GST TAX INVOICE & ESCROW RECEIPT', 600, 180);
+
+      ctx.fillStyle = '#C5A880';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText(`Receipt ID: #EV-2026-${id}  •  Date: ${new Date().toLocaleDateString('en-IN')}`, 600, 230);
+
+      // 4. Customer Details Container Box
+      ctx.fillStyle = '#FAF6F0';
+      ctx.fillRect(80, 310, 1040, 190);
+      ctx.strokeStyle = '#DDD0BB';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(80, 310, 1040, 190);
+
+      ctx.fillStyle = '#1F1E1B';
+      ctx.font = 'bold 24px serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Customer Name: Langanuru Haritha', 120, 365);
+      ctx.fillText(`Event Name: Royal Vivah Ceremony (Event ID #${id})`, 120, 415);
+      ctx.fillText('Escrow Security: 100% Guaranteed by EventVerse Protection', 120, 465);
+
+      // 5. Table Header
+      ctx.fillStyle = '#8A1C2C';
+      ctx.fillRect(80, 540, 1040, 60);
+
+      ctx.fillStyle = '#FAF0E0';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('MILESTONE STAGE', 110, 578);
+      ctx.fillText('PERCENT', 570, 578);
+      ctx.fillText('STATUS', 730, 578);
+      ctx.fillText('AMOUNT (INR)', 930, 578);
+
+      // 6. Table Rows
+      const rows = [
+        { stage: 'Stage 1: Advance Booking Deposit', pct: '30%', status: 'RELEASED TO VENDORS', amt: '₹45,000' },
+        { stage: 'Stage 2: Pre-Event Setup Verification', pct: '40%', status: 'READY TO RELEASE', amt: '₹60,000' },
+        { stage: 'Stage 3: Post-Event Final Settlement', pct: '30%', status: 'ESCROW LOCKED', amt: '₹45,000' },
+      ];
+
+      let y = 660;
+      rows.forEach((r, idx) => {
+        ctx.fillStyle = idx % 2 === 0 ? '#FFFFFF' : '#FAF6F0';
+        ctx.fillRect(80, y - 45, 1040, 75);
+        ctx.strokeStyle = '#DDD0BB';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(80, y - 45, 1040, 75);
+
+        ctx.fillStyle = '#1F1E1B';
+        ctx.font = 'bold 22px serif';
+        ctx.fillText(r.stage, 110, y + 2);
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(r.pct, 570, y + 2);
+
+        ctx.fillStyle = idx === 0 ? '#166534' : idx === 1 ? '#1D4ED8' : '#B45309';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText(r.status, 730, y + 2);
+
+        ctx.fillStyle = '#8A1C2C';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText(r.amt, 930, y + 2);
+
+        y += 95;
       });
-      const url = canvas.toDataURL('image/png');
+
+      // 7. Total Summary Banner
+      ctx.fillStyle = '#2C1810';
+      ctx.fillRect(80, y + 40, 1040, 100);
+
+      ctx.fillStyle = '#FFD700';
+      ctx.font = 'bold 30px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TOTAL EVENT BUDGET & ESCROW: ₹1,50,000', 600, y + 102);
+
+      // 8. Footer Guarantee Seal
+      ctx.fillStyle = '#7A6652';
+      ctx.font = 'italic 18px serif';
+      ctx.fillText('Thank you for choosing EventVerse! This is an official computer-generated receipt.', 600, 1480);
+      ctx.fillText('⚜ EventVerse Buyer Escrow Guarantee Protection Active ⚜', 600, 1515);
+
+      // Export PNG Image Data URL
+      const imgUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
-      link.href = url;
+      link.href = imgUrl;
       link.download = `eventverse-tax-receipt-ev-${id}.png`;
       link.click();
       toast('📥 Tax Receipt downloaded as PNG image (.png)!', 'success');
-    } catch (e) {
-      console.error('Receipt PNG download error:', e);
+    } catch (err) {
+      console.error('Final PNG export error:', err);
       toast('Failed to export receipt image. Please try again.', 'error');
     }
   };
