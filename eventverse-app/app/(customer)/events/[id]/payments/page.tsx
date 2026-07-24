@@ -63,88 +63,29 @@ export default function EscrowPaymentTrackerPage({
     }));
   };
 
-  const handleDownloadInvoice = () => {
-    toast('📥 Generating official EventVerse PDF Tax Receipt...', 'info');
+  const handleDownloadInvoice = async () => {
+    toast('📥 Capturing high-definition PNG Tax Receipt Image...', 'info');
     try {
-      const receiptHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>EventVerse Tax Invoice Receipt #${id}</title>
-  <style>
-    body { font-family: 'Times New Roman', serif; padding: 40px; color: #1F1E1B; background: #FFFDF8; }
-    .header { text-align: center; border-bottom: 2px solid #C5A880; padding-bottom: 20px; margin-bottom: 20px; }
-    .title { color: #8A1C2C; font-size: 24px; font-weight: bold; margin: 5px 0; }
-    .subtitle { color: #C5A880; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
-    .details { background: #FAF6F0; border: 1px solid #DDD0BB; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; }
-    .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .table th, .table td { border: 1px solid #DDD0BB; padding: 12px; text-align: left; font-size: 13px; }
-    .table th { background: #2C1810; color: #FFD700; font-family: sans-serif; text-transform: uppercase; font-size: 11px; }
-    .total { text-align: right; font-size: 18px; font-weight: bold; color: #8A1C2C; margin-top: 25px; font-family: sans-serif; }
-    .footer { margin-top: 40px; font-size: 11px; text-align: center; color: #7A6652; border-top: 1px solid #DDD0BB; padding-top: 15px; font-style: italic; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="subtitle">⚜ OFFICIAL EVENTVERSE PAYMENT RECEIPT ⚜</div>
-    <h1 class="title">GST TAX INVOICE & ESCROW RECEIPT</h1>
-    <p style="font-size: 12px; color: #555; margin: 0;">Receipt ID: #EV-2026-${id} • Date: ${new Date().toLocaleDateString('en-IN')}</p>
-  </div>
-  <div class="details">
-    <p style="margin: 3px 0;"><strong>Customer Name:</strong> Langanuru Haritha</p>
-    <p style="margin: 3px 0;"><strong>Event Name:</strong> Royal Vivah Ceremony (ID #${id})</p>
-    <p style="margin: 3px 0;"><strong>Escrow Vault Protection:</strong> 100% Guaranteed by EventVerse</p>
-  </div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Milestone Stage</th>
-        <th>Percentage</th>
-        <th>Status</th>
-        <th>Amount (INR)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Stage 1: Advance Booking Deposit</td>
-        <td>30%</td>
-        <td>RELEASED TO VENDORS</td>
-        <td>₹45,000</td>
-      </tr>
-      <tr>
-        <td>Stage 2: Pre-Event Setup Verification</td>
-        <td>40%</td>
-        <td>READY TO RELEASE</td>
-        <td>₹60,000</td>
-      </tr>
-      <tr>
-        <td>Stage 3: Post-Event Final Settlement</td>
-        <td>30%</td>
-        <td>ESCROW LOCKED</td>
-        <td>₹45,000</td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="total">Total Event Budget: ₹1,50,000</div>
-  <div class="footer">
-    Thank you for using EventVerse! This is an official tax receipt under EventVerse Escrow Buyer Guarantee.
-  </div>
-</body>
-</html>
-      `;
-
-      const blob = new Blob([receiptHtml], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
+      const receiptEl = document.getElementById('payment-tax-receipt-card');
+      if (!receiptEl) {
+        throw new Error('Receipt card element not found');
+      }
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(receiptEl, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FFFDF8'
+      });
+      const url = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = url;
-      link.download = `EventVerse-Tax-Receipt-EV-${id}.html`;
+      link.download = `eventverse-tax-receipt-ev-${id}.png`;
       link.click();
-      URL.revokeObjectURL(url);
-      toast('📥 Tax Receipt downloaded successfully!', 'success');
+      toast('📥 Tax Receipt downloaded as PNG image (.png)!', 'success');
     } catch (e) {
-      console.error(e);
-      toast('Failed to generate receipt. Please try again.', 'error');
+      console.error('Receipt PNG download error:', e);
+      toast('Failed to export receipt image. Please try again.', 'error');
     }
   };
 
@@ -179,13 +120,13 @@ export default function EscrowPaymentTrackerPage({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleDownloadInvoice}
-                className="px-4 py-2.5 bg-white border border-[#DDD0BB] text-[#2C1810] text-xs font-bold uppercase tracking-wider rounded shadow hover:bg-[#FAF6F0] transition flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded shadow hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer font-sans"
               >
-                <Download className="w-4 h-4 text-[#8A1C2C]" /> PDF Receipt
+                <Download className="w-4 h-4 text-[#FFD700]" /> Download Receipt Image (PNG)
               </button>
               <button
                 onClick={handleShareWhatsapp}
-                className="px-4 py-2.5 bg-[#25D366] text-white text-xs font-bold uppercase tracking-wider rounded shadow hover:bg-[#20bd5a] transition flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2.5 bg-[#25D366] text-white text-xs font-bold uppercase tracking-wider rounded shadow hover:bg-[#20bd5a] transition flex items-center gap-1.5 cursor-pointer font-sans"
               >
                 <Share2 className="w-4 h-4" /> WhatsApp
               </button>
@@ -194,7 +135,7 @@ export default function EscrowPaymentTrackerPage({
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div id="payment-tax-receipt-card" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#FAF6F0] p-6 rounded-2xl">
         {/* Escrow Guarantee Banner */}
         <div className="bg-white rounded-xl border border-[#DDD0BB] p-6 shadow-sm flex flex-col sm:flex-row items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-green-100 border border-green-300 flex items-center justify-center text-green-700 flex-shrink-0">
