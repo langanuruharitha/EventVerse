@@ -64,7 +64,88 @@ export default function EscrowPaymentTrackerPage({
   };
 
   const handleDownloadInvoice = () => {
-    toast('📥 PDF Tax Invoice downloaded successfully!', 'success');
+    toast('📥 Generating official EventVerse PDF Tax Receipt...', 'info');
+    try {
+      const receiptHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>EventVerse Tax Invoice Receipt #${id}</title>
+  <style>
+    body { font-family: 'Times New Roman', serif; padding: 40px; color: #1F1E1B; background: #FFFDF8; }
+    .header { text-align: center; border-bottom: 2px solid #C5A880; padding-bottom: 20px; margin-bottom: 20px; }
+    .title { color: #8A1C2C; font-size: 24px; font-weight: bold; margin: 5px 0; }
+    .subtitle { color: #C5A880; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+    .details { background: #FAF6F0; border: 1px solid #DDD0BB; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; }
+    .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .table th, .table td { border: 1px solid #DDD0BB; padding: 12px; text-align: left; font-size: 13px; }
+    .table th { background: #2C1810; color: #FFD700; font-family: sans-serif; text-transform: uppercase; font-size: 11px; }
+    .total { text-align: right; font-size: 18px; font-weight: bold; color: #8A1C2C; margin-top: 25px; font-family: sans-serif; }
+    .footer { margin-top: 40px; font-size: 11px; text-align: center; color: #7A6652; border-top: 1px solid #DDD0BB; padding-top: 15px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="subtitle">⚜ OFFICIAL EVENTVERSE PAYMENT RECEIPT ⚜</div>
+    <h1 class="title">GST TAX INVOICE & ESCROW RECEIPT</h1>
+    <p style="font-size: 12px; color: #555; margin: 0;">Receipt ID: #EV-2026-${id} • Date: ${new Date().toLocaleDateString('en-IN')}</p>
+  </div>
+  <div class="details">
+    <p style="margin: 3px 0;"><strong>Customer Name:</strong> Langanuru Haritha</p>
+    <p style="margin: 3px 0;"><strong>Event Name:</strong> Royal Vivah Ceremony (ID #${id})</p>
+    <p style="margin: 3px 0;"><strong>Escrow Vault Protection:</strong> 100% Guaranteed by EventVerse</p>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Milestone Stage</th>
+        <th>Percentage</th>
+        <th>Status</th>
+        <th>Amount (INR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Stage 1: Advance Booking Deposit</td>
+        <td>30%</td>
+        <td>RELEASED TO VENDORS</td>
+        <td>₹45,000</td>
+      </tr>
+      <tr>
+        <td>Stage 2: Pre-Event Setup Verification</td>
+        <td>40%</td>
+        <td>READY TO RELEASE</td>
+        <td>₹60,000</td>
+      </tr>
+      <tr>
+        <td>Stage 3: Post-Event Final Settlement</td>
+        <td>30%</td>
+        <td>ESCROW LOCKED</td>
+        <td>₹45,000</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="total">Total Event Budget: ₹1,50,000</div>
+  <div class="footer">
+    Thank you for using EventVerse! This is an official tax receipt under EventVerse Escrow Buyer Guarantee.
+  </div>
+</body>
+</html>
+      `;
+
+      const blob = new Blob([receiptHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `EventVerse-Tax-Receipt-EV-${id}.html`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast('📥 Tax Receipt downloaded successfully!', 'success');
+    } catch (e) {
+      console.error(e);
+      toast('Failed to generate receipt. Please try again.', 'error');
+    }
   };
 
   const handleShareWhatsapp = () => {
