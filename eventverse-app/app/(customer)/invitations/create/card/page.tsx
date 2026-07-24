@@ -81,17 +81,17 @@ function CreateCardInvitationContent() {
       // Load html2canvas dynamically
       const html2canvas = (await import('html2canvas')).default;
       const tempDiv = document.createElement('div');
-      tempDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:800px;height:1100px;overflow:hidden;z-index:-1;';
+      tempDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:800px;height:1120px;overflow:hidden;z-index:-1;';
       tempDiv.innerHTML = generatedCard;
       document.body.appendChild(tempDiv);
-      await new Promise(r => setTimeout(r, 800)); // wait for font & render
+      await new Promise(r => setTimeout(r, 1000)); // wait for fonts & SVG render
       const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: null,
         width: 800,
-        height: 1100,
+        height: 1120,
       });
       document.body.removeChild(tempDiv);
       const url = canvas.toDataURL('image/png');

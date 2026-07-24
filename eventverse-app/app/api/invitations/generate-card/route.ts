@@ -137,40 +137,41 @@ function buildBeautifulCard(data: {
   themeConfig?: any;
 }): string {
   const desc = (data.themeDescription || '').toLowerCase();
+  const type = (data.eventType || '').toLowerCase();
   
-  let bodyBg = 'radial-gradient(circle, #f3e8ff 0%, #e9d5ff 100%)';
-  let cardBg = '#ffffff';
-  let textColor = '#1e1b4b';
-  let subTextColor = '#6b7280';
-  let primaryColor = '#7c3aed';
-  let secondaryColor = '#a855f7';
-  let panelBg = '#faf5ff';
-  let panelBorder = '#f3e8ff';
-  let frameBorder = 'rgba(168, 85, 247, 0.3)';
-  let headerGradient = 'linear-gradient(135deg, #7c3aed, #ec4899)';
-  let decorativeOverlay = '';
-  let cssAnimations = '';
-  let greetingText = 'You are cordially invited';
+  // High-End Royal Palette Presets
+  let bodyBg = 'linear-gradient(145deg, #1f050b 0%, #3b0a0f 40%, #150206 100%)'; // Deep Royal Red & Gold
+  let cardBg = 'radial-gradient(ellipse at center, rgba(59, 10, 15, 0.95) 0%, rgba(26, 3, 6, 0.98) 100%)';
+  let textColor = '#FAF0E0';
+  let subTextColor = '#E6C687';
+  let primaryColor = '#FDF0D5';
+  let secondaryColor = '#D4AF37'; // Royal Metallic Gold
+  let panelBg = 'rgba(212, 175, 55, 0.08)';
+  let panelBorder = 'rgba(212, 175, 55, 0.4)';
+  let frameBorder = '#D4AF37';
+  let headerGradient = 'linear-gradient(90deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C)';
 
-  if (!data.themeConfig) {
-    const isSpace = desc.includes('space') || desc.includes('sky') || desc.includes('night') || desc.includes('galaxy') || desc.includes('dark');
-    if (isSpace) {
-      bodyBg = 'radial-gradient(circle at center, #0b0f19 0%, #030712 100%)';
-      cardBg = 'rgba(17, 24, 39, 0.85)';
-      textColor = '#f8fafc';
-      subTextColor = '#94a3b8';
-      primaryColor = '#38bdf8';
-      secondaryColor = '#c084fc';
-      panelBg = 'rgba(31, 41, 55, 0.5)';
-      panelBorder = 'rgba(255, 255, 255, 0.1)';
-      frameBorder = 'rgba(56, 189, 248, 0.3)';
-      headerGradient = 'linear-gradient(135deg, #0284c7, #7c3aed)';
-      decorativeOverlay = `
-        <div style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden">
-          <div style="position:absolute;top:10%;left:20%;width:3px;height:3px;background:white;border-radius:50%;box-shadow:0 0 10px white;animation:pulse 2s infinite"></div>
-        </div>`;
-      cssAnimations = `@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }`;
-    }
+  // Theme Detection Overrides
+  if (type === 'wedding' || desc.includes('wedding') || desc.includes('royal') || desc.includes('gold') || desc.includes('traditional')) {
+    bodyBg = 'linear-gradient(135deg, #2b0308 0%, #4a0810 50%, #1c0205 100%)';
+    secondaryColor = '#FFD700';
+    primaryColor = '#FFF5D6';
+  } else if (type === 'birthday' || desc.includes('balloon') || desc.includes('party') || desc.includes('gala')) {
+    bodyBg = 'linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #090e1a 100%)'; // Midnight Navy & Gold
+    cardBg = 'radial-gradient(ellipse at center, rgba(28, 37, 65, 0.95) 0%, rgba(11, 19, 43, 0.98) 100%)';
+    primaryColor = '#E0FBFC';
+    secondaryColor = '#F4D06F';
+    subTextColor = '#C2DFE3';
+  } else if (desc.includes('rose') || desc.includes('floral') || desc.includes('pink') || desc.includes('anniversary')) {
+    bodyBg = 'linear-gradient(135deg, #2b0b1e 0%, #52153b 50%, #1c0613 100%)'; // Velvet Plum & Rose Gold
+    primaryColor = '#FFF0F5';
+    secondaryColor = '#E6B89C';
+    subTextColor = '#F4C2C2';
+  } else if (desc.includes('green') || desc.includes('emerald') || desc.includes('nature')) {
+    bodyBg = 'linear-gradient(135deg, #032015 0%, #0a402b 50%, #02140d 100%)'; // Emerald & Gold
+    primaryColor = '#E8F5E9';
+    secondaryColor = '#D4AF37';
+    subTextColor = '#A5D6A7';
   }
 
   if (data.themeConfig) {
@@ -181,31 +182,12 @@ function buildBeautifulCard(data: {
     if (ai.subTextColor) subTextColor = ai.subTextColor;
     if (ai.primaryColor) primaryColor = ai.primaryColor;
     if (ai.secondaryColor) secondaryColor = ai.secondaryColor;
-    if (ai.headerGradient) headerGradient = ai.headerGradient;
-    if (ai.decorativeOverlay) decorativeOverlay = ai.decorativeOverlay;
-    if (ai.cssAnimations) cssAnimations = ai.cssAnimations;
-    if (ai.greetingText) greetingText = ai.greetingText;
-    
-    panelBg = 'rgba(255,255,255,0.05)';
-    panelBorder = ai.secondaryColor ? ai.secondaryColor + '40' : 'rgba(0,0,0,0.1)';
-    frameBorder = ai.secondaryColor ? ai.secondaryColor + '60' : 'rgba(0,0,0,0.2)';
   }
 
-  const fontUrl = data.style === 'traditional'
-    ? 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:ital,wght@0,300;0,400;1,300&display=swap'
-    : data.style === 'modern'
-    ? 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap'
-    : 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap';
-
-  const fontFamily = data.style === 'traditional'
-    ? "'Cinzel', 'Georgia', serif"
-    : data.style === 'modern'
-    ? "'Outfit', 'Segoe UI', sans-serif"
-    : "'Cormorant Garamond', 'Georgia', serif";
-
-  const bodyFont = data.style === 'modern'
-    ? "'Outfit', 'Segoe UI', sans-serif"
-    : "'Lato', sans-serif";
+  const fontUrl = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Great+Vibes&family=Montserrat:ital,wght@0,300;0,400;0,600;1,300&display=swap';
+  const headerFont = "'Cinzel', serif";
+  const scriptFont = "'Great Vibes', cursive";
+  const bodyFont = "'Montserrat', sans-serif";
 
   const e = (s: string) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -217,151 +199,245 @@ function buildBeautifulCard(data: {
 <link href="${fontUrl}" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: ${bodyFont};
+  html, body {
+    width: 800px;
+    height: 1120px;
     background: ${bodyBg};
-    display: flex; align-items: center; justify-content: center;
-    min-height: 100vh; padding: 24px;
-  }
-  ${cssAnimations}
-  .wrapper { max-width: 640px; width: 100%; position: relative; }
-  .card {
-    position: relative;
-    background: ${cardBg};
-    border-radius: 20px;
-    padding: 0;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.25);
-    overflow: hidden;
+    font-family: ${bodyFont};
     color: ${textColor};
-    backdrop-filter: blur(12px);
+    overflow: hidden;
   }
-  .header-strip {
-    height: 10px;
-    background: ${headerGradient};
+  .card-container {
+    width: 800px;
+    height: 1120px;
+    position: relative;
+    padding: 36px;
+    background: ${cardBg};
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
   }
-  .frame {
+  /* Outer Gold Filigree Frame */
+  .outer-border {
     position: absolute;
-    top: 20px; left: 20px; right: 20px; bottom: 20px;
-    border: 1px solid ${frameBorder};
-    border-radius: 14px;
+    top: 24px; left: 24px; right: 24px; bottom: 24px;
+    border: 3px double ${secondaryColor};
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.2);
+  }
+  .inner-border {
+    position: absolute;
+    top: 32px; left: 32px; right: 32px; bottom: 32px;
+    border: 1px solid ${secondaryColor}66;
+    border-radius: 8px;
     pointer-events: none;
     z-index: 2;
   }
-  .content { position: relative; z-index: 4; padding: 50px 45px; }
-  .greeting {
-    font-family: ${fontFamily};
-    font-size: 13px;
+  /* Corner Filigree Ornaments */
+  .corner {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .corner-tl { top: 16px; left: 16px; }
+  .corner-tr { top: 16px; right: 16px; transform: scaleX(-1); }
+  .corner-bl { bottom: 16px; left: 16px; transform: scaleY(-1); }
+  .corner-br { bottom: 16px; right: 16px; transform: scale(-1); }
+
+  .content-box {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .royal-emblem {
+    font-size: 32px;
     color: ${secondaryColor};
-    text-align: center;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-    font-weight: 600;
-  }
-  .event-name {
-    font-family: ${fontFamily};
-    font-size: 38px;
-    font-weight: 700;
-    color: ${primaryColor};
-    text-align: center;
+    letter-spacing: 4px;
     margin-bottom: 8px;
-    line-height: 1.2;
   }
-  .host {
-    font-size: 15px;
+  .greeting-tag {
+    font-family: ${headerFont};
+    font-size: 13px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: ${secondaryColor};
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .event-title {
+    font-family: ${headerFont};
+    font-size: 42px;
+    font-weight: 900;
+    color: ${primaryColor};
+    letter-spacing: 1.5px;
+    line-height: 1.25;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px ${secondaryColor}44;
+    margin: 10px 0 16px;
+    text-transform: uppercase;
+  }
+  .host-line {
+    font-family: ${scriptFont};
+    font-size: 36px;
     color: ${subTextColor};
-    text-align: center;
-    font-style: italic;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
   }
-  .divider {
-    display: flex; align-items: center; justify-content: center;
-    gap: 12px; margin: 24px 0;
-  }
-  .divider-line { flex: 1; height: 1px; background: ${frameBorder}; }
-  .details-panel {
-    background: ${panelBg};
-    border: 1px solid ${panelBorder};
-    border-radius: 14px;
-    padding: 22px;
-    margin: 20px 0;
-  }
-  .details-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-  }
-  .detail-label {
-    font-family: ${fontFamily};
-    font-size: 11px;
+  .honour-line {
+    font-size: 14px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: ${primaryColor};
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 600;
+    color: ${textColor};
+    opacity: 0.9;
+    margin-bottom: 24px;
   }
-  .detail-value {
-    font-size: 14px;
+
+  .gold-divider {
+    width: 60%;
+    height: 2px;
+    background: ${headerGradient};
+    margin: 16px auto;
+    border-radius: 2px;
+    box-shadow: 0 0 10px ${secondaryColor};
+  }
+
+  .details-card {
+    background: ${panelBg};
+    border: 1.5px solid ${panelBorder};
+    border-radius: 16px;
+    padding: 28px 36px;
+    width: 90%;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .detail-item {
+    text-align: center;
+  }
+  .detail-label {
+    font-family: ${headerFont};
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: ${secondaryColor};
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .detail-val {
+    font-size: 16px;
+    font-weight: 600;
     color: ${textColor};
     line-height: 1.4;
   }
-  .message {
-    font-size: 14px;
+
+  .message-quote {
+    font-family: ${scriptFont};
+    font-size: 28px;
     color: ${subTextColor};
-    text-align: center;
-    font-style: italic;
-    margin-top: 15px;
-    line-height: 1.6;
+    line-height: 1.4;
+    max-width: 85%;
+    margin: 16px auto;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
   }
-  .rsvp {
-    background: ${panelBg};
-    border: 1.5px solid ${frameBorder};
+
+  .rsvp-badge {
+    border: 1px solid ${secondaryColor};
+    background: rgba(212, 175, 55, 0.12);
     border-radius: 30px;
-    padding: 10px 20px;
-    text-align: center;
-    margin: 20px auto 0;
-    max-width: 250px;
-  }
-  .rsvp-label {
+    padding: 10px 32px;
+    font-family: ${headerFont};
     font-size: 11px;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: ${secondaryColor};
     font-weight: 700;
-    color: ${primaryColor};
+    margin-top: 16px;
+    display: inline-block;
+  }
+  .footer-emblem {
+    font-size: 20px;
+    color: ${secondaryColor};
+    margin-top: 12px;
+    opacity: 0.8;
   }
 </style>
 </head>
 <body>
-<div class="wrapper">
-  ${decorativeOverlay}
-  <div class="card">
-    <div class="header-strip"></div>
-    <div class="frame"></div>
-    <div class="content">
-      <div class="greeting">${e(greetingText)}</div>
-      <div class="event-name">${e(data.eventName)}</div>
-      <div class="host">Hosted by ${e(data.fromName)}</div>
-      ${data.toName ? `<div class="host">Honouring ${e(data.toName)}</div>` : ''}
-      
-      <div class="divider"><div class="divider-line"></div></div>
+<div class="card-container">
+  <div class="outer-border"></div>
+  <div class="inner-border"></div>
 
-      <div class="details-panel">
+  <!-- SVG Royal Corner Ornaments -->
+  <svg class="corner corner-tl" viewBox="0 0 100 100" fill="none">
+    <path d="M10 10 H90 V25 H35 V90 H10 Z" fill="${secondaryColor}" opacity="0.6"/>
+    <circle cx="20" cy="20" r="6" fill="${secondaryColor}"/>
+    <path d="M30 10 Q60 40 10 60" stroke="${secondaryColor}" stroke-width="2" fill="none"/>
+  </svg>
+  <svg class="corner corner-tr" viewBox="0 0 100 100" fill="none">
+    <path d="M10 10 H90 V25 H35 V90 H10 Z" fill="${secondaryColor}" opacity="0.6"/>
+    <circle cx="20" cy="20" r="6" fill="${secondaryColor}"/>
+    <path d="M30 10 Q60 40 10 60" stroke="${secondaryColor}" stroke-width="2" fill="none"/>
+  </svg>
+  <svg class="corner corner-bl" viewBox="0 0 100 100" fill="none">
+    <path d="M10 10 H90 V25 H35 V90 H10 Z" fill="${secondaryColor}" opacity="0.6"/>
+    <circle cx="20" cy="20" r="6" fill="${secondaryColor}"/>
+    <path d="M30 10 Q60 40 10 60" stroke="${secondaryColor}" stroke-width="2" fill="none"/>
+  </svg>
+  <svg class="corner corner-br" viewBox="0 0 100 100" fill="none">
+    <path d="M10 10 H90 V25 H35 V90 H10 Z" fill="${secondaryColor}" opacity="0.6"/>
+    <circle cx="20" cy="20" r="6" fill="${secondaryColor}"/>
+    <path d="M30 10 Q60 40 10 60" stroke="${secondaryColor}" stroke-width="2" fill="none"/>
+  </svg>
+
+  <div class="content-box">
+    <div>
+      <div class="royal-emblem">⚜ ❦ ⚜</div>
+      <div class="greeting-tag">Cordial Invitation</div>
+      <h1 class="event-title">${e(data.eventName)}</h1>
+      <div class="host-line">Hosted by ${e(data.fromName)}</div>
+      ${data.toName ? `<div class="honour-line">In Honour of <strong>${e(data.toName)}</strong></div>` : ''}
+    </div>
+
+    <div style="width: 100%;">
+      <div class="gold-divider"></div>
+      <div class="details-card">
         <div class="details-grid">
-          <div>
-            <span class="detail-label">Date &amp; Time</span>
-            <div class="detail-value">${e(data.formattedDate)} at ${e(data.time)}</div>
+          <div class="detail-item">
+            <span class="detail-label">🗓 Date &amp; Time</span>
+            <div class="detail-val">${e(data.formattedDate)}<br/>at ${e(data.time)}</div>
           </div>
-          <div>
-            <span class="detail-label">Venue</span>
-            <div class="detail-value">${e(data.venue)}</div>
+          <div class="detail-item">
+            <span class="detail-label">📍 Ceremony Venue</span>
+            <div class="detail-val">${e(data.venue)}</div>
           </div>
         </div>
       </div>
+      <div class="gold-divider"></div>
+    </div>
 
-      ${data.message ? `<div class="message">"${e(data.message)}"</div>` : ''}
-
-      ${data.includeRSVP ? `
-      <div class="rsvp">
-        <div class="rsvp-label">RSVP via EventVerse</div>
-      </div>` : ''}
+    <div>
+      ${data.message ? `<div class="message-quote">"${e(data.message)}"</div>` : ''}
+      ${data.includeRSVP ? `<div class="rsvp-badge">RSVP via EventVerse</div>` : ''}
+      <div class="footer-emblem">❦</div>
     </div>
   </div>
 </div>

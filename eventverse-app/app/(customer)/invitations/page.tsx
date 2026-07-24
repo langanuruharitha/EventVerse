@@ -43,28 +43,54 @@ export default async function InvitationsPage() {
           <h2 className="text-2xl font-bold text-[#1F1E1B] flex items-center gap-3">
             <span className="text-[#C5A880]">❦</span> Create New Invitation
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card Invitations */}
             <Link
               href="/invitations/create/card"
-              className="group bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] p-8 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              className="group bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
             >
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-full bg-[#FAF6F0] border border-[#C5A880]/30 flex items-center justify-center text-3xl group-hover:scale-105 transition-transform">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-[#FAF6F0] border border-[#C5A880]/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
                   🎨
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-[#1F1E1B] mb-2 group-hover:text-[#8A1C2C] transition-colors">
-                    Invitation Cards
+                  <h3 className="text-lg font-bold text-[#1F1E1B] mb-1 group-hover:text-[#8A1C2C] transition-colors">
+                    Custom AI Cards
                   </h3>
                   <p className="text-[#1F1E1B]/60 text-xs italic">
-                    Design custom, royal digital invitation cards crafted by AI.
+                    Design custom royal invitation cards with AI background themes.
                   </p>
                 </div>
               </div>
               <div className="mt-6 pt-4 border-t border-[#FAF6F0] flex items-center justify-between text-xs font-bold text-[#8A1C2C] uppercase tracking-wider font-sans">
                 <span className="flex items-center gap-1">
-                  <Plus className="w-4 h-4" /> Create Custom Card
+                  <Plus className="w-4 h-4" /> Create AI Card
+                </span>
+                <span className="group-hover:translate-x-1.5 transition-transform">→</span>
+              </div>
+            </Link>
+
+            {/* 20 Real Cards Gallery */}
+            <Link
+              href="/invitations/templates"
+              className="group bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-[#FAF6F0] border border-[#C5A880]/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                  👑
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-[#1F1E1B] mb-1 group-hover:text-[#8A1C2C] transition-colors">
+                    20 Real Pre-Designed Cards
+                  </h3>
+                  <p className="text-[#1F1E1B]/60 text-xs italic">
+                    Handcrafted royal invitation templates with instant PNG image download.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-[#FAF6F0] flex items-center justify-between text-xs font-bold text-[#8A1C2C] uppercase tracking-wider font-sans">
+                <span className="flex items-center gap-1">
+                  <Download className="w-4 h-4" /> Browse 20 Real Cards
                 </span>
                 <span className="group-hover:translate-x-1.5 transition-transform">→</span>
               </div>
@@ -73,18 +99,18 @@ export default async function InvitationsPage() {
             {/* Video Invitations */}
             <Link
               href="/invitations/create/video"
-              className="group bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] p-8 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              className="group bg-white rounded border border-[#DDD0BB] hover:border-[#8A1C2C] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
             >
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-full bg-[#FAF6F0] border border-[#C5A880]/30 flex items-center justify-center text-3xl group-hover:scale-105 transition-transform">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-[#FAF6F0] border border-[#C5A880]/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
                   🎬
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-[#1F1E1B] mb-2 group-hover:text-[#8A1C2C] transition-colors">
+                  <h3 className="text-lg font-bold text-[#1F1E1B] mb-1 group-hover:text-[#8A1C2C] transition-colors">
                     Video Invitations
                   </h3>
                   <p className="text-[#1F1E1B]/60 text-xs italic">
-                    Compile stunning animated video invitations with your custom media.
+                    Compile animated video invitations with slideshow & music.
                   </p>
                 </div>
               </div>
