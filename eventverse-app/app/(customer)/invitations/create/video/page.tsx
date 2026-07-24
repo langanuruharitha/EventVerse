@@ -49,17 +49,23 @@ function CreateVideoInvitationContent() {
     }
   };
 
-  const generateVideo = async () => {
-    if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
-      toast('Please fill all required fields: Event Name, Host Name, Date, Time and Venue', 'warning');
-      return;
-    }
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
+  const generateVideo = async () => {
     setGenerating(true);
+
+    const payload = {
+      ...formData,
+      eventName: formData.eventName.trim() || 'Grand Celebration',
+      fromName: formData.fromName.trim() || 'Host',
+      date: formData.date.trim() || new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+      time: formData.time.trim() || '18:00',
+      venue: formData.venue.trim() || 'Grand Venue'
+    };
     
     try {
       // Always generate a custom canvas-based video with the custom AI background theme!
-      const videoBlob = await createVideoFromPhotos(formData.photos, formData);
+      const videoBlob = await createVideoFromPhotos(formData.photos, payload);
       const videoUrl = URL.createObjectURL(videoBlob);
       setGeneratedVideo(videoUrl);
       setStep(3);
@@ -681,31 +687,43 @@ function CreateVideoInvitationContent() {
                 {/* Event Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Event Name *
+                    Event Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.eventName}
-                    onChange={(e) => setFormData({ ...formData, eventName: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, eventName: e.target.value });
+                      if (errors.eventName) setErrors(prev => ({ ...prev, eventName: false }));
+                    }}
                     placeholder="e.g., Sarah's 25th Birthday"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                      errors.eventName ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                    }`}
                     required
                   />
+                  {errors.eventName && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Event Name is required</p>}
                 </div>
 
                 {/* From Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    From (Host/Sender Name) *
+                    From (Host/Sender Name) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.fromName}
-                    onChange={(e) => setFormData({ ...formData, fromName: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, fromName: e.target.value });
+                      if (errors.fromName) setErrors(prev => ({ ...prev, fromName: false }));
+                    }}
                     placeholder="e.g., John & Jane"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                      errors.fromName ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                    }`}
                     required
                   />
+                  {errors.fromName && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Host Name is required</p>}
                 </div>
 
                 {/* To Name */}
@@ -726,43 +744,61 @@ function CreateVideoInvitationContent() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Date *
+                      Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
                       value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        setFormData({ ...formData, date: e.target.value });
+                        if (errors.date) setErrors(prev => ({ ...prev, date: false }));
+                      }}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        errors.date ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                      }`}
                       required
                     />
+                    {errors.date && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Date is required</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Time *
+                      Time <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="time"
                       value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        setFormData({ ...formData, time: e.target.value });
+                        if (errors.time) setErrors(prev => ({ ...prev, time: false }));
+                      }}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        errors.time ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                      }`}
                       required
                     />
+                    {errors.time && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Time is required</p>}
                   </div>
                 </div>
 
                 {/* Venue */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Venue *
+                    Venue <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.venue}
-                    onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, venue: e.target.value });
+                      if (errors.venue) setErrors(prev => ({ ...prev, venue: false }));
+                    }}
                     placeholder="e.g., Royal Gardens, Mumbai"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                      errors.venue ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                    }`}
                     required
                   />
+                  {errors.venue && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Venue is required</p>}
                 </div>
 
                 {/* Message */}
@@ -834,15 +870,8 @@ function CreateVideoInvitationContent() {
                   </button>
                   <button
                     onClick={generateVideo}
-                    disabled={
-                      !formData.eventName ||
-                      !formData.fromName ||
-                      !formData.date ||
-                      !formData.time ||
-                      !formData.venue ||
-                      generating
-                    }
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    disabled={generating}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer transition-all"
                   >
                     {generating ? (
                       <>

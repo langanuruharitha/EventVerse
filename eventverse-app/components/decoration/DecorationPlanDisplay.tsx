@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Palette, CheckCircle, Circle, DollarSign, Clock, Sparkles, Download } from 'lucide-react';
+import { downloadSpecSheet } from '@/lib/utils/download-helper';
 
 interface Props {
   plan: any;
@@ -34,6 +35,22 @@ export default function DecorationPlanDisplay({ plan, eventId, onUpdate }: Props
   const totalCost = items.reduce((sum: number, item: any) => sum + (item.estimated_cost || 0), 0);
   const completedItems = items.filter((item: any) => item.status === 'completed').length;
 
+  const handleExportBlueprint = () => {
+    const details: Record<string, any> = {
+      'Plan Name': plan.plan_name,
+      'Budget Range': `₹${plan.budget_range?.toLocaleString('en-IN')}`,
+      'Estimated Total Cost': `₹${totalCost?.toLocaleString('en-IN')}`,
+      'Setup Time': `${plan.setup_time_hours || 0} Hours`,
+      'Total Items': items.length,
+      'Completed Items': `${completedItems} of ${items.length}`,
+      'Selected Colors': plan.selected_colors ? Object.values(plan.selected_colors).join(', ') : 'Default Palette',
+      'Decoration Items Checklist': items.map((i: any) => `[${i.status.toUpperCase()}] ${i.item_name} (${i.category}) - ₹${i.estimated_cost || 0} - ${i.description || ''}`)
+    };
+
+    const filename = `${(plan.plan_name || 'decoration-plan').toLowerCase().replace(/[^a-z0-9]/g, '-')}-blueprint.txt`;
+    downloadSpecSheet(plan.plan_name || 'Decoration Event Plan', 'Theme Plan', details, filename);
+  };
+
   return (
     <div className="space-y-6">
       {/* Plan Header */}
@@ -50,9 +67,12 @@ export default function DecorationPlanDisplay({ plan, eventId, onUpdate }: Props
               )}
             </p>
           </div>
-          <button className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors flex items-center">
+          <button
+            onClick={handleExportBlueprint}
+            className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors flex items-center shadow"
+          >
             <Download className="w-4 h-4 mr-2" />
-            Export PDF
+            Export Blueprint
           </button>
         </div>
 

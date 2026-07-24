@@ -17,13 +17,22 @@ export async function POST(request: NextRequest) {
       themeDescription
     } = body;
 
-    if (!eventName || !fromName || !date || !time || !venue) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    const defaultDateStr = new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0];
+    
+    const finalEventName = (eventName && eventName.trim()) || 'Grand Celebration';
+    const finalFromName = (fromName && fromName.trim()) || 'Host';
+    const finalDate = (date && date.trim()) || defaultDateStr;
+    const finalTime = (time && time.trim()) || '18:00';
+    const finalVenue = (venue && venue.trim()) || 'Grand Venue';
 
-    const formattedDate = new Date(date).toLocaleDateString('en-IN', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+    let formattedDate = finalDate;
+    try {
+      formattedDate = new Date(finalDate).toLocaleDateString('en-IN', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    } catch (e) {
+      formattedDate = finalDate;
+    }
 
     const key = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
@@ -46,12 +55,12 @@ export async function POST(request: NextRequest) {
     console.log('Building HTML card with themeConfig:', themeConfig ? 'Custom AI Theme' : 'Fallback Theme');
     const htmlContent = buildBeautifulCard({
       eventType,
-      eventName,
-      fromName,
+      eventName: finalEventName,
+      fromName: finalFromName,
       toName,
       formattedDate,
-      time,
-      venue,
+      time: finalTime,
+      venue: finalVenue,
       message,
       style: style || 'elegant',
       includeRSVP: !!includeRSVP,

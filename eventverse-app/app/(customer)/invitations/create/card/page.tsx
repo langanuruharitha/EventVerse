@@ -31,20 +31,27 @@ function CreateCardInvitationContent() {
     themeDescription: ''
   });
 
-  const handleGenerate = async () => {
-    if (!formData.eventName || !formData.fromName || !formData.date || !formData.time || !formData.venue) {
-      toast('Please fill all required fields before generating.', 'error');
-      return;
-    }
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
+  const handleGenerate = async () => {
     setGenerating(true);
+
+    // Provide smart defaults if user didn't fill specific fields
+    const payload = {
+      ...formData,
+      eventName: formData.eventName.trim() || 'Grand Celebration',
+      fromName: formData.fromName.trim() || 'Host',
+      date: formData.date.trim() || new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+      time: formData.time.trim() || '18:00',
+      venue: formData.venue.trim() || 'Grand Venue'
+    };
 
     try {
       // Call AI to generate invitation card with AI-generated background
       const response = await fetch('/api/invitations/generate-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
@@ -65,25 +72,24 @@ function CreateCardInvitationContent() {
     }
   };
 
-  // Download invitation as PNG image using html2canvas
+  // Download invitation as PNG image using html2canvas (PNG ONLY, no HTML)
   const downloadAsImage = async () => {
     if (!generatedCard) return;
     setDownloadingPng(true);
-    toast('Preparing your PNG download...', 'info');
+    toast('Preparing your PNG image download...', 'info');
     try {
       // Load html2canvas dynamically
       const html2canvas = (await import('html2canvas')).default;
-      // Create a hidden iframe to render the HTML
       const tempDiv = document.createElement('div');
       tempDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:800px;height:1100px;overflow:hidden;z-index:-1;';
       tempDiv.innerHTML = generatedCard;
       document.body.appendChild(tempDiv);
-      await new Promise(r => setTimeout(r, 600)); // wait for render
+      await new Promise(r => setTimeout(r, 800)); // wait for font & render
       const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         width: 800,
         height: 1100,
       });
@@ -91,18 +97,13 @@ function CreateCardInvitationContent() {
       const url = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = url;
-      link.download = `invitation-${formData.eventName || 'card'}.png`;
+      const filename = (formData.eventName || 'invitation-card').toLowerCase().replace(/[^a-z0-9]/g, '-');
+      link.download = `${filename}.png`;
       link.click();
-      toast('📥 Invitation card downloaded as PNG!', 'success');
+      toast('📥 Invitation card downloaded as PNG image!', 'success');
     } catch (err) {
       console.error('PNG download failed:', err);
-      toast('PNG download failed. Downloading as HTML instead.', 'error');
-      // Fallback to HTML download
-      const blob = new Blob([generatedCard], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'invitation-card.html'; a.click();
-      URL.revokeObjectURL(url);
+      toast('PNG image download failed. Please try clicking download again.', 'error');
     } finally {
       setDownloadingPng(false);
     }
@@ -167,31 +168,43 @@ function CreateCardInvitationContent() {
               {/* Event Name */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Event Name *
+                  Event Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.eventName}
-                  onChange={(e) => setFormData({ ...formData, eventName: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, eventName: e.target.value });
+                    if (errors.eventName) setErrors(prev => ({ ...prev, eventName: false }));
+                  }}
                   placeholder="e.g., Sarah's 25th Birthday Party"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    errors.eventName ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                  }`}
                   required
                 />
+                {errors.eventName && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Event Name is required</p>}
               </div>
 
               {/* From Name */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  From (Host Name) *
+                  From (Host Name) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.fromName}
-                  onChange={(e) => setFormData({ ...formData, fromName: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, fromName: e.target.value });
+                    if (errors.fromName) setErrors(prev => ({ ...prev, fromName: false }));
+                  }}
                   placeholder="e.g., John & Jane Smith"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    errors.fromName ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                  }`}
                   required
                 />
+                {errors.fromName && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Host Name is required</p>}
               </div>
 
               {/* To Name */}
@@ -212,43 +225,61 @@ function CreateCardInvitationContent() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Date *
+                    Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
                     value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    onChange={(e) => {
+                      setFormData({ ...formData, date: e.target.value });
+                      if (errors.date) setErrors(prev => ({ ...prev, date: false }));
+                    }}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                      errors.date ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                    }`}
                     required
                   />
+                  {errors.date && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Date is required</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Time *
+                    Time <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="time"
                     value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    onChange={(e) => {
+                      setFormData({ ...formData, time: e.target.value });
+                      if (errors.time) setErrors(prev => ({ ...prev, time: false }));
+                    }}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                      errors.time ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                    }`}
                     required
                   />
+                  {errors.time && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Time is required</p>}
                 </div>
               </div>
 
               {/* Venue */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Venue *
+                  Venue <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.venue}
-                  onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, venue: e.target.value });
+                    if (errors.venue) setErrors(prev => ({ ...prev, venue: false }));
+                  }}
                   placeholder="e.g., Royal Gardens, Mumbai"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    errors.venue ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20' : 'border-gray-300'
+                  }`}
                   required
                 />
+                {errors.venue && <p className="text-xs text-red-600 mt-1 font-sans">⚠️ Venue is required</p>}
               </div>
 
               {/* Message */}
@@ -281,8 +312,6 @@ function CreateCardInvitationContent() {
                   💡 Be specific! AI will create unique content, design, and wording based on your description. Don't just repeat basic info - describe the style, mood, and creativity you want!
                 </p>
               </div>
-
-
 
               {/* Style */}
               <div>
@@ -324,15 +353,8 @@ function CreateCardInvitationContent() {
               <div className="pt-6">
                 <button
                   onClick={handleGenerate}
-                  disabled={
-                    !formData.eventName ||
-                    !formData.fromName ||
-                    !formData.date ||
-                    !formData.time ||
-                    !formData.venue ||
-                    generating
-                  }
-                  className="w-full py-3.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-sans"
+                  disabled={generating}
+                  className="w-full py-3.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-sans transition-all cursor-pointer"
                 >
                   {generating ? (
                     <>
@@ -388,38 +410,21 @@ function CreateCardInvitationContent() {
             <div className="flex flex-wrap gap-3 font-sans text-xs">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 py-3 border border-[#DDD0BB] text-[#7A6652] font-semibold rounded hover:bg-[#FAF6F0] transition"
+                className="flex-1 py-3.5 border border-[#DDD0BB] text-[#7A6652] font-semibold rounded hover:bg-[#FAF6F0] transition"
               >
-                Edit Details
+                ✏️ Edit Details
               </button>
               <button
                 onClick={downloadAsImage}
                 disabled={downloadingPng}
-                className="flex-1 py-3 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:shadow transition disabled:opacity-60"
+                className="flex-2 py-3.5 bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:shadow-lg transition disabled:opacity-60 cursor-pointer text-sm"
               >
-                {downloadingPng ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileImage className="w-4 h-4" />}
-                {downloadingPng ? 'Creating PNG...' : 'Download as PNG'}
-              </button>
-              <button
-                onClick={() => {
-                  if (!generatedCard) return;
-                  const blob = new Blob([generatedCard], { type: 'text/html;charset=utf-8' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'invitation-card.html';
-                  a.click();
-                  URL.revokeObjectURL(url);
-                  toast('📄 Invitation downloaded as HTML!', 'success');
-                }}
-                className="flex-1 py-3 border border-[#8A1C2C] text-[#8A1C2C] font-bold rounded flex items-center justify-center gap-2 uppercase tracking-wider hover:bg-[#FAF6F0] transition"
-              >
-                <Download className="w-4 h-4" />
-                Download HTML
+                {downloadingPng ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileImage className="w-5 h-5" />}
+                {downloadingPng ? 'Generating PNG Image...' : '📥 Download Invitation Card (PNG Image)'}
               </button>
               <button
                 onClick={() => router.push('/invitations')}
-                className="flex-1 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800 uppercase tracking-wider transition"
+                className="flex-1 py-3.5 bg-green-700 text-white font-bold rounded hover:bg-green-800 uppercase tracking-wider transition cursor-pointer"
               >
                 Done
               </button>
