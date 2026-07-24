@@ -109,11 +109,21 @@ export async function POST(request: NextRequest) {
       console.warn('Failed to log activity:', logError);
     }
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       message: 'Login successful',
       admin,
       session: authData.session,
     });
+
+    res.cookies.set('admin_authenticated', 'true', {
+      path: '/',
+      httpOnly: false, // Accessible to clientJS
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return res;
   } catch (error: any) {
     console.error('Admin login error:', error);
     return NextResponse.json(

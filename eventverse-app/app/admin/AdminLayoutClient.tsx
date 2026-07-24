@@ -21,8 +21,9 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   const router = useRouter();
   const [admin, setAdmin] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // Skip sidebar on standalone auth pages
+  // Skip auth enforcement on standalone login/reset/setup pages
   const isAuthPage =
     pathname === '/admin/login' ||
     pathname === '/admin/forgot-password' ||
@@ -31,13 +32,35 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     pathname === '/admin/setup';
 
   useEffect(() => {
-    async function fetchUser() {
+    if (isAuthPage) {
+      setCheckingAuth(false);
+      return;
+    }
+
+    async function checkAdminAuth() {
+      setCheckingAuth(true);
       try {
         const { createBrowserClient } = await import('@/lib/supabase/client');
         const supabase = createBrowserClient();
         const { data: { user } } = await supabase.auth.getUser();
 
+        // Also check admin_authenticated cookie
+        const hasAdminCookie = document.cookie.includes('admin_authenticated=true');
+
+        if (!user && !hasAdminCookie) {
+          console.warn('Unauthorized access to admin panel. Redirecting to /admin/login');
+          router.replace('/admin/login');
+          return;
+        }
+
         if (user) {
+          // Check if user is registered in admin_users table or is an admin email
+          const { data: adminRecord } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
           const { data: profile } = await supabase
             .from('user_profiles')
             .select('full_name')
@@ -45,26 +68,37 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
             .single();
 
           const displayName =
+            adminRecord?.full_name ||
             profile?.full_name ||
             user.email?.split('@')[0]?.replace(/[._-]/g, ' ') ||
-            'Admin';
+            'System Admin';
 
           setAdmin({
             email: user.email,
             full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
-            role: 'Admin',
+            role: adminRecord?.role || 'Super Admin',
+          });
+        } else if (hasAdminCookie) {
+          setAdmin({
+            email: 'admin@eventverse.com',
+            full_name: 'System Admin',
+            role: 'Super Admin',
           });
         } else {
-          setAdmin({ email: 'admin@eventverse.com', full_name: 'System Admin', role: 'Super Admin' });
+          router.replace('/admin/login');
+          return;
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
-        setAdmin({ email: 'admin@eventverse.com', full_name: 'System Admin', role: 'Super Admin' });
+        console.error('Error verifying admin authentication:', error);
+        router.replace('/admin/login');
+        return;
+      } finally {
+        setCheckingAuth(false);
       }
     }
 
-    fetchUser();
-  }, []);
+    checkAdminAuth();
+  }, [pathname, isAuthPage, router]);
 
   const handleSignOut = async () => {
     try {
@@ -74,11 +108,29 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     } catch (error) {
       console.error('Error signing out:', error);
     }
-    router.push('/admin/login');
+    document.cookie = 'admin_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    setAdmin(null);
+    router.replace('/admin/login');
   };
 
   if (isAuthPage) {
     return <>{children}</>;
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-[#1F1E1B] flex flex-col items-center justify-center font-serif text-[#FAF0E0] p-4">
+        <div className="text-center space-y-3 max-w-sm bg-[#2C1810] border-2 border-double border-[#C5A880] p-8 rounded shadow-2xl">
+          <div className="animate-spin text-4xl text-[#C5A880]">⚜</div>
+          <h2 className="text-base font-bold tracking-wide">Authenticating Admin Access...</h2>
+          <p className="text-xs text-[#C5A880] font-sans italic">Verifying credentials for Admin Command Center</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!admin) {
+    return null;
   }
 
   const SidebarContent = () => (

@@ -60,8 +60,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/signin', request.url));
   }
 
-  // /admin routes — block unauthenticated users, allow the rest through.
-  // Role verification (admin_users table) is done in app/admin/layout.tsx.
+  // /admin routes — block unauthenticated users from admin dashboard
   const adminPublicPaths = [
     '/admin/login',
     '/admin/debug',
@@ -70,8 +69,11 @@ export async function middleware(request: NextRequest) {
     '/admin/reset-password',
   ];
   const isAdminPublicPath = adminPublicPaths.some((p) => pathname.startsWith(p));
-  if (pathname.startsWith('/admin') && !isAdminPublicPath && !user) {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+  if (pathname.startsWith('/admin') && !isAdminPublicPath) {
+    const hasAdminCookie = request.cookies.has('admin_authenticated');
+    if (!user && !hasAdminCookie) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
   }
 
   // /vendor routes — block unauthenticated users, allow the rest through.
