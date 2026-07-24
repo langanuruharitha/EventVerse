@@ -123,6 +123,45 @@ export default async function EventDetailPage({
           ))}
         </div>
 
+        {/* Dual-Portal Innovative Features Banner Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link
+            href={`/events/${event.id}/workspace`}
+            className="group bg-gradient-to-r from-[#2C1810] to-[#1F0A05] text-[#FAF0E0] border-2 border-double border-[#C5A880] p-6 rounded-xl shadow-md hover:shadow-xl transition-all flex items-center justify-between"
+          >
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded bg-[#C5A880]/20 text-[#C5A880] text-[10px] font-bold uppercase tracking-widest font-sans">
+                🤝 Collaborative Feature
+              </span>
+              <h3 className="text-lg font-bold font-serif text-[#FFD700] group-hover:text-white transition">
+                Shared Workspace & Live Run-Sheet
+              </h3>
+              <p className="text-xs text-[#FAF0E0]/80 italic">
+                Minute-by-minute live schedule, vendor item approvals & digital e-sign contracts.
+              </p>
+            </div>
+            <span className="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+          </Link>
+
+          <Link
+            href={`/events/${event.id}/payments`}
+            className="group bg-gradient-to-r from-[#8A1C2C] to-[#6B1522] text-[#FAF0E0] border-2 border-double border-[#FFD700]/50 p-6 rounded-xl shadow-md hover:shadow-xl transition-all flex items-center justify-between"
+          >
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded bg-[#FFD700]/20 text-[#FFD700] text-[10px] font-bold uppercase tracking-widest font-sans">
+                🛡️ Payment Security
+              </span>
+              <h3 className="text-lg font-bold font-serif text-white group-hover:text-[#FFD700] transition">
+                Milestone Escrow Payment Tracker
+              </h3>
+              <p className="text-xs text-[#FAF0E0]/80 italic">
+                3-Stage milestone funds release, 100% buyer protection & PDF receipts.
+              </p>
+            </div>
+            <span className="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+          </Link>
+        </div>
+
         {/* Budget Breakdown */}
         {event.ai_blueprint?.budgetBreakdown && event.ai_blueprint.budgetBreakdown.length > 0 && (
           <div className="bg-white rounded border border-[#DDD0BB] shadow-sm overflow-hidden">

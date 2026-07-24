@@ -222,11 +222,19 @@ export default function VendorBookingsPage() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-sm text-gray-500">Status:</span>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${statusColors[selected.status]} capitalize`}>
-                  {selected.status}
-                </span>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Status:</span>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${statusColors[selected.status]} capitalize`}>
+                    {selected.status}
+                  </span>
+                </div>
+                <a
+                  href={`/vendor/bookings/${selected.id}/workspace`}
+                  className="px-3 py-1.5 bg-[#8A1C2C] text-[#FAF0E0] text-xs font-bold uppercase tracking-wider rounded font-sans hover:bg-[#6B1522] transition flex items-center gap-1 text-decoration-none"
+                >
+                  🤝 Execution Workspace
+                </a>
               </div>
 
               {/* Actions */}
