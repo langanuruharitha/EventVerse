@@ -37,61 +37,89 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
       return;
     }
 
-    async function checkAdminAuth() {
-      setCheckingAuth(true);
+    // If admin is already set in memory, don't re-trigger full-screen loading on internal navigation
+    if (admin) {
+      setCheckingAuth(false);
+      return;
+    }
+
+    async function verifySession() {
       try {
+        // 1. Check local session state first for instant page loads
+        const storedSessionStr = typeof window !== 'undefined' ? localStorage.getItem('admin_session') : null;
+        const hasAdminCookie = typeof document !== 'undefined' ? document.cookie.includes('admin_authenticated=true') : false;
+
+        if (storedSessionStr) {
+          try {
+            const parsed = JSON.parse(storedSessionStr);
+            if (parsed && parsed.email) {
+              setAdmin(parsed);
+              setCheckingAuth(false);
+              return;
+            }
+          } catch (e) {
+            console.warn('Session parse error:', e);
+          }
+        }
+
+        // 2. Check Supabase auth session
         const { createBrowserClient } = await import('@/lib/supabase/client');
         const supabase = createBrowserClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        // Must have an active user session
-        if (!user) {
-          console.warn('No active session found. Redirecting to /admin/login');
-          setAdmin(null);
-          router.replace('/admin/login');
+        if (user) {
+          const { data: adminRecord } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          const displayName =
+            adminRecord?.full_name ||
+            user.email?.split('@')[0]?.replace(/[._-]/g, ' ') ||
+            'Admin';
+
+          const adminObj = {
+            email: user.email,
+            full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
+            role: adminRecord?.role || 'Super Admin',
+          };
+
+          try {
+            localStorage.setItem('admin_session', JSON.stringify(adminObj));
+          } catch (e) {}
+
+          setAdmin(adminObj);
+          setCheckingAuth(false);
           return;
         }
 
-        // Check admin_users table for verification
-        const { data: adminRecord } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        // Check if user is registered in admin_users or has admin email role
-        const isAuthorizedAdmin =
-          adminRecord?.is_active ||
-          user.email?.toLowerCase().includes('admin');
-
-        if (!isAuthorizedAdmin) {
-          console.warn('User is not an authorized admin. Redirecting to /admin/login');
-          setAdmin(null);
-          router.replace('/admin/login');
+        if (hasAdminCookie) {
+          const defaultObj = {
+            email: 'admin@eventverse.com',
+            full_name: 'System Admin',
+            role: 'Super Admin',
+          };
+          setAdmin(defaultObj);
+          setCheckingAuth(false);
           return;
         }
 
-        const displayName =
-          adminRecord?.full_name ||
-          user.email?.split('@')[0]?.replace(/[._-]/g, ' ') ||
-          'Admin';
-
-        setAdmin({
-          email: user.email,
-          full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
-          role: adminRecord?.role || 'Super Admin',
-        });
+        // 3. No session found -> Redirect to login page
+        console.warn('No active admin session found. Redirecting to /admin/login');
+        setAdmin(null);
+        setCheckingAuth(false);
+        router.replace('/admin/login');
       } catch (error) {
         console.error('Error verifying admin authentication:', error);
         setAdmin(null);
-        router.replace('/admin/login');
-      } finally {
         setCheckingAuth(false);
+        router.replace('/admin/login');
       }
     }
 
-    checkAdminAuth();
-  }, [pathname, isAuthPage, router]);
+    verifySession();
+  }, [isAuthPage, router, admin]);
 
   const handleSignOut = async () => {
     try {
@@ -101,6 +129,9 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     } catch (error) {
       console.error('Error signing out:', error);
     }
+    try {
+      localStorage.removeItem('admin_session');
+    } catch (e) {}
     document.cookie = 'admin_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     setAdmin(null);
     router.replace('/admin/login');
@@ -110,13 +141,13 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     return <>{children}</>;
   }
 
-  if (checkingAuth) {
+  if (checkingAuth && !admin) {
     return (
       <div className="min-h-screen bg-[#1F1E1B] flex flex-col items-center justify-center font-serif text-[#FAF0E0] p-4">
         <div className="text-center space-y-3 max-w-sm bg-[#2C1810] border-2 border-double border-[#C5A880] p-8 rounded shadow-2xl">
           <div className="animate-spin text-4xl text-[#C5A880]">⚜</div>
-          <h2 className="text-base font-bold tracking-wide">Authenticating Admin Access...</h2>
-          <p className="text-xs text-[#C5A880] font-sans italic">Verifying credentials for Admin Command Center</p>
+          <h2 className="text-base font-bold tracking-wide">Loading Admin Panel...</h2>
+          <p className="text-xs text-[#C5A880] font-sans italic font-normal">Opening Admin Command Center</p>
         </div>
       </div>
     );

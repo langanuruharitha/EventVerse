@@ -28,6 +28,17 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (response.ok) {
+        const adminObj = data.admin || {
+          email: email,
+          full_name: email.split('@')[0].replace(/[._-]/g, ' '),
+          role: 'Super Admin'
+        };
+        try {
+          localStorage.setItem('admin_session', JSON.stringify(adminObj));
+          document.cookie = 'admin_authenticated=true; path=/; max-age=604800';
+        } catch (e) {
+          console.warn('Storage notice:', e);
+        }
         router.push('/admin/dashboard');
       } else {
         const errorMsg = data.error || 'Login failed';
