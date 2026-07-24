@@ -44,54 +44,47 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         const supabase = createBrowserClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        // Also check admin_authenticated cookie
-        const hasAdminCookie = document.cookie.includes('admin_authenticated=true');
-
-        if (!user && !hasAdminCookie) {
-          console.warn('Unauthorized access to admin panel. Redirecting to /admin/login');
+        // Must have an active user session
+        if (!user) {
+          console.warn('No active session found. Redirecting to /admin/login');
+          setAdmin(null);
           router.replace('/admin/login');
           return;
         }
 
-        if (user) {
-          // Check if user is registered in admin_users table or is an admin email
-          const { data: adminRecord } = await supabase
-            .from('admin_users')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
+        // Check admin_users table for verification
+        const { data: adminRecord } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('full_name')
-            .eq('user_id', user.id)
-            .single();
+        // Check if user is registered in admin_users or has admin email role
+        const isAuthorizedAdmin =
+          adminRecord?.is_active ||
+          user.email?.toLowerCase().includes('admin');
 
-          const displayName =
-            adminRecord?.full_name ||
-            profile?.full_name ||
-            user.email?.split('@')[0]?.replace(/[._-]/g, ' ') ||
-            'System Admin';
-
-          setAdmin({
-            email: user.email,
-            full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
-            role: adminRecord?.role || 'Super Admin',
-          });
-        } else if (hasAdminCookie) {
-          setAdmin({
-            email: 'admin@eventverse.com',
-            full_name: 'System Admin',
-            role: 'Super Admin',
-          });
-        } else {
+        if (!isAuthorizedAdmin) {
+          console.warn('User is not an authorized admin. Redirecting to /admin/login');
+          setAdmin(null);
           router.replace('/admin/login');
           return;
         }
+
+        const displayName =
+          adminRecord?.full_name ||
+          user.email?.split('@')[0]?.replace(/[._-]/g, ' ') ||
+          'Admin';
+
+        setAdmin({
+          email: user.email,
+          full_name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
+          role: adminRecord?.role || 'Super Admin',
+        });
       } catch (error) {
         console.error('Error verifying admin authentication:', error);
+        setAdmin(null);
         router.replace('/admin/login');
-        return;
       } finally {
         setCheckingAuth(false);
       }
