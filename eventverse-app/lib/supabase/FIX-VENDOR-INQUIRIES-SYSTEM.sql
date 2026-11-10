@@ -84,3 +84,4 @@ DO $$
 BEGIN
   RAISE NOTICE '✅ vendor_inquiries table and RLS policies configured successfully!';
 END $$;
+
