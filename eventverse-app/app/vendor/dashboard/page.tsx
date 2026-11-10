@@ -151,6 +151,29 @@ export default function VendorDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Quick Command Actions */}
+      <div className="bg-white border border-[#DDD0BB] rounded shadow-sm p-6">
+        <h2 className="text-base font-bold text-[#2C1810] border-b border-[#FAF6F0] pb-3 mb-4">Quick Command Actions</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 font-sans">
+          {[
+            { label: 'Customer Inquiries', icon: '💬', href: '/vendor/inquiries' },
+            { label: 'Add Service', icon: '➕', href: '/vendor/services' },
+            { label: 'View Bookings', icon: '📅', href: '/vendor/bookings' },
+            { label: 'Growth Analytics', icon: '📈', href: '/vendor/analytics' },
+            { label: 'Check Earnings', icon: '💰', href: '/vendor/earnings' },
+          ].map((action) => (
+            <Link
+              key={action.label}
+              href={action.href}
+              className="flex flex-col items-center justify-center gap-2 p-3.5 rounded border border-[#DDD0BB] bg-[#FAF6F0] hover:bg-[#FAF0E0] hover:border-[#C5A880] transition text-center"
+            >
+              <span className="text-xl">{action.icon}</span>
+              <span className="text-xs font-bold text-[#2C1810]">{action.label}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

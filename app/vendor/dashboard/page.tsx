@@ -157,9 +157,10 @@ export default function VendorDashboardPage() {
       {/* Quick Actions */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {[
-            { label: 'Add Service', icon: '➕', href: '/vendor/services', color: 'from-orange-500 to-amber-500' },
+            { label: 'Inquiries', icon: '💬', href: '/vendor/inquiries', color: 'from-orange-500 to-amber-500' },
+            { label: 'Add Service', icon: '➕', href: '/vendor/services', color: 'from-amber-500 to-yellow-500' },
             { label: 'View Bookings', icon: '📅', href: '/vendor/bookings', color: 'from-blue-500 to-indigo-500' },
             { label: 'Check Earnings', icon: '💰', href: '/vendor/earnings', color: 'from-green-500 to-emerald-500' },
             { label: 'Edit Profile', icon: '✏️', href: '/vendor/profile', color: 'from-purple-500 to-pink-500' },
